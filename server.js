@@ -132,13 +132,17 @@ app.post('/delete_license', async (req, res) => {
 
 
 // Proxy route for CORS bypass
+// FIX: frontend bhejta hai "_target" field, isliye dono "url" aur "_target" accept karte hain
 app.post('/proxy', async (req, res) => {
-  const { url, params } = req.body || {};
-  if (!url) return res.json({ error: 'No URL provided' });
+  const { url, params, _target, key, action, ...rest } = req.body || {};
+  const targetUrl = url || _target; // <-- ab "_target" bhi chal jayega
+  if (!targetUrl) return res.json({ error: 'No URL provided' });
   try {
     const fetch = (await import('node-fetch')).default;
-    const body = new URLSearchParams(params || {});
-    const response = await fetch(url, {
+    // agar "params" object nahi bheja gaya, to baaki saare fields (key, action, etc.) ko forward karo
+    const forwardParams = params || { key, action, ...rest };
+    const body = new URLSearchParams(forwardParams);
+    const response = await fetch(targetUrl, {
       method: 'POST',
       body,
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
