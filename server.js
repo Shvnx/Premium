@@ -1,89 +1,68 @@
 const express = require('express');
 const cors = require('cors');
-const axios = require('axios');
-const cron = require('node-cron');
+const mysql = require('mysql2/promise');
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-// ── In-memory store ──
-let schedules = [];
-let licenses = {
-  "SPIDEY-1234-ABCD": { expires_at: "2099-12-31", active: true },
-  "SPIDEY-5678-EFGH": { expires_at: "2099-12-31", active: true }
+const dbConfig = {
+  host: 'sql306.byetcluster.com',
+  user: 'if0_42250740',
+  password: 'Shovan7131',
+  database: 'if0_42250740_licenses'
 };
 
-// ── License verify ──
-app.post('/check_license.php', (req, res) => {
-  const { action, key } = req.body;
-  if (action === 'verify') {
-    const lic = licenses[key];
-    if (lic && lic.active) {
-      res.json({ valid: true, expires_at: lic.expires_at });
-    } else {
-      res.json({ valid: false, reason: 'Invalid or expired key' });
-    }
-  }
-});
+function getClientIP(req) {
+  return req.headers['cf-connecting-ip']
+    || (req.headers['x-forwarded-for'] || '').split(',')[0].trim()
+    || req.socket.remoteAddress
+    || '0.0.0.0';
+}
 
-// ── SMM API proxy ──
-app.post('/api/smm', async (req, res) => {
-  try {
-    const response = await axios.post(req.body.apiUrl, new URLSearchParams({
-      key: req.body.apiKey,
-      ...req.body.params
-    }));
-    res.json(response.data);
-  } catch (e) {
-    res.json({ error: e.message });
-  }
-});
-
-// ── Schedule run ──
-app.post('/api/schedule/add', (req, res) => {
-  const s = req.body;
-  s.id = Date.now();
-  s.currentLeg = 0;
-  s.active = true;
-  s.nextRun = Date.now() + (s.intervalMs || 3600000);
-  schedules.push(s);
-  res.json({ success: true, id: s.id });
-});
-
-app.get('/api/schedule/list', (req, res) => {
-  res.json(schedules);
-});
-
-app.post('/api/schedule/delete', (req, res) => {
-  schedules = schedules.filter(s => s.id != req.body.id);
-  res.json({ success: true });
-});
-
-// ── Cron: every minute check schedules ──
-cron.schedule('* * * * *', async () => {
-  const now = Date.now();
-  for (const s of schedules) {
-    if (!s.active || now < s.nextRun) continue;
-    if (s.currentLeg >= s.totalLegs) { s.active = false; continue; }
-    try {
-      await axios.post(s.apiUrl, new URLSearchParams({
-        key: s.apiKey,
-        action: 'add',
-        service: s.serviceId,
-        link: s.link,
-        quantity: s.quantity
-      }));
-      s.currentLeg++;
-      s.nextRun = now + (s.intervalMs || 3600000);
-    } catch(e) {
-      console.log('Order error:', e.message);
-    }
-  }
-});
-
-// ── Keep alive ──
 app.get('/', (req, res) => res.send('SPIDEY Backend Running ✅'));
 
+app.post('/check_license.php', async (req, res) => {
+  const { action, key } = req.body || {};
+  const keyCode = (key || '').trim();
+  const clientIP = getClientIP(req);
+
+  if (action !== 'verify') return res.json({ valid: false, reason: 'Unknown action' });
+  if (!keyCode) return res.json({ valid: false, reason: 'No key provided' });
+
+  let conn;
+  try {
+    conn = await mysql.createConnection(dbConfig);
+    const [rows] = await conn.execute('SELECT * FROM licenses WHERE key_code = ?', [keyCode]);
+
+    if (!rows.length) return res.json({ valid: false, reason: 'Invalid key' });
+
+    const row = rows[0];
+
+    if (!row.is_active) return res.json({ valid: false, reason: 'Key revoked' });
+
+    if (!row.activated_at) {
+      const expiresAt = new Date(Date.now() + row.duration_minutes * 60 * 1000)
+        .toISOString().slice(0, 19).replace('T', ' ');
+      await conn.execute(
+        'UPDATE licenses SET activated_at = NOW(), expires_at = ?, bound_ip = ? WHERE id = ?',
+        [expiresAt, clientIP, row.id]
+      );
+      return res.json({ valid: true, expires_at: expiresAt, message: 'Activated successfully' });
+    }
+
+    if (row.bound_ip !== clientIP) return res.json({ valid: false, reason: 'This key is locked to another device/IP' });
+    if (new Date(row.expires_at) < new Date()) return res.json({ valid: false, reason: 'Key expired' });
+
+    return res.json({ valid: true, expires_at: row.expires_at, message: 'Valid' });
+
+  } catch (e) {
+    console.error('DB Error:', e.message);
+    return res.json({ valid: false, reason: 'Server error: ' + e.message });
+  } finally {
+    if (conn) await conn.end();
+  }
+});
+
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log('Server running on port', PORT));
+app.listen(PORT, () => console.log('SPIDEY backend running on port', PORT));
