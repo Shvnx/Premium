@@ -129,6 +129,27 @@ app.post('/delete_license', async (req, res) => {
   }
 });
 
+
+// Proxy route for CORS bypass
+app.post('/proxy', async (req, res) => {
+  const { url, params } = req.body || {};
+  if (!url) return res.json({ error: 'No URL provided' });
+  try {
+    const fetch = (await import('node-fetch')).default;
+    const body = new URLSearchParams(params || {});
+    const response = await fetch(url, {
+      method: 'POST',
+      body,
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      signal: AbortSignal.timeout(15000)
+    });
+    const text = await response.text();
+    try { res.json(JSON.parse(text)); } catch { res.send(text); }
+  } catch(e) {
+    res.json({ error: 'Proxy error: ' + e.message });
+  }
+});
+
 initDB();
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log('SPIDEY backend running on port', PORT));
