@@ -34,7 +34,7 @@ async function initDB() {
         activated_at DATETIME DEFAULT NULL,
         expires_at DATETIME DEFAULT NULL,
         bound_ip VARCHAR(100) DEFAULT NULL,
-        created_at DATETIME DEFAULT NOW()
+        created_at DATETIME DEFAULT NULL
       )
     `);
     console.log('✅ DB connected & table ready');
