@@ -20,7 +20,6 @@ function getClientIP(req) {
     || '0.0.0.0';
 }
 
-// Auto-create table if not exists
 async function initDB() {
   let conn;
   try {
@@ -33,8 +32,7 @@ async function initDB() {
         duration_minutes INT DEFAULT 43200,
         activated_at DATETIME DEFAULT NULL,
         expires_at DATETIME DEFAULT NULL,
-        bound_ip VARCHAR(100) DEFAULT NULL,
-        created_at DATETIME DEFAULT NULL
+        bound_ip VARCHAR(100) DEFAULT NULL
       )
     `);
     console.log('✅ DB connected & table ready');
@@ -74,7 +72,7 @@ app.post('/check_license.php', async (req, res) => {
       return res.json({ valid: true, expires_at: expiresAt, message: 'Activated successfully' });
     }
 
-    if (row.bound_ip !== clientIP) return res.json({ valid: false, reason: 'This key is locked to another device/IP' });
+    if (row.bound_ip !== clientIP) return res.json({ valid: false, reason: 'IP locked to another device' });
     if (new Date(row.expires_at) < new Date()) return res.json({ valid: false, reason: 'Key expired' });
 
     return res.json({ valid: true, expires_at: row.expires_at, message: 'Valid' });
@@ -86,7 +84,6 @@ app.post('/check_license.php', async (req, res) => {
   }
 });
 
-// Add license key (admin route)
 app.post('/add_license', async (req, res) => {
   const { key, duration_minutes, admin_secret } = req.body || {};
   if (admin_secret !== 'spidey_admin_2024') return res.json({ success: false, reason: 'Unauthorized' });
