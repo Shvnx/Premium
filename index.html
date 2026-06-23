@@ -261,11 +261,27 @@ function switchTab(tab) {
 
 async function callApi(params) {
   const body = new URLSearchParams({ key: apiKey, ...params });
-  try {
-    const res = await fetch(apiUrl, { method: 'POST', body });
-    return await res.json();
-  } catch(e) {
-    return { error: 'Network error: ' + e.message };
+  const proxies = [
+    { type: "direct" },
+    { type: "proxy", url: "https://corsproxy.io/?" },
+    { type: "proxy", url: "https://api.allorigins.win/raw?url=" }
+  ];
+  for (let i = 0; i < proxies.length; i++) {
+    try {
+      let res;
+      if (proxies[i].type === "direct") {
+        res = await fetch(apiUrl, { method: "POST", body });
+      } else {
+        const fullUrl = proxies[i].url + encodeURIComponent(apiUrl + "?" + body.toString());
+        res = await fetch(fullUrl);
+      }
+      const text = await res.text();
+      try { return JSON.parse(text); }
+      catch(e) { if (i < proxies.length-1) continue; return { error: "Bad response: " + text.slice(0,100) }; }
+    } catch(e) {
+      if (i < proxies.length-1) continue;
+      return { error: "Network error: " + e.message };
+    }
   }
 }
 
