@@ -4,6 +4,7 @@ const mysql = require('mysql2/promise');
 const app = express();
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true })); // <-- Bas yeh line extra jodhni hai
 
 const dbConfig = {
   host: 'sql12.freesqldatabase.com',
