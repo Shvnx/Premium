@@ -1,16 +1,16 @@
 const express = require('express');
 const cors = require('cors');
 const mysql = require('mysql2/promise');
-
 const app = express();
 app.use(cors());
 app.use(express.json());
 
 const dbConfig = {
-  host: 'sql306.byetcluster.com',
-  user: 'if0_42250740',
-  password: 'Shovan7131',
-  database: 'if0_42250740_licenses'
+  host: 'sql12.freesqldatabase.com',
+  user: 'sql12831389',
+  password: 'D8QfVPcSJD',
+  database: 'sql12831389',
+  port: 3306
 };
 
 function getClientIP(req) {
@@ -18,6 +18,31 @@ function getClientIP(req) {
     || (req.headers['x-forwarded-for'] || '').split(',')[0].trim()
     || req.socket.remoteAddress
     || '0.0.0.0';
+}
+
+// Auto-create table if not exists
+async function initDB() {
+  let conn;
+  try {
+    conn = await mysql.createConnection(dbConfig);
+    await conn.execute(`
+      CREATE TABLE IF NOT EXISTS licenses (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        key_code VARCHAR(255) NOT NULL UNIQUE,
+        is_active TINYINT(1) DEFAULT 1,
+        duration_minutes INT DEFAULT 43200,
+        activated_at DATETIME DEFAULT NULL,
+        expires_at DATETIME DEFAULT NULL,
+        bound_ip VARCHAR(100) DEFAULT NULL,
+        created_at DATETIME DEFAULT NOW()
+      )
+    `);
+    console.log('✅ DB connected & table ready');
+  } catch(e) {
+    console.error('❌ DB init error:', e.message);
+  } finally {
+    if (conn) await conn.end();
+  }
 }
 
 app.get('/', (req, res) => res.send('SPIDEY Backend Running ✅'));
@@ -34,11 +59,9 @@ app.post('/check_license.php', async (req, res) => {
   try {
     conn = await mysql.createConnection(dbConfig);
     const [rows] = await conn.execute('SELECT * FROM licenses WHERE key_code = ?', [keyCode]);
-
     if (!rows.length) return res.json({ valid: false, reason: 'Invalid key' });
 
     const row = rows[0];
-
     if (!row.is_active) return res.json({ valid: false, reason: 'Key revoked' });
 
     if (!row.activated_at) {
@@ -55,7 +78,6 @@ app.post('/check_license.php', async (req, res) => {
     if (new Date(row.expires_at) < new Date()) return res.json({ valid: false, reason: 'Key expired' });
 
     return res.json({ valid: true, expires_at: row.expires_at, message: 'Valid' });
-
   } catch (e) {
     console.error('DB Error:', e.message);
     return res.json({ valid: false, reason: 'Server error: ' + e.message });
@@ -64,5 +86,27 @@ app.post('/check_license.php', async (req, res) => {
   }
 });
 
+// Add license key (admin route)
+app.post('/add_license', async (req, res) => {
+  const { key, duration_minutes, admin_secret } = req.body || {};
+  if (admin_secret !== 'spidey_admin_2024') return res.json({ success: false, reason: 'Unauthorized' });
+  if (!key) return res.json({ success: false, reason: 'No key provided' });
+
+  let conn;
+  try {
+    conn = await mysql.createConnection(dbConfig);
+    await conn.execute(
+      'INSERT INTO licenses (key_code, duration_minutes) VALUES (?, ?)',
+      [key.trim().toUpperCase(), duration_minutes || 43200]
+    );
+    return res.json({ success: true, message: 'License added: ' + key });
+  } catch(e) {
+    return res.json({ success: false, reason: e.message });
+  } finally {
+    if (conn) await conn.end();
+  }
+});
+
+initDB();
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log('SPIDEY backend running on port', PORT));
