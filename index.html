@@ -184,9 +184,15 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
 .info-box{background:rgba(220,38,38,.06);border:1px solid rgba(220,38,38,.15);border-radius:10px;padding:10px 14px;font-size:12px;color:#c4bcbc;margin-top:10px}
 .info-box strong{color:#fca5a5}
 .empty-state{text-align:center;padding:36px;color:#8a8282;font-size:13px}
+/* TOAST NOTIFICATION — chhota, top pe, green gradient */
+#toastWrap{position:fixed;top:18px;left:0;right:0;display:flex;justify-content:center;z-index:10000;pointer-events:none}
+.toast{display:flex;align-items:center;gap:8px;padding:11px 20px;border-radius:100px;font-size:13px;font-weight:700;color:#fff;background:linear-gradient(135deg,#16a34a,#15803d);box-shadow:0 8px 24px rgba(22,163,74,.4),inset 0 1px 0 rgba(255,255,255,.2);transform:translateY(-60px);opacity:0;transition:all .35s cubic-bezier(.34,1.56,.64,1)}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.error{background:linear-gradient(135deg,#dc2626,#991b1b);box-shadow:0 8px 24px rgba(220,38,38,.4),inset 0 1px 0 rgba(255,255,255,.2)}
 </style>
 </head>
 <body>
+<div id="toastWrap"></div>
 
 <!-- ============================================ -->
 <!-- LICENSE LOCK OVERLAY -->
@@ -1044,7 +1050,7 @@ async function directOrder(){
   addLog('success','Direct order placed: '+name+' — '+servicesData.length+' services, '+totalQtyAll.toLocaleString()+' total qty');
   await refreshSchedulesFromServer();
   switchTab('schedules',document.querySelectorAll('.tab')[2]);
-  alert('Order placed!\n'+servicesData.length+' services • '+totalQtyAll.toLocaleString()+' total quantity\nStarting now. Ye backend pe chalega, browser band karne pe bhi nahi rukega.');
+  showToast('Order Confirmed 🎉');
 }
 
 // ===== Backend schedule helpers =====
@@ -1123,6 +1129,15 @@ async function runNow(id){
   }catch(e){alert('Network error: '+e.message);}
 }
 
+function showToast(message,type){
+  const wrap=document.getElementById('toastWrap');
+  const t=document.createElement('div');
+  t.className='toast'+(type==='error'?' error':'');
+  t.textContent=message;
+  wrap.appendChild(t);
+  requestAnimationFrame(()=>t.classList.add('show'));
+  setTimeout(()=>{t.classList.remove('show');setTimeout(()=>t.remove(),350);},2800);
+}
 function addLog(type,message){const time=new Date().toLocaleTimeString();logs.unshift({type,message,time});if(logs.length>200)logs=logs.slice(0,200);localStorage.setItem('smm_logs',JSON.stringify(logs));renderLogs();}
 function renderLogs(){const a=document.getElementById('logArea');if(!logs.length){a.innerHTML='<div class="log-line info">[System] No logs</div>';return;}a.innerHTML=logs.map(l=>`<div class="log-line ${l.type}">[${l.time}] ${l.message}</div>`).join('');}
 function clearLogs(){logs=[];localStorage.setItem('smm_logs','[]');renderLogs();}
