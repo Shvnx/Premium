@@ -265,34 +265,41 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
     <div style="margin-top:14px">
       <label>Delivery Speed</label>
       <div class="speed-btns">
-        <button class="speed-btn" onclick="setSpeed('6h',this)">6h</button>
-        <button class="speed-btn active" onclick="setSpeed('12h',this)">12h</button>
-        <button class="speed-btn" onclick="setSpeed('24h',this)">24h</button>
-        <button class="speed-btn" onclick="setSpeed('48h',this)">48h</button>
-        <button class="speed-btn" onclick="setSpeed('auto',this)">Auto</button>
-        <button class="speed-btn" onclick="setSpeed('custom',this)">Custom</button>
+        <button class="speed-btn" onclick="setSpeed('1h',this)">1 Hr</button>
+        <button class="speed-btn" onclick="setSpeed('6h',this)">6 Hr</button>
+        <button class="speed-btn active" onclick="setSpeed('12h',this)">12 Hr</button>
+        <button class="speed-btn" onclick="setSpeed('24h',this)">24 Hr</button>
+        <button class="speed-btn" onclick="setSpeed('48h',this)">48 Hr</button>
+        <button class="speed-btn" onclick="setSpeed('manual',this)">Manual</button>
       </div>
     </div>
-    <div class="row2" style="margin-top:14px">
-      <div>
-        <label>Number of Legs</label>
-        <input type="number" id="numLegs" value="5" min="1" max="50" oninput="updateGraph();previewLegs();renderMultiSlotLegPicker();updateViewsLegsSlot()" />
+    <div style="margin-top:14px;position:relative" id="legsSection">
+      <!-- Lock overlay -->
+      <div id="legsLockOverlay" style="position:absolute;inset:0;z-index:10;background:rgba(0,0,0,0.55);backdrop-filter:blur(2px);border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:10px;pointer-events:all;border:1px solid rgba(220,38,38,0.18)">
+        <div style="font-size:22px;margin-bottom:4px">🔒</div>
+        <div style="font-size:10px;color:#fca5a5;font-weight:700;text-transform:uppercase;letter-spacing:.6px;text-align:center">Auto — select <em>Manual</em> to edit</div>
       </div>
-      <div>
-        <label>Like — Number of Legs</label>
-        <input type="number" id="numLegsLike" value="5" min="1" max="50" oninput="updateViewsLegsSlot();updateGraph();previewLegs()" />
+      <div class="row2">
+        <div>
+          <label>Number of Legs</label>
+          <input type="number" id="numLegs" value="5" min="1" max="50" oninput="updateGraph();previewLegs();renderMultiSlotLegPicker();updateViewsLegsSlot()" />
+        </div>
+        <div>
+          <label>Like — Number of Legs</label>
+          <input type="number" id="numLegsLike" value="5" min="1" max="50" oninput="updateViewsLegsSlot();updateGraph();previewLegs()" />
+        </div>
       </div>
-    </div>
-    <div class="row2" style="margin-top:14px">
-      <div>
-        <label>Leg Duration</label>
-        <div class="row2" style="gap:6px">
-          <input type="number" id="legDuration" value="30" min="1" oninput="updateGraph();previewLegs()" />
-          <select id="legDurationUnit" onchange="updateGraph();previewLegs()">
-            <option value="minutes">Min</option>
-            <option value="hours" selected>Hrs</option>
-            <option value="days">Days</option>
-          </select>
+      <div class="row2" style="margin-top:14px">
+        <div>
+          <label>Leg Duration</label>
+          <div class="row2" style="gap:6px">
+            <input type="number" id="legDuration" value="30" min="1" oninput="updateGraph();previewLegs()" />
+            <select id="legDurationUnit" onchange="updateGraph();previewLegs()">
+              <option value="minutes">Min</option>
+              <option value="hours" selected>Hrs</option>
+              <option value="days">Days</option>
+            </select>
+          </div>
         </div>
       </div>
     </div>
@@ -356,7 +363,7 @@ let allServices=[];
 let schedules=[];
 let logs=JSON.parse(localStorage.getItem('smm_logs')||'[]');
 let currentMode='viral';
-let currentSpeed='12h';
+let currentSpeed='12h'; // default
 let graphMode='smooth';
 let growthChart=null;
 let usdToInr=84;
@@ -376,6 +383,8 @@ window.onload=()=>{
   if(saved.url){document.getElementById('apiUrl').value=saved.url;apiUrl=saved.url;}
   if(saved.key){document.getElementById('apiKey').value=saved.key;apiKey=saved.key;}
   initChart();renderLogs();renderSvcSlots();renderPresets();updateViewsLegsSlot();
+  setLegsLock(true); // default speed is 12h (not manual)
+  applySpeedPreset('12h');
   if(apiUrl&&apiKey){setConnected('Saved — loading...');fetchServices();}
   refreshSchedulesFromServer();startScheduleAutoRefresh();fetchRate();
 };
@@ -423,10 +432,13 @@ function updateCostBoxForSlot(uid){const slot=getSlot(uid);const box=document.ge
 function renderCurrencyTable(uid){const slot=getSlot(uid);if(!slot||!slot.service)return;const qty=parseInt(document.getElementById('qty-'+uid)?.value)||0;const usd=(qty/1000)*slot.service.rate;const t=document.getElementById('ctable-'+uid);t.innerHTML=Object.keys(currencyMeta).map(cur=>{const val=convertFromUsd(usd,cur);return`<tr class="${cur===activeCurrency?'cc-active':''}"><td class="cc-name">${cur}</td><td class="cc-val">${currencyMeta[cur].symbol}${val.toFixed(cur==='USD'?4:2)}</td></tr>`;}).join('');}
 function updateTotals(){const box=document.getElementById('totalsBox');const validSlots=svcSlots.filter(s=>s.service);if(!validSlots.length){box.style.display='none';return;}box.style.display='block';let totalQty=0,totalUsd=0,minMin=Infinity;validSlots.forEach(slot=>{const qty=parseInt(document.getElementById('qty-'+slot.uid)?.value)||0;totalQty+=qty;totalUsd+=(qty/1000)*slot.service.rate;minMin=Math.min(minMin,slot.service.min);});document.getElementById('totQtyAll').textContent=totalQty.toLocaleString();document.getElementById('totCostAll').textContent='$'+totalUsd.toFixed(4)+' ≈ ₹'+(totalUsd*usdToInr).toFixed(2);document.getElementById('totMinAll').textContent=minMin===Infinity?'—':minMin.toLocaleString();}
 
-const modePresets={viral:{legs:8,duration:3,unit:'hours',speed:'6h',variance:20},fast:{legs:3,duration:1,unit:'hours',speed:'6h',variance:15},trending:{legs:6,duration:6,unit:'hours',speed:'12h',variance:25},slow:{legs:12,duration:12,unit:'hours',speed:'48h',variance:30},custom:{legs:5,duration:30,unit:'minutes',speed:'12h',variance:22}};
+const modePresets={viral:{legs:8,duration:3,unit:'hours',speed:'6h',variance:20},fast:{legs:3,duration:1,unit:'hours',speed:'6h',variance:15},trending:{legs:6,duration:6,unit:'hours',speed:'12h',variance:25},slow:{legs:12,duration:12,unit:'hours',speed:'48h',variance:30},custom:{legs:5,duration:30,unit:'minutes',speed:'manual',variance:22}};
 function setMode(mode,el){currentMode=mode;document.querySelectorAll('.mode-btn').forEach(b=>b.className=b.className.replace(' active',''));el.classList.add('active');const p=modePresets[mode];document.getElementById('numLegs').value=p.legs;document.getElementById('legDuration').value=p.duration;document.getElementById('legDurationUnit').value=p.unit;document.getElementById('variance').value=p.variance;document.getElementById('varianceVal').textContent=p.variance;document.getElementById('variance').style.setProperty('--val',p.variance+'%');setSpeedVal(p.speed);updateGraph();previewLegs();renderMultiSlotLegPicker();}
-function setSpeed(speed,el){currentSpeed=speed;document.querySelectorAll('.speed-btn').forEach(b=>b.classList.remove('active'));el.classList.add('active');}
-function setSpeedVal(speed){currentSpeed=speed;document.querySelectorAll('.speed-btn').forEach(b=>{b.classList.toggle('active',b.textContent===speed);});}
+const speedPresets={'1h':{legs:2,duration:30,unit:'minutes'},'6h':{legs:4,duration:90,unit:'minutes'},'12h':{legs:6,duration:2,unit:'hours'},'24h':{legs:8,duration:3,unit:'hours'},'48h':{legs:12,duration:4,unit:'hours'}};
+function applySpeedPreset(speed){const p=speedPresets[speed];if(!p)return;document.getElementById('numLegs').value=p.legs;document.getElementById('numLegsLike').value=p.legs;document.getElementById('legDuration').value=p.duration;document.getElementById('legDurationUnit').value=p.unit;updateGraph();previewLegs();renderMultiSlotLegPicker();updateViewsLegsSlot();}
+function setLegsLock(locked){const overlay=document.getElementById('legsLockOverlay');if(overlay)overlay.style.display=locked?'flex':'none';['numLegs','numLegsLike','legDuration','legDurationUnit'].forEach(id=>{const el=document.getElementById(id);if(el)el.disabled=locked;});}
+function setSpeed(speed,el){currentSpeed=speed;document.querySelectorAll('.speed-btn').forEach(b=>b.classList.remove('active'));el.classList.add('active');if(speed==='manual'){setLegsLock(false);}else{applySpeedPreset(speed);setLegsLock(true);}}
+function setSpeedVal(speed){currentSpeed=speed;const labelMap={'1h':'1 Hr','6h':'6 Hr','12h':'12 Hr','24h':'24 Hr','48h':'48 Hr','manual':'Manual'};document.querySelectorAll('.speed-btn').forEach(b=>{b.classList.toggle('active',b.textContent.trim()===(labelMap[speed]||speed));});if(speed==='manual'){setLegsLock(false);}else{applySpeedPreset(speed);setLegsLock(true);}}
 
 const slotColors=['#ef4444','#ffffff','#f59e0b','#fb7185','#fca5a5','#60a5fa'];
 function initChart(){const ctx=document.getElementById('growthChart').getContext('2d');growthChart=new Chart(ctx,{type:'line',data:{labels:[],datasets:[]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{display:true,position:'top',labels:{color:'#d6cfcf',font:{size:9},boxWidth:8,boxHeight:8,padding:6}},tooltip:{backgroundColor:'rgba(15,5,5,0.95)',borderColor:'rgba(220,38,38,0.4)',borderWidth:1,titleColor:'#fca5a5',bodyColor:'#f5f5f5',padding:10,callbacks:{label:c=>(c.dataset.label||'')+': '+Math.round(c.raw).toLocaleString()}}},scales:{x:{grid:{color:'rgba(255,255,255,0.05)'},ticks:{color:'#9c9494',font:{size:9},maxTicksLimit:6}},y:{grid:{color:'rgba(255,255,255,0.05)'},ticks:{color:'#9c9494',font:{size:9},callback:v=>v>=1000?(v/1000).toFixed(1)+'k':v},beginAtZero:true}},animation:{duration:300,easing:'easeInOutQuart'}}});}
