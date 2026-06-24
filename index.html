@@ -13,6 +13,8 @@ body::before{content:'';position:fixed;inset:0;z-index:-2;background:radial-grad
 @keyframes glowPulse{0%,100%{opacity:1}50%{opacity:.65}}
 body::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;background-image:radial-gradient(circle at 1px 1px,rgba(255,255,255,.05) 1px,transparent 0);background-size:32px 32px}
 @keyframes shimmer{0%{background-position:-200% center}100%{background-position:200% center}}
+@keyframes plasmaShimmer{0%{background-position:-200% center}100%{background-position:200% center}}
+@keyframes plasmaGlow{0%,100%{text-shadow:0 0 6px rgba(34,197,94,0.5),0 0 14px rgba(74,222,128,0.3)}50%{text-shadow:0 0 16px rgba(34,197,94,1),0 0 32px rgba(74,222,128,0.8),0 0 50px rgba(134,239,172,0.4)}}
 @keyframes waFloat{0%,100%{transform:translateY(0px);box-shadow:0 4px 18px rgba(37,211,102,0.5),0 2px 8px rgba(0,0,0,0.3)}50%{transform:translateY(-7px);box-shadow:0 14px 34px rgba(37,211,102,0.75),0 4px 14px rgba(0,0,0,0.25)}}
 @keyframes iconShimmer{0%,100%{filter:drop-shadow(0 0 0px rgba(255,255,255,0))}50%{filter:drop-shadow(0 0 7px rgba(255,255,255,0.95))}}
 .shimmer-text{background:linear-gradient(90deg,rgba(255,255,255,0.45) 0%,rgba(255,255,255,0.45) 35%,rgba(255,255,255,1) 50%,rgba(255,255,255,0.45) 65%,rgba(255,255,255,0.45) 100%);background-size:200% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:shimmer 3s linear infinite}
@@ -207,7 +209,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
 <div id="toastWrap"></div>
 
 <!-- WhatsApp Float Button -->
-<a href="https://wa.me/917384793255" target="_blank" rel="noopener" style="position:fixed;bottom:22px;right:20px;z-index:99999;display:flex;align-items:center;justify-content:center;width:52px;height:52px;border-radius:50%;background:#25D366;text-decoration:none;animation:waFloat 2.8s ease-in-out infinite" title="Chat on WhatsApp">
+<a id="waBtnFloat" href="https://wa.me/917384793255" target="_blank" rel="noopener" style="position:fixed;bottom:22px;right:20px;z-index:99999;display:flex;align-items:center;justify-content:center;width:52px;height:52px;border-radius:50%;background:#25D366;text-decoration:none;animation:waFloat 2.8s ease-in-out infinite" title="Chat on WhatsApp">
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="30" height="30" style="animation:iconShimmer 2.8s ease-in-out infinite">
     <path fill="#fff" d="M24 4C13 4 4 13 4 24c0 3.6 1 7 2.7 10L4 44l10.3-2.7C17.1 43 20.5 44 24 44c11 0 20-9 20-20S35 4 24 4z"/>
     <path fill="#25D366" d="M24 6.5C14.3 6.5 6.5 14.3 6.5 24c0 3.3.9 6.4 2.5 9.1L6.5 41.5l8.6-2.5c2.6 1.4 5.6 2.2 8.9 2.2 9.7 0 17.5-7.8 17.5-17.5S33.7 6.5 24 6.5z"/>
@@ -230,7 +232,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
     <label style="display:block;font-size:10px;color:#9ca3af;margin-bottom:5px;text-transform:uppercase;letter-spacing:.8px;font-weight:700">License Key</label>
     <input type="text" id="licenseKeyInput" autocomplete="off" placeholder="XXXX-XXXX-XXXX-XXXX" style="width:100%;padding:11px 12px;background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.15);border-radius:10px;color:#f5f5f5;font-size:14px;outline:none;font-family:monospace;text-transform:uppercase">
     <button id="licenseSubmitBtn" onclick="verifyLicense()" style="width:100%;margin-top:14px;padding:13px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;border:none;background:linear-gradient(135deg,#dc2626,#991b1b);color:#fff;box-shadow:0 4px 20px rgba(220,38,38,.4)">Unlock</button>
-    <div id="licenseError" style="display:none;color:#fca5a5;font-size:12px;margin-top:12px;text-align:center"></div>
+    <div id="licenseError" style="display:none;font-size:13px;font-weight:700;margin-top:12px;text-align:center;letter-spacing:0.4px;animation:plasmaGlow 2.2s ease-in-out infinite"><span style="background:linear-gradient(90deg,#15803d 0%,#4ade80 25%,#bbf7d0 50%,#4ade80 75%,#15803d 100%);background-size:200% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:plasmaShimmer 2.2s linear infinite;display:inline-block">Contact Developer For Key ⚡</span></div>
     <div id="licenseExpiry" style="display:none;color:#86efac;font-size:11px;margin-top:12px;text-align:center"></div>
     <div style="margin-top:22px;padding-top:14px;border-top:1px solid rgba(255,255,255,0.07);text-align:center">
       <p class="shimmer-text" style="font-size:11.5px;font-weight:400;letter-spacing:0.4px;line-height:1.8;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;margin:0">
@@ -432,10 +434,13 @@ window.onload=()=>{
   if(saved.url){document.getElementById('apiUrl').value=saved.url;apiUrl=saved.url;}
   if(saved.key){document.getElementById('apiKey').value=saved.key;apiKey=saved.key;}
   initChart();renderLogs();renderSvcSlots();renderPresets();renderApiProfiles();updateViewsLegsSlot();
-  setLegsLock(true); // default speed is 12h (not manual)
+  setLegsLock(true);
   applySpeedPreset('12h');
   if(apiUrl&&apiKey){setConnected('Saved — loading...');fetchServices();}
   refreshSchedulesFromServer();startScheduleAutoRefresh();fetchRate();startLiveClock();
+  // WhatsApp button: visible on license page by default, on API tab after unlock
+  const waBtn=document.getElementById('waBtnFloat');
+  if(document.getElementById('licenseOverlay').style.display!=='none'){if(waBtn)waBtn.style.display='flex';}
 };
 
 function startLiveClock(){
@@ -453,7 +458,7 @@ function startLiveClock(){
 }
 
 async function fetchRate(){try{const r=await fetch('https://open.er-api.com/v6/latest/USD');const d=await r.json();if(d&&d.rates){fxRates=d.rates;usdToInr=d.rates.INR||84;updateAllCostBoxes();}}catch(e){}}
-function switchTab(tab,el){document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));document.getElementById('tab-'+tab).classList.add('active');if(el)el.classList.add('active');if(tab==='order'&&growthChart)setTimeout(()=>{growthChart.resize();updateGraph();},100);}
+function switchTab(tab,el){document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));document.getElementById('tab-'+tab).classList.add('active');if(el)el.classList.add('active');if(tab==='order'&&growthChart)setTimeout(()=>{growthChart.resize();updateGraph();},100);const waBtn=document.getElementById('waBtnFloat');if(waBtn)waBtn.style.display=(tab==='setup')?'flex':'none';}
 async function callApi(params){const body=new URLSearchParams({_target:apiUrl,key:apiKey,...params});try{const res=await fetch(BACKEND+'/proxy',{method:'POST',body,signal:AbortSignal.timeout(15000)});return JSON.parse(await res.text());}catch(e){try{const r2=await fetch(apiUrl,{method:'POST',body:new URLSearchParams({key:apiKey,...params}),signal:AbortSignal.timeout(8000)});return await r2.json();}catch(e2){return{error:'Network error: '+e2.message};}}}
 function setConnected(msg){document.getElementById('statusDot').classList.add('on');document.getElementById('statusText').textContent=msg;}
 async function testConnection(){apiUrl=document.getElementById('apiUrl').value.trim();apiKey=document.getElementById('apiKey').value.trim();if(!apiUrl||!apiKey){alert('Enter both URL and API key!');return;}const res=await callApi({action:'balance'});if(res.balance!==undefined){setConnected('Balance: $'+parseFloat(res.balance).toFixed(4));alert('Connected! Balance: $'+res.balance);}else alert('Error: '+JSON.stringify(res));}
@@ -744,8 +749,8 @@ function clearLogs(){logs=[];localStorage.setItem('smm_logs','[]');renderLogs();
 
 // LICENSE
 const LICENSE_API_URL=BACKEND+'/check_license.php';
-function showApp(){document.getElementById('licenseOverlay').style.display='none';document.getElementById('appContent').style.display='block';}
-function showLicenseError(msg){const el=document.getElementById('licenseError');el.textContent=msg;el.style.display='block';document.getElementById('licenseExpiry').style.display='none';}
+function showApp(){document.getElementById('licenseOverlay').style.display='none';document.getElementById('appContent').style.display='block';const waBtn=document.getElementById('waBtnFloat');if(waBtn)waBtn.style.display='flex';}
+function showLicenseError(msg){const el=document.getElementById('licenseError');el.style.display='block';document.getElementById('licenseExpiry').style.display='none';}
 function clearStoredLicense(){localStorage.removeItem('smm_license_key');localStorage.removeItem('smm_license_expiry');}
 async function verifyLicense(manualKey){const btn=document.getElementById('licenseSubmitBtn');const key=(manualKey||document.getElementById('licenseKeyInput').value||'').trim().toUpperCase();if(!key){showLicenseError('Enter a key first');return;}btn.disabled=true;btn.textContent='Checking...';try{const res=await fetch(LICENSE_API_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'verify',key})});const data=await res.json();if(data.valid){localStorage.setItem('smm_license_key',key);localStorage.setItem('smm_license_expiry',data.expires_at);showApp();}else{clearStoredLicense();showLicenseError(data.reason||'Invalid key');}}catch(e){showLicenseError('Could not connect to server.');}btn.disabled=false;btn.textContent='Unlock';}
 (async function initLicenseCheck(){const storedKey=localStorage.getItem('smm_license_key');if(!storedKey){return;}await verifyLicense(storedKey);})();
