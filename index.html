@@ -60,6 +60,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
 .service-search-input.dd-open{border-radius:10px 10px 0 0}
 .service-search-input:focus{border-color:rgba(220,38,38,.7);background:rgba(220,38,38,.07)}
 .service-dropdown{background:#140505;border:1px solid rgba(220,38,38,.3);border-top:none;border-radius:0 0 10px 10px;max-height:240px;overflow-y:auto;display:none;box-shadow:0 12px 32px rgba(0,0,0,.7);position:absolute;width:100%;z-index:100}
+.service-dropdown.open{display:block}
 .svc-item{display:flex;align-items:center;gap:8px;padding:9px 12px;cursor:pointer;transition:background .15s;border-bottom:1px solid rgba(255,255,255,.03)}
 .svc-item:last-child{border-bottom:none}
 .svc-item:hover,.svc-item.sel{background:rgba(220,38,38,.12)}
@@ -69,165 +70,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
 .svc-min{font-size:10px;color:#9c9494;margin-left:2px;white-space:nowrap}
 .presets-box{background:linear-gradient(135deg,rgba(220,38,38,.08),rgba(0,0,0,.2));border:1px solid rgba(220,38,38,.22);border-radius:14px;padding:12px 14px;margin-bottom:16px}
 .presets-head{display:flex;align-items:center;justify-content:space-between;cursor:pointer}
-.presets-head-title{font-size:12px;font-weight:700;color:#fca5a5;display:flex;align-items:center;gap:7px;letter-spacing:.2px}
-.presets-expand{background:none;border:none;color:#d6cfcf;cursor:pointer;font-size:13px;padding:2px;transition:transform .2s}
-.presets-expand.open{transform:rotate(180deg);color:#fca5a5}
-.presets-list{display:none;margin-top:10px;flex-direction:column;gap:7px}
-.presets-list.open{display:flex}
-.preset-item{display:flex;align-items:center;justify-content:space-between;gap:8px;background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:9px 11px;cursor:pointer;transition:all .2s}
-.preset-item:hover{border-color:rgba(220,38,38,.4);background:rgba(220,38,38,.08)}
-.preset-item-info{flex:1;min-width:0}
-.preset-item-name{font-size:12px;font-weight:700;color:#f5f5f5}
-.preset-item-meta{font-size:10px;color:#b0a8a8;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.preset-item-del{background:rgba(127,29,29,.4);border:1px solid rgba(127,29,29,.6);color:#fca5a5;width:24px;height:24px;border-radius:7px;cursor:pointer;font-size:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.presets-empty{font-size:11px;color:#9c9494;text-align:center;padding:10px}
-.save-direct-row{display:flex;gap:10px;margin-top:14px}
-.btn-save-preset{flex:1;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);color:#f5f5f5}
-.btn-save-preset:hover{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.25)}
-.btn-direct-order{flex:1.4;background:linear-gradient(135deg,#dc2626,#991b1b);color:#fff;box-shadow:0 4px 20px rgba(220,38,38,.4)}
-.btn-direct-order:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(220,38,38,.5)}
-.cost-box{background:linear-gradient(135deg,rgba(34,197,94,.06),rgba(220,38,38,.06));border:1px solid rgba(34,197,94,.18);border-radius:12px;padding:11px 14px;margin-top:10px}
-.cost-slot{display:flex;align-items:center;justify-content:space-between;gap:10px}
-.cost-slot-main{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
-.cost-slot-usd{font-size:18px;font-weight:800;color:#22c55e;line-height:1}
-.cost-slot-inr{font-size:13px;font-weight:700;color:#f59e0b}
-.cost-slot-meta{font-size:10px;color:#b0a8a8;margin-top:2px}
-.cost-expand-btn{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:#d6cfcf;width:26px;height:26px;border-radius:8px;cursor:pointer;font-size:11px;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0}
-.cost-expand-btn:hover{border-color:rgba(220,38,38,.5);color:#fca5a5;background:rgba(220,38,38,.1)}
-.cost-expand-btn.open{transform:rotate(180deg);color:#fca5a5;border-color:rgba(220,38,68,.5)}
-.currency-table{display:none;margin-top:10px;border-top:1px solid rgba(255,255,255,.06);padding-top:10px}
-.currency-table.open{display:block}
-.currency-select-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
-.currency-select-row label{margin:0;flex-shrink:0}
-.currency-select-row select{font-size:12px;padding:7px 10px}
-.ctable{width:100%;border-collapse:collapse}
-.ctable tr{border-bottom:1px solid rgba(255,255,255,.04)}
-.ctable tr:last-child{border-bottom:none}
-.ctable td{padding:6px 4px;font-size:12px}
-.ctable td.cc-name{color:#c4bcbc}
-.ctable td.cc-val{text-align:right;font-weight:700;color:#f5f5f5}
-.ctable tr.cc-active td{color:#22c55e!important;font-weight:800}
-.min-warning{font-size:11px;color:#f87171;margin-top:5px;display:none;align-items:center;gap:4px}
-.min-warning.show{display:flex}
-.graph-legs-flex{display:flex;gap:10px;margin-top:10px;align-items:flex-start}
-.graph-wrap{position:relative;height:165px;flex:0 0 75%;max-width:75%;border-radius:12px;overflow:hidden;background:rgba(0,0,0,.2);padding:8px}
-.graph-actions{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
-.gBtn{padding:6px 14px;border-radius:7px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid rgba(255,255,255,.07);background:rgba(255,255,255,.03);color:#b0a8a8;transition:all .2s}
-.gBtn.active,.gBtn:hover{border-color:rgba(220,38,38,.5);color:#fca5a5;background:rgba(220,38,38,.1)}
-.legs-side-panel{flex:1;min-width:0;background:rgba(0,0,0,.2);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:10px 8px;height:165px;display:flex;flex-direction:column}
-.legs-side-title{font-size:9px;font-weight:700;color:#fca5a5;text-transform:uppercase;letter-spacing:.5px;display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
-.legs-side-expand{background:none;border:none;color:#c4bcbc;cursor:pointer;font-size:11px;padding:2px;transition:transform .2s}
-.legs-side-expand.open{transform:rotate(180deg);color:#fca5a5}
-.legs-side-count{font-size:20px;font-weight:800;color:#f5f5f5;text-align:center;margin-top:auto}
-.legs-side-count span{font-size:10px;color:#b0a8a8;font-weight:600;display:block;margin-top:2px;text-transform:none}
-.legs-side-detail{display:none;overflow-y:auto;flex:1}
-.legs-side-detail.open{display:block}
-.legs-side-detail .leg-mini-row{display:flex;justify-content:space-between;font-size:10px;padding:3px 2px;color:#d6cfcf;border-bottom:1px solid rgba(255,255,255,.03)}
-.legs-side-detail .leg-mini-row span:first-child{color:#dc2626;font-weight:600}
-.svc-slots{display:flex;flex-direction:column;gap:10px}
-.svc-slot{background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:12px;position:relative}
-.svc-slot-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
-.svc-slot-label{font-size:10px;font-weight:700;color:#c4bcbc;text-transform:uppercase;letter-spacing:.6px}
-.svc-slot-remove{background:rgba(127,29,29,.4);border:1px solid rgba(127,29,29,.6);color:#fca5a5;width:22px;height:22px;border-radius:6px;cursor:pointer;font-size:11px;display:flex;align-items:center;justify-content:center}
-.svc-slot-row{display:flex;gap:8px;align-items:flex-start}
-.svc-slot-row .service-picker-wrap{flex:1;position:relative}
-.svc-type-select{width:120px;flex-shrink:0}
-.add-slot-btn{display:flex;align-items:center;justify-content:center;gap:6px;padding:11px;border-radius:10px;border:1px dashed rgba(220,38,38,.4);background:rgba(220,38,38,.05);color:#fca5a5;font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;margin-top:4px}
-.add-slot-btn:hover{background:rgba(220,38,38,.12);border-color:rgba(220,38,38,.6)}
-.svc-slot-min{font-size:10px;color:#b0a8a8;margin-top:6px}
-.totals-box{background:linear-gradient(135deg,rgba(220,38,38,.08),rgba(153,27,27,.05));border:1px solid rgba(220,38,38,.2);border-radius:12px;padding:12px 14px;margin-top:12px}
-.totals-box-title{font-size:10px;font-weight:700;color:#fca5a5;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px}
-.totals-row{display:flex;justify-content:space-between;font-size:12px;color:#d6cfcf;padding:3px 0}
-.totals-row strong{color:#f5f5f5}
-.svc-leg-select-block{margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,.05)}
-.svc-leg-select-title{font-size:10px;font-weight:700;color:#c4bcbc;text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px}
-.svc-leg-select-row{display:flex;align-items:center;justify-content:space-between;padding:6px 8px;background:rgba(0,0,0,.2);border-radius:8px;margin-bottom:5px;font-size:12px}
-.svc-leg-select-row .sl-name{color:#f0e8e8;font-weight:600}
-.svc-leg-select-row select{width:90px;padding:6px 8px;font-size:11px}
-.error-banner{background:rgba(127,29,29,.25);border:1px solid rgba(248,113,113,.4);border-radius:10px;padding:10px 14px;margin-top:10px;font-size:12px;color:#fca5a5;display:none;align-items:center;gap:8px}
-.error-banner.show{display:flex}
-.si{background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:14px;margin-bottom:8px;transition:border-color .2s}
-.si:hover{border-color:rgba(220,38,38,.25)}
-.si-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
-.si-name{font-size:13px;font-weight:700;color:#f5f5f5}
-.si-meta{font-size:11px;color:#b0a8a8;margin-top:3px}
-.si-actions{display:flex;gap:6px;flex-shrink:0}
-.si-progress{margin-top:10px;background:rgba(255,255,255,.05);border-radius:4px;height:4px;overflow:hidden}
-.si-progress-fill{height:100%;background:linear-gradient(90deg,#dc2626,#22c55e);transition:width .5s;border-radius:4px}
-.badge{display:inline-block;padding:2px 9px;border-radius:100px;font-size:10px;font-weight:700}
-.badge-green{background:rgba(34,197,94,.12);color:#22c55e;border:1px solid rgba(34,197,94,.2)}
-.badge-yellow{background:rgba(234,179,8,.12);color:#eab308;border:1px solid rgba(234,179,8,.2)}
-.log-area{background:rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:12px;font-family:monospace;font-size:11px;max-height:280px;overflow-y:auto}
-.log-line{padding:3px 0;border-bottom:1px solid rgba(255,255,255,.02);color:#8a8282;line-height:1.5}
-.log-line.success{color:#22c55e}.log-line.error{color:#f87171}.log-line.info{color:#e5e5e5}
-.divider{border:none;border-top:1px solid rgba(255,255,255,.05);margin:16px 0}
-.info-box{background:rgba(220,38,38,.06);border:1px solid rgba(220,38,38,.15);border-radius:10px;padding:10px 14px;font-size:12px;color:#c4bcbc;margin-top:10px}
-.info-box strong{color:#fca5a5}
-.empty-state{text-align:center;padding:36px;color:#8a8282;font-size:13px}
-#toastWrap{position:fixed;top:18px;left:0;right:0;display:flex;justify-content:center;z-index:10000;pointer-events:none}
-.toast{display:flex;align-items:center;gap:8px;padding:11px 20px;border-radius:100px;font-size:13px;font-weight:700;color:#fff;background:linear-gradient(135deg,#16a34a,#15803d);box-shadow:0 8px 24px rgba(22,163,74,.4),inset 0 1px 0 rgba(255,255,255,.2);transform:translateY(-60px);opacity:0;transition:all .35s cubic-bezier(.34,1.56,.64,1)}
-.toast.show{transform:translateY(0);opacity:1}
-.toast.error{background:linear-gradient(135deg,#dc2626,#991b1b);box-shadow:0 8px 24px rgba(220,38,38,.4),inset 0 1px 0 rgba(255,255,255,.2)}
-
-#licenseOverlay{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;overflow:hidden}
-#licenseBgVideo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;opacity:0.45;pointer-events:none}
-#licenseOverlayDim{position:absolute;inset:0;z-index:1;background:linear-gradient(135deg,rgba(10,0,0,0.6) 0%,rgba(26,4,4,0.5) 20%,rgba(61,10,10,0.5) 40%,rgba(92,15,15,0.45) 55%,rgba(43,7,7,0.55) 75%,rgba(10,0,0,0.65) 100%)}
-#licenseCard{position:relative;z-index:2;max-width:340px;width:100%;background:rgba(0,0,0,0.45);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.12);border-radius:18px;padding:26px;box-shadow:0 8px 40px rgba(0,0,0,.7),0 0 0 1px rgba(220,38,38,.1)}
-</style>
-</head>
-<body>
-<div id="toastWrap"></div>
-
-<div id="licenseOverlay">
-  <video id="licenseBgVideo" autoplay muted loop playsinline>
-    <source src="https://raw.githubusercontent.com/Shvnx/Premium/main/ii_landscape.mp4.mp4" type="video/mp4">
-  </video>
-  <div id="licenseOverlayDim"></div>
-  <div id="licenseCard">
-    <div style="font-size:20px;font-weight:900;background:linear-gradient(135deg,#fff,#ef4444,#991b1b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:4px">⚡ SPIDEY</div>
-    <div style="font-size:12px;color:#9ca3af;margin-bottom:18px">Enter license key to access</div>
-    <label style="display:block;font-size:10px;color:#9ca3af;margin-bottom:5px;text-transform:uppercase;letter-spacing:.8px;font-weight:700">License Key</label>
-    <input type="text" id="licenseKeyInput" placeholder="XXXX-XXXX-XXXX-XXXX" style="width:100%;padding:11px 12px;background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.15);border-radius:10px;color:#f5f5f5;font-size:14px;outline:none;font-family:monospace;text-transform:uppercase">
-    <button id="licenseSubmitBtn" onclick="verifyLicense()" style="width:100%;margin-top:14px;padding:13px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;border:none;background:linear-gradient(135deg,#dc2626,#991b1b);color:#fff;box-shadow:0 4px 20px rgba(220,38,38,.4)">Unlock</button>
-    <div id="licenseError" style="display:none;color:#fca5a5;font-size:12px;margin-top:12px;text-align:center"></div>
-    <div id="licenseExpiry" style="display:none;color:#86efac;font-size:11px;margin-top:12px;text-align:center"></div>
-  </div>
-</div>
-
-<div id="appContent" style="display:none">
-<div class="topbar">
-  <div class="logo">⚡ SPIDEY <span>Private panel</span></div>
-  <div class="status-pill">
-    <div class="dot" id="statusDot"></div>
-    <span id="statusText">Not connected</span>
-  </div>
-</div>
-<div class="tabs">
-  <button class="tab active" onclick="switchTab('setup',this)">🔌 API</button>
-  <button class="tab" onclick="switchTab('order',this)">📦 Order</button>
-  <button class="tab" onclick="switchTab('schedules',this)">🗓 Schedules</button>
-  <button class="tab" onclick="switchTab('logs',this)">📋 Logs</button>
-</div>
-<div class="tab-content active" id="tab-setup">
-  <div class="card">
-    <div class="card-title">🔌 API Connection</div>
-    <label>Panel URL</label>
-    <input type="text" id="apiUrl" placeholder="https://yoyomedia.in/api/v2" />
-    <label>API Key</label>
-    <input type="password" id="apiKey" placeholder="Your API key" />
-    <div class="row2" style="margin-top:14px;gap:10px">
-      <button class="btn btn-outline" onclick="testConnection()">Test Connection</button>
-      <button class="btn btn-primary" style="margin-top:0" onclick="saveAndFetch()">Connect & Load</button>
-    </div>
-    <div class="info-box" style="margin-top:14px"><strong>Proxy:</strong> Render backend — CORS bypass enabled</div>
-  </div>
-</div>
-<div class="tab-content" id="tab-order">
-  <div class="card">
-    <div class="card-title">📦 Create Order</div>
-    <div class="presets-box">
-      <div class="presets-head" onclick="togglePresets()">
-        <div class="presets-head-title">💾 Saved Presets <span id="presetsCountBadge" style="color:#b0a8a8;font-weight:500"></span></div>
+.presets-head-title">💾 Saved Presets <span id="presetsCountBadge" style="color:#b0a8a8;font-weight:500"></span></div>
         <button class="presets-expand" id="presetsExpandBtn">▾</button>
       </div>
       <div class="presets-list" id="presetsList"></div>
@@ -367,7 +210,7 @@ window.onload=()=>{
   if(apiUrl&&apiKey){setConnected('Saved — loading...');fetchServices();}
   refreshSchedulesFromServer();startScheduleAutoRefresh();fetchRate();
 
-  // Document click handler to safety close dropdowns
+  // Optimized Document click handler
   document.addEventListener('click', (e) => {
     svcSlots.forEach(slot => {
       const wrap = document.getElementById(`slot-${slot.uid}`);
@@ -412,7 +255,7 @@ function renderSvcSlots(){
     const typeOptions=Object.keys(slotTypeLabels).map(t=>`<option value="${t}" ${slot.type===t?'selected':''}>${slotTypeLabels[t]}</option>`).join('');
     const removeBtn=svcSlots.length>2||idx>=2?`<button class="svc-slot-remove" onclick="removeSvcSlot(${slot.uid})">✕</button>`:'';
     const minNote=slot.service?`Min: <strong style="color:#f59e0b">${slot.service.min}</strong> &nbsp;|&nbsp; Max: ${slot.service.max}`:'No service selected yet';
-    return`<div class="svc-slot" id="slot-${slot.uid}"><div class="svc-slot-head"><span class="svc-slot-label">Slot ${idx+1}</span>${removeBtn}</div><div class="svc-slot-row"><select class="svc-type-select" onchange="setSlotType(${slot.uid},this.value)">${typeOptions}</select><div class="service-picker-wrap"><span class="svc-search-icon">🔍</span><input type="text" class="service-search-input" id="svcSearch-${slot.uid}" placeholder="Type service ID or name..." oninput="onSvcInput(${slot.uid})" onfocus="onSvcFocus(${slot.uid})" /><div class="service-dropdown" id="svcDropdown-${slot.uid}"></div></div></div><div class="svc-slot-min">${minNote}</div><div class="row2" style="margin-top:8px"><div><label style="margin-top:6px">Quantity</label><input type="number" id="qty-${slot.uid}" placeholder="e.g. 2000" value="${slot.qty||''}" oninput="onSlotQtyInput(${slot.uid})" /></div><div><label style="margin-top:6px">&nbsp;</label><div class="cost-box" id="costBox-${slot.uid}" style="margin-top:0;display:none"><div class="cost-slot"><div><div class="cost-slot-main"><span class="cost-slot-usd" id="calcUSD-${slot.uid}">—</span><span class="cost-slot-inr" id="calcINR-${slot.uid}">—</span></div><div class="cost-slot-meta" id="calcMeta-${slot.uid}">—</div></div><button class="cost-expand-btn" id="expandBtn-${slot.uid}" onclick="toggleCurrencyTable(${slot.uid})">▾</button></div><div class="currency-table" id="currencyTable-${slot.uid}"><div class="currency-select-row"><label style="margin:0">Currency</label><select onchange="setActiveCurrency(${slot.uid},this.value)">${Object.keys(currencyMeta).map(c=>`<option value="${c}" ${c===activeCurrency?'selected':''}>${c}</option>`).join('')}</select></div><table class="ctable" id="ctable-${slot.uid}"></table></div></div></div></div><div class="min-warning" id="minWarning-${slot.uid}">⚠️ <span id="minWarnText-${slot.uid}"></span></div></div>`;
+    return`<div class="svc-slot" id="slot-${slot.uid}"><div class="svc-slot-head"><span class="svc-slot-label">Slot ${idx+1}</span>${removeBtn}</div><div class="svc-slot-row"><select class="svc-type-select" onchange="setSlotType(${slot.uid},this.value)">${typeOptions}</select><div class="service-picker-wrap"><span class="svc-search-icon">🔍</span><input type="text" class="service-search-input" id="svcSearch-${slot.uid}" placeholder="Type service ID or name..." oninput="onSvcInput(${slot.uid})" onfocus="onSvcFocus(${slot.uid})" onclick="onSvcFocus(${slot.uid})" /><div class="service-dropdown" id="svcDropdown-${slot.uid}"></div></div></div><div class="svc-slot-min">${minNote}</div><div class="row2" style="margin-top:8px"><div><label style="margin-top:6px">Quantity</label><input type="number" id="qty-${slot.uid}" placeholder="e.g. 2000" value="${slot.qty||''}" oninput="onSlotQtyInput(${slot.uid})" /></div><div><label style="margin-top:6px">&nbsp;</label><div class="cost-box" id="costBox-${slot.uid}" style="margin-top:0;display:none"><div class="cost-slot"><div><div class="cost-slot-main"><span class="cost-slot-usd" id="calcUSD-${slot.uid}">—</span><span class="cost-slot-inr" id="calcINR-${slot.uid}">—</span></div><div class="cost-slot-meta" id="calcMeta-${slot.uid}">—</div></div><button class="cost-expand-btn" id="expandBtn-${slot.uid}" onclick="toggleCurrencyTable(${slot.uid})">▾</button></div><div class="currency-table" id="currencyTable-${slot.uid}"><div class="currency-select-row"><label style="margin:0">Currency</label><select onchange="setActiveCurrency(${slot.uid},this.value)">${Object.keys(currencyMeta).map(c=>`<option value="${c}" ${c===activeCurrency?'selected':''}>${c}</option>`).join('')}</select></div><table class="ctable" id="ctable-${slot.uid}"></table></div></div></div></div><div class="min-warning" id="minWarning-${slot.uid}">⚠️ <span id="minWarnText-${slot.uid}"></span></div></div>`;
   }).join('');
   svcSlots.forEach(slot=>{if(slot.service){const inp=document.getElementById('svcSearch-'+slot.uid);if(inp)inp.value='#'+slot.service.service+' — '+slot.service.name;}});
   updateAllCostBoxes();updateTotals();validateAllSlots();renderMultiSlotLegPicker();
@@ -427,7 +270,7 @@ function renderSvcDD(uid,list){const dd=document.getElementById('svcDropdown-'+u
 function onSvcFocus(uid){if(!allServices.length){addLog('info','Connect API first');return;}document.getElementById('svcSearch-'+uid).classList.add('dd-open');document.getElementById('svcDropdown-'+uid).classList.add('open');renderSvcDD(uid,allServices);}
 function closeSvcDD(uid){const dd=document.getElementById('svcDropdown-'+uid),inp=document.getElementById('svcSearch-'+uid);if(dd)dd.classList.remove('open');if(inp)inp.classList.remove('dd-open');}
 function onSvcInput(uid){const inp=document.getElementById('svcSearch-'+uid);const q=inp.value.trim();document.getElementById('svcDropdown-'+uid).classList.add('open');inp.classList.add('dd-open');if(/^\d+$/.test(q)){const match=allServices.find(s=>String(s.service)===q);if(match)selectSvc(uid,match.service,match.name||'Unknown',parseFloat(match.rate||0),parseInt(match.min||1),parseInt(match.max||999999));}const filtered=allServices.filter(s=>(s.name||'').toLowerCase().includes(q.toLowerCase())||String(s.service).includes(q));renderSvcDD(uid,filtered);}
-function selectSvc(uid,id,name,rate,min,max){const slot=getSlot(uid);if(!slot)return;slot.service={service:id,name,rate,min,max};document.getElementById('svcSearch-'+uid).value='#'+id+' — '+name;closeSvcDD(uid);addLog('info','Slot service selected: #'+id+' — '+name);renderSvcSlots();renderMultiSlotLegPicker();}
+function selectSvc(uid,id,name,rate,min,max){const slot=getSlot(uid);if(!slot)return;slot.service={service:id,name,rate,min,max};document.getElementById('svcSearch-'+uid).value='#'+id+' — '+name;setTimeout(()=>closeSvcDD(uid),50);addLog('info','Slot service selected: #'+id+' — '+name);renderSvcSlots();renderMultiSlotLegPicker();}
 function getSlotMin(uid){const slot=getSlot(uid);return slot&&slot.service?slot.service.min:1;}
 function getBaseSlotQty(){const base=svcSlots[0];return parseInt(document.getElementById('qty-'+base.uid)?.value)||0;}
 function onSlotQtyInput(uid){const slot=getSlot(uid);if(slot)slot.qty=parseInt(document.getElementById('qty-'+uid).value)||0;updateAllCostBoxes();updateTotals();validateAllSlots();updateGraph();previewLegs();}
