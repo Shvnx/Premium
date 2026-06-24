@@ -231,7 +231,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
       <button class="btn btn-outline" onclick="testConnection()">Test Connection</button>
       <button class="btn btn-primary" style="margin-top:0" onclick="saveAndFetch()">Connect & Load</button>
     </div>
-    <div class="info-box" style="margin-top:14px"><strong>Proxy:</strong> spidey.infinityfree.me — CORS bypass enabled</div>
+    <div class="info-box" style="margin-top:14px"><strong>Proxy:</strong> Render backend — CORS bypass enabled</div>
   </div>
 </div>
 
@@ -371,8 +371,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
 </div><!-- /#appContent -->
 
 <script>
-const PROXY='https://spidey.infinityfree.me/proxy.php';
-const BACKEND='https://premium-29ko.onrender.com'; // <-- schedules ab yahan server-side process hote hain
+const BACKEND='https://premium-29ko.onrender.com'; // <-- saara backend traffic (proxy + schedules + license) yahan se jaata hai
 let apiUrl='',apiKey='';
 let scheduleRefreshTimer=null;
 let allServices=[];
@@ -434,7 +433,7 @@ function switchTab(tab,el){
 async function callApi(params){
   const body=new URLSearchParams({_target:apiUrl,key:apiKey,...params});
   try{
-    const res=await fetch(PROXY,{method:'POST',body,signal:AbortSignal.timeout(15000)});
+    const res=await fetch(BACKEND+'/proxy',{method:'POST',body,signal:AbortSignal.timeout(15000)});
     return JSON.parse(await res.text());
   }catch(e){
     try{
