@@ -276,20 +276,14 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
     <div class="row2" style="margin-top:14px">
       <div>
         <label>Number of Legs</label>
-        <div style="display:flex;align-items:center;gap:8px">
-          <input type="number" id="numLegs" value="5" min="1" max="50" oninput="updateGraph();previewLegs();renderMultiSlotLegPicker();updateViewsLegsSlot()" style="flex:1" />
-          <div id="viewsLegsSlot" style="background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.35);border-radius:9px;padding:6px 10px;min-width:72px;text-align:center;flex-shrink:0">
-            <div style="font-size:9px;color:#fca5a5;font-weight:700;text-transform:uppercase;letter-spacing:.6px;margin-bottom:2px">👁 Views</div>
-            <div id="viewsLegsVal" style="font-size:17px;font-weight:800;color:#f5f5f5;line-height:1">5</div>
-            <div style="font-size:9px;color:#b0a8a8;margin-top:1px">legs</div>
-          </div>
-          <div id="likeLegsSlot" style="background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.35);border-radius:9px;padding:6px 10px;min-width:72px;text-align:center;flex-shrink:0">
-            <div style="font-size:9px;color:#fca5a5;font-weight:700;text-transform:uppercase;letter-spacing:.6px;margin-bottom:2px">❤️ Like</div>
-            <div id="likeLegsVal" style="font-size:17px;font-weight:800;color:#f5f5f5;line-height:1">5</div>
-            <div style="font-size:9px;color:#b0a8a8;margin-top:1px">legs</div>
-          </div>
-        </div>
+        <input type="number" id="numLegs" value="5" min="1" max="50" oninput="updateGraph();previewLegs();renderMultiSlotLegPicker();updateViewsLegsSlot()" />
       </div>
+      <div>
+        <label>Like — Number of Legs</label>
+        <input type="number" id="numLegsLike" value="5" min="1" max="50" oninput="updateViewsLegsSlot();updateGraph();previewLegs()" />
+      </div>
+    </div>
+    <div class="row2" style="margin-top:14px">
       <div>
         <label>Leg Duration</label>
         <div class="row2" style="gap:6px">
@@ -381,7 +375,7 @@ window.onload=()=>{
   const saved=JSON.parse(localStorage.getItem('smm_api')||'{}');
   if(saved.url){document.getElementById('apiUrl').value=saved.url;apiUrl=saved.url;}
   if(saved.key){document.getElementById('apiKey').value=saved.key;apiKey=saved.key;}
-  initChart();renderLogs();renderSvcSlots();renderPresets();
+  initChart();renderLogs();renderSvcSlots();renderPresets();updateViewsLegsSlot();
   if(apiUrl&&apiKey){setConnected('Saved — loading...');fetchServices();}
   refreshSchedulesFromServer();startScheduleAutoRefresh();fetchRate();
 };
@@ -451,12 +445,11 @@ function previewLegs(){renderMultiSlotLegPicker();if(growthChart)updateGraph();}
 
 function updateViewsLegsSlot(){
   const n=parseInt(document.getElementById('numLegs').value)||5;
-  const vEl=document.getElementById('viewsLegsVal');
-  const lEl=document.getElementById('likeLegsVal');
+  const nLike=parseInt(document.getElementById('numLegsLike').value)||5;
   const viewsSlot=svcSlots.find(s=>s.type==='views');
   const likeSlot=svcSlots.find(s=>s.type==='like');
-  if(vEl)vEl.textContent=viewsSlot?.legOverride||n;
-  if(lEl)lEl.textContent=likeSlot?.legOverride||n;
+  if(viewsSlot)viewsSlot.legOverride=n;
+  if(likeSlot)likeSlot.legOverride=nLike;
 }
 
 function togglePresets(){presetsOpen=!presetsOpen;document.getElementById('presetsList').classList.toggle('open',presetsOpen);document.getElementById('presetsExpandBtn').classList.toggle('open',presetsOpen);if(presetsOpen)renderPresets();}
