@@ -1132,7 +1132,7 @@ function clearLogs(){logs=[];localStorage.setItem('smm_logs','[]');renderLogs();
 // LICENSE VERIFICATION LOGIC
 // IMPORTANT: change this to your actual InfinityFree URL
 // ============================================
-const LICENSE_API_URL = 'http://spidey.infinityfree.me/check_license.php';
+const LICENSE_API_URL = BACKEND + '/check_license.php'; // <-- ab Render backend pe point karta hai (admin panel jahan keys generate karta hai, wahi hai)
 
 function showApp(){
   document.getElementById('licenseOverlay').style.display='none';
