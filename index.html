@@ -254,14 +254,6 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
     </div>
     <div class="error-banner" id="globalErrorBanner"><span>⚠️</span><span id="globalErrorText"></span></div>
     <hr class="divider">
-    <div class="card-title" style="margin-bottom:10px">🎯 Delivery Mode</div>
-    <div class="mode-btns">
-      <button class="mode-btn viral active" onclick="setMode('viral',this)">🚀 Viral Boost</button>
-      <button class="mode-btn fast" onclick="setMode('fast',this)">⚡ Fast Start</button>
-      <button class="mode-btn trending" onclick="setMode('trending',this)">🔥 Trending</button>
-      <button class="mode-btn slow" onclick="setMode('slow',this)">🐢 Slow Burn</button>
-      <button class="mode-btn custom" onclick="setMode('custom',this)">✏️ Custom</button>
-    </div>
     <div style="margin-top:14px">
       <label>Delivery Speed</label>
       <div class="speed-btns">
@@ -422,7 +414,38 @@ function selectSvc(uid,id,name,rate,min,max){const slot=getSlot(uid);if(!slot)re
 function getSlotMin(uid){const slot=getSlot(uid);return slot&&slot.service?slot.service.min:1;}
 function getBaseSlotQty(){const base=svcSlots[0];return parseInt(document.getElementById('qty-'+base.uid)?.value)||0;}
 function onSlotQtyInput(uid){const slot=getSlot(uid);if(slot)slot.qty=parseInt(document.getElementById('qty-'+uid).value)||0;updateAllCostBoxes();updateTotals();validateAllSlots();updateGraph();previewLegs();updateViewsLegsSlot();}
-function validateAllSlots(){const baseQty=getBaseSlotQty();let errorMsg='';svcSlots.forEach((slot,idx)=>{const qtyInput=document.getElementById('qty-'+slot.uid);const qty=parseInt(qtyInput?.value)||0;const minQ=getSlotMin(slot.uid);const w=document.getElementById('minWarning-'+slot.uid);if(!w)return;let msg='';if(qty>0&&qty<minQ){msg='Minimum '+minQ+' required, you entered '+qty;}if(idx>0&&baseQty>0&&qty>baseQty){msg='Bot detected: '+slotTypeLabels[slot.type].replace(/^[^\s]+\s/,'')+' quantity can not exceed Views quantity ('+baseQty.toLocaleString()+')';qtyInput.value=baseQty;slot.qty=baseQty;errorMsg=msg;}if(msg&&idx===0){w.classList.add('show');document.getElementById('minWarnText-'+slot.uid).textContent=msg;}else{w.classList.remove('show');}});const banner=document.getElementById('globalErrorBanner');if(errorMsg){banner.classList.add('show');document.getElementById('globalErrorText').textContent=errorMsg+' — auto-adjusted to safe value.';updateAllCostBoxes();updateTotals();updateGraph();previewLegs();}else{banner.classList.remove('show');}}
+function validateAllSlots(){
+  const baseQty=getBaseSlotQty();
+  const maxEngagement=baseQty>0?Math.floor(baseQty*0.034):0; // 3.4% cap
+  let errorMsg='';
+  svcSlots.forEach((slot,idx)=>{
+    const qtyInput=document.getElementById('qty-'+slot.uid);
+    const qty=parseInt(qtyInput?.value)||0;
+    const minQ=getSlotMin(slot.uid);
+    const w=document.getElementById('minWarning-'+slot.uid);
+    if(!w)return;
+    let msg='';
+    // Min check (views slot)
+    if(qty>0&&qty<minQ){msg='Minimum '+minQ+' required, you entered '+qty;}
+    // Old bot check: non-views can't exceed views total
+    if(idx>0&&baseQty>0&&qty>baseQty){
+      msg='Bot detected: '+slotTypeLabels[slot.type].replace(/^[^\s]+\s/,'')+' quantity can not exceed Views quantity ('+baseQty.toLocaleString()+')';
+      qtyInput.value=baseQty;slot.qty=baseQty;errorMsg=msg;
+    }
+    // NEW: 3.4% organic cap for all non-views slots
+    if(idx>0&&baseQty>0&&qty>maxEngagement){
+      const capped=maxEngagement;
+      qtyInput.value=capped;slot.qty=capped;
+      msg='⚠️ Not Organic — max '+maxEngagement.toLocaleString()+' allowed (3.4% of '+baseQty.toLocaleString()+' views). Auto-reset!';
+      errorMsg='Not Organic: '+slotTypeLabels[slot.type].replace(/^[^\s]+\s/,'')+' capped to '+capped.toLocaleString()+' (3.4% of Views)';
+    }
+    if(msg){w.classList.add('show');document.getElementById('minWarnText-'+slot.uid).textContent=msg;}
+    else{w.classList.remove('show');}
+  });
+  const banner=document.getElementById('globalErrorBanner');
+  if(errorMsg){banner.classList.add('show');document.getElementById('globalErrorText').textContent=errorMsg;updateAllCostBoxes();updateTotals();updateGraph();previewLegs();}
+  else{banner.classList.remove('show');}
+}
 
 function toggleCurrencyTable(uid){const t=document.getElementById('currencyTable-'+uid);const b=document.getElementById('expandBtn-'+uid);const open=t.classList.toggle('open');b.classList.toggle('open',open);if(open)renderCurrencyTable(uid);}
 function setActiveCurrency(uid,cur){activeCurrency=cur;updateAllCostBoxes();}
@@ -448,8 +471,59 @@ function updateGraph(){if(!growthChart)return;const numLegs=parseInt(document.ge
 
 let lastLegsData=[];
 function toggleLegsSide(){legsSideOpen=!legsSideOpen;document.getElementById('legsSideDetail').classList.toggle('open',legsSideOpen);document.getElementById('legsSideExpandBtn').classList.toggle('open',legsSideOpen);if(legsSideOpen)renderLegsSideDetail();}
-function updateLegsSidePanel(legsData){lastLegsData=legsData;const numLegs=legsData.length?legsData[0].legs.length:0;document.getElementById('legsSideCount').innerHTML=(numLegs||'—')+'<span>legs</span>';if(legsSideOpen)renderLegsSideDetail();}
-function renderLegsSideDetail(){const wrap=document.getElementById('legsSideDetail');if(!lastLegsData.length){wrap.innerHTML='<div style="font-size:10px;color:#475569;text-align:center;margin-top:10px">No data</div>';return;}wrap.innerHTML=lastLegsData.map(({slot,legs})=>{const typeName=slotTypeLabels[slot.type].replace(/^[^\s]+\s/,'');const rows=legs.map((q,i)=>`<div class="leg-mini-row"><span>L${i+1}</span><span>${q.toLocaleString()}</span></div>`).join('');return`<div style="margin-bottom:8px"><div style="font-size:9px;color:#fca5a5;font-weight:700;margin-bottom:2px">${typeName}</div>${rows}</div>`;}).join('');}
+function updateLegsSidePanel(legsData){lastLegsData=legsData;const maxLegs=legsData.length?Math.max(...legsData.map(d=>d.legs.length)):0;document.getElementById('legsSideCount').innerHTML=(maxLegs||'—')+'<span>legs</span>';if(legsSideOpen)renderLegsSideDetail();}
+function renderLegsSideDetail(){
+  const wrap=document.getElementById('legsSideDetail');
+  if(!lastLegsData.length){wrap.innerHTML='<div style="font-size:10px;color:#475569;text-align:center;margin-top:10px">No data</div>';return;}
+  // Find views and like slots
+  const viewsD=lastLegsData.find(d=>d.slot.type==='views');
+  const likeD=lastLegsData.find(d=>d.slot.type==='like');
+  const others=lastLegsData.filter(d=>d.slot.type!=='views'&&d.slot.type!=='like');
+  let html='';
+  if(viewsD){
+    const vLegs=viewsD.legs;
+    const lLegs=likeD?likeD.legs:[];
+    const maxL=Math.max(vLegs.length,lLegs.length);
+    html+='<div style="margin-bottom:6px">';
+    for(let i=0;i<maxL;i++){
+      const v=vLegs[i];
+      const l=lLegs[i];
+      const hasBoth=v!==undefined&&l!==undefined;
+      const hasOnlyV=v!==undefined&&l===undefined;
+      if(hasBoth){
+        // Views + Like together on same leg
+        html+=`<div class="leg-mini-row" style="gap:4px">
+          <span style="color:#dc2626;font-weight:700;min-width:22px">L${i+1}</span>
+          <span style="color:#ef4444">👁 ${v.toLocaleString()}</span>
+          <span style="color:#9ca3af;font-size:9px">+</span>
+          <span style="color:#f87171">❤️ ${l.toLocaleString()}</span>
+        </div>`;
+      } else if(hasOnlyV){
+        // Only views remaining
+        html+=`<div class="leg-mini-row">
+          <span style="color:#dc2626;font-weight:700;min-width:22px">L${i+1}</span>
+          <span style="color:#ef4444">👁 ${v.toLocaleString()}</span>
+          <span style="color:#374151;font-size:9px;margin-left:4px">views only</span>
+        </div>`;
+      } else if(l!==undefined){
+        // Only like remaining (edge case)
+        html+=`<div class="leg-mini-row">
+          <span style="color:#dc2626;font-weight:700;min-width:22px">L${i+1}</span>
+          <span style="color:#f87171">❤️ ${l.toLocaleString()}</span>
+        </div>`;
+      }
+    }
+    html+='</div>';
+  }
+  // Other slots (save, repost etc) — show separately as before
+  others.forEach(({slot,legs})=>{
+    const typeName=slotTypeLabels[slot.type].replace(/^[^\s]+\s/,'');
+    html+=`<div style="margin-bottom:6px"><div style="font-size:9px;color:#fca5a5;font-weight:700;margin-bottom:2px">${typeName}</div>`;
+    html+=legs.map((q,i)=>`<div class="leg-mini-row"><span>L${i+1}</span><span>${q.toLocaleString()}</span></div>`).join('');
+    html+='</div>';
+  });
+  wrap.innerHTML=html;
+}
 function renderMultiSlotLegPicker(){const block=document.getElementById('multiSlotLegPicker');const list=document.getElementById('multiSlotLegPickerList');if(svcSlots.length<4){block.style.display='none';return;}block.style.display='block';const globalLegs=parseInt(document.getElementById('numLegs').value)||5;list.innerHTML=svcSlots.map(slot=>{const name=slotTypeLabels[slot.type]+(slot.service?' — '+slot.service.name.slice(0,22):'');const opts=[];for(let i=1;i<=Math.max(globalLegs,20);i++)opts.push(`<option value="${i}" ${(slot.legOverride||globalLegs)===i?'selected':''}>${i}</option>`);return`<div class="svc-leg-select-row"><span class="sl-name">${name}</span><select onchange="setSlotLegOverride(${slot.uid},this.value)">${opts.join('')}</select></div>`;}).join('');}
 function setSlotLegOverride(uid,val){const slot=getSlot(uid);if(slot)slot.legOverride=parseInt(val)||null;updateGraph();previewLegs();updateViewsLegsSlot();}
 function generateLegsFor(totalQty,numLegs,variancePct,minQ){if(numLegs<=0||totalQty<=0)return[];minQ=minQ||1;const vp=(variancePct||22)/100;const maxPossibleLegs=Math.max(1,Math.floor(totalQty/minQ));numLegs=Math.min(numLegs,maxPossibleLegs);const base=Math.floor(totalQty/numLegs);let legs=[],remaining=totalQty;for(let i=0;i<numLegs-1;i++){const variation=Math.floor(base*vp);let lq=Math.floor(Math.random()*(variation*2+1))+(base-variation);lq=Math.max(minQ,Math.min(lq,remaining-(numLegs-i-1)*minQ));legs.push(lq);remaining-=lq;}legs.push(Math.max(minQ,remaining));for(let i=legs.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[legs[i],legs[j]]=[legs[j],legs[i]];}return legs;}
