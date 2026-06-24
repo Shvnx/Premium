@@ -54,7 +54,6 @@ select option{background:#140505}
 input[type=range]{-webkit-appearance:none;width:100%;height:4px;border-radius:2px;background:linear-gradient(90deg,#dc2626 var(--val,22%),rgba(255,255,255,.08) var(--val,22%));border:none;padding:0;cursor:pointer}
 input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:linear-gradient(135deg,#f87171,#dc2626);border:2px solid #fff;box-shadow:0 2px 8px rgba(220,38,38,.5)}
 .slider-labels{display:flex;justify-content:space-between;font-size:10px;color:#b0a8a8;margin-top:4px}
-/* SERVICE PICKER */
 .service-picker-wrap{position:relative}
 .svc-search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:13px;pointer-events:none;z-index:1}
 .service-search-input{width:100%;padding:10px 12px 10px 34px;background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.08);border-radius:10px;color:#f5f5f5;font-size:13px;outline:none;transition:all .2s}
@@ -69,8 +68,6 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
 .svc-name{font-size:12px;flex:1;color:#f0e8e8;line-height:1.3}
 .svc-price{font-size:11px;color:#22c55e;white-space:nowrap;font-weight:600}
 .svc-min{font-size:10px;color:#9c9494;margin-left:2px;white-space:nowrap}
-.svc-selected-bar{background:linear-gradient(135deg,rgba(220,38,38,.1),rgba(153,27,27,.07));border:1px solid rgba(220,38,38,.25);border-radius:10px;padding:12px 14px;margin-top:8px;display:none;font-size:12px;color:#fca5a5;line-height:1.7}
-/* PRESETS */
 .presets-box{background:linear-gradient(135deg,rgba(220,38,38,.08),rgba(0,0,0,.2));border:1px solid rgba(220,38,38,.22);border-radius:14px;padding:12px 14px;margin-bottom:16px}
 .presets-head{display:flex;align-items:center;justify-content:space-between;cursor:pointer}
 .presets-head-title{font-size:12px;font-weight:700;color:#fca5a5;display:flex;align-items:center;gap:7px;letter-spacing:.2px}
@@ -90,7 +87,6 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
 .btn-save-preset:hover{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.25)}
 .btn-direct-order{flex:1.4;background:linear-gradient(135deg,#dc2626,#991b1b);color:#fff;box-shadow:0 4px 20px rgba(220,38,38,.4)}
 .btn-direct-order:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(220,38,38,.5)}
-/* COST BOX — compact slot */
 .cost-box{background:linear-gradient(135deg,rgba(34,197,94,.06),rgba(220,38,38,.06));border:1px solid rgba(34,197,94,.18);border-radius:12px;padding:11px 14px;margin-top:10px}
 .cost-slot{display:flex;align-items:center;justify-content:space-between;gap:10px}
 .cost-slot-main{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
@@ -99,7 +95,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
 .cost-slot-meta{font-size:10px;color:#b0a8a8;margin-top:2px}
 .cost-expand-btn{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:#d6cfcf;width:26px;height:26px;border-radius:8px;cursor:pointer;font-size:11px;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0}
 .cost-expand-btn:hover{border-color:rgba(220,38,38,.5);color:#fca5a5;background:rgba(220,38,38,.1)}
-.cost-expand-btn.open{transform:rotate(180deg);color:#fca5a5;border-color:rgba(220,38,38,.5)}
+.cost-expand-btn.open{transform:rotate(180deg);color:#fca5a5;border-color:rgba(220,38,68,.5)}
 .currency-table{display:none;margin-top:10px;border-top:1px solid rgba(255,255,255,.06);padding-top:10px}
 .currency-table.open{display:block}
 .currency-select-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
@@ -112,16 +108,13 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
 .ctable td.cc-name{color:#c4bcbc}
 .ctable td.cc-val{text-align:right;font-weight:700;color:#f5f5f5}
 .ctable tr.cc-active td{color:#22c55e!important;font-weight:800}
-/* MIN INFO (no manual override, read-only floor) */
 .min-warning{font-size:11px;color:#f87171;margin-top:5px;display:none;align-items:center;gap:4px}
 .min-warning.show{display:flex}
-/* GRAPH — compact + side legs panel */
 .graph-legs-flex{display:flex;gap:10px;margin-top:10px;align-items:flex-start}
 .graph-wrap{position:relative;height:165px;flex:0 0 75%;max-width:75%;border-radius:12px;overflow:hidden;background:rgba(0,0,0,.2);padding:8px}
 .graph-actions{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
 .gBtn{padding:6px 14px;border-radius:7px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid rgba(255,255,255,.07);background:rgba(255,255,255,.03);color:#b0a8a8;transition:all .2s}
 .gBtn.active,.gBtn:hover{border-color:rgba(220,38,38,.5);color:#fca5a5;background:rgba(220,38,38,.1)}
-/* LEGS side mini panel */
 .legs-side-panel{flex:1;min-width:0;background:rgba(0,0,0,.2);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:10px 8px;height:165px;display:flex;flex-direction:column}
 .legs-side-title{font-size:9px;font-weight:700;color:#fca5a5;text-transform:uppercase;letter-spacing:.5px;display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
 .legs-side-expand{background:none;border:none;color:#c4bcbc;cursor:pointer;font-size:11px;padding:2px;transition:transform .2s}
@@ -132,15 +125,6 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
 .legs-side-detail.open{display:block}
 .legs-side-detail .leg-mini-row{display:flex;justify-content:space-between;font-size:10px;padding:3px 2px;color:#d6cfcf;border-bottom:1px solid rgba(255,255,255,.03)}
 .legs-side-detail .leg-mini-row span:first-child{color:#dc2626;font-weight:600}
-/* LEGS */
-.legs-preview{margin-top:12px;display:none}
-.leg-bar-row{display:flex;align-items:center;gap:8px;padding:5px 8px;background:rgba(0,0,0,.2);border-radius:7px;margin-bottom:3px;border:1px solid rgba(255,255,255,.03)}
-.leg-label{font-size:11px;color:#dc2626;width:45px;flex-shrink:0;font-weight:600}
-.leg-bar-track{flex:1;height:5px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden}
-.leg-bar-fill{height:100%;background:linear-gradient(90deg,#dc2626,#f87171);border-radius:3px;transition:width .3s}
-.leg-qty{font-size:11px;color:#f5f5f5;width:65px;text-align:right;font-weight:600}
-.leg-time{font-size:10px;color:#b0a8a8;width:55px;text-align:right}
-/* MULTI-SERVICE SLOTS */
 .svc-slots{display:flex;flex-direction:column;gap:10px}
 .svc-slot{background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:12px}
 .svc-slot-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
@@ -152,7 +136,6 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
 .add-slot-btn{display:flex;align-items:center;justify-content:center;gap:6px;padding:11px;border-radius:10px;border:1px dashed rgba(220,38,38,.4);background:rgba(220,38,38,.05);color:#fca5a5;font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;margin-top:4px}
 .add-slot-btn:hover{background:rgba(220,38,38,.12);border-color:rgba(220,38,38,.6)}
 .svc-slot-min{font-size:10px;color:#b0a8a8;margin-top:6px}
-/* TOTALS SUMMARY */
 .totals-box{background:linear-gradient(135deg,rgba(220,38,38,.08),rgba(153,27,27,.05));border:1px solid rgba(220,38,38,.2);border-radius:12px;padding:12px 14px;margin-top:12px}
 .totals-box-title{font-size:10px;font-weight:700;color:#fca5a5;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px}
 .totals-row{display:flex;justify-content:space-between;font-size:12px;color:#d6cfcf;padding:3px 0}
@@ -164,7 +147,6 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
 .svc-leg-select-row select{width:90px;padding:6px 8px;font-size:11px}
 .error-banner{background:rgba(127,29,29,.25);border:1px solid rgba(248,113,113,.4);border-radius:10px;padding:10px 14px;margin-top:10px;font-size:12px;color:#fca5a5;display:none;align-items:center;gap:8px}
 .error-banner.show{display:flex}
-/* SCHEDULE */
 .si{background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:14px;margin-bottom:8px;transition:border-color .2s}
 .si:hover{border-color:rgba(220,38,38,.25)}
 .si-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
@@ -176,7 +158,6 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
 .badge{display:inline-block;padding:2px 9px;border-radius:100px;font-size:10px;font-weight:700}
 .badge-green{background:rgba(34,197,94,.12);color:#22c55e;border:1px solid rgba(34,197,94,.2)}
 .badge-yellow{background:rgba(234,179,8,.12);color:#eab308;border:1px solid rgba(234,179,8,.2)}
-/* LOG */
 .log-area{background:rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:12px;font-family:monospace;font-size:11px;max-height:280px;overflow-y:auto}
 .log-line{padding:3px 0;border-bottom:1px solid rgba(255,255,255,.02);color:#8a8282;line-height:1.5}
 .log-line.success{color:#22c55e}.log-line.error{color:#f87171}.log-line.info{color:#e5e5e5}
@@ -184,32 +165,42 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
 .info-box{background:rgba(220,38,38,.06);border:1px solid rgba(220,38,38,.15);border-radius:10px;padding:10px 14px;font-size:12px;color:#c4bcbc;margin-top:10px}
 .info-box strong{color:#fca5a5}
 .empty-state{text-align:center;padding:36px;color:#8a8282;font-size:13px}
-/* TOAST NOTIFICATION — chhota, top pe, green gradient */
 #toastWrap{position:fixed;top:18px;left:0;right:0;display:flex;justify-content:center;z-index:10000;pointer-events:none}
 .toast{display:flex;align-items:center;gap:8px;padding:11px 20px;border-radius:100px;font-size:13px;font-weight:700;color:#fff;background:linear-gradient(135deg,#16a34a,#15803d);box-shadow:0 8px 24px rgba(22,163,74,.4),inset 0 1px 0 rgba(255,255,255,.2);transform:translateY(-60px);opacity:0;transition:all .35s cubic-bezier(.34,1.56,.64,1)}
 .toast.show{transform:translateY(0);opacity:1}
 .toast.error{background:linear-gradient(135deg,#dc2626,#991b1b);box-shadow:0 8px 24px rgba(220,38,38,.4),inset 0 1px 0 rgba(255,255,255,.2)}
+
+/* ===== LICENSE OVERLAY WITH VIDEO BG ===== */
+#licenseOverlay{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;overflow:hidden}
+#licenseBgVideo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;opacity:0.45;pointer-events:none}
+#licenseOverlayDim{position:absolute;inset:0;z-index:1;background:linear-gradient(135deg,rgba(10,0,0,0.6) 0%,rgba(26,4,4,0.5) 20%,rgba(61,10,10,0.5) 40%,rgba(92,15,15,0.45) 55%,rgba(43,7,7,0.55) 75%,rgba(10,0,0,0.65) 100%)}
+#licenseCard{position:relative;z-index:2;max-width:340px;width:100%;background:rgba(0,0,0,0.45);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.12);border-radius:18px;padding:26px;box-shadow:0 8px 40px rgba(0,0,0,.7),0 0 0 1px rgba(220,38,38,.1)}
 </style>
 </head>
 <body>
 <div id="toastWrap"></div>
 
-<!-- ============================================ -->
 <!-- LICENSE LOCK OVERLAY -->
-<!-- ============================================ -->
-<div id="licenseOverlay" style="position:fixed;inset:0;z-index:9999;background:linear-gradient(135deg,#0a0000 0%,#1a0404 20%,#3d0a0a 40%,#5c0f0f 55%,#2b0707 75%,#0a0000 100%);display:flex;align-items:center;justify-content:center;padding:20px">
-  <div style="max-width:340px;width:100%;background:rgba(0,0,0,.35);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.08);border-radius:18px;padding:26px;box-shadow:0 8px 32px rgba(0,0,0,.5)">
+<div id="licenseOverlay">
+  <!-- Background Video -->
+  <video id="licenseBgVideo" autoplay muted loop playsinline>
+    <source src="https://raw.githubusercontent.com/Shvnx/Premium/main/ii_landscape.mp4.mp4" type="video/mp4">
+  </video>
+  <!-- Dark dim layer -->
+  <div id="licenseOverlayDim"></div>
+  <!-- License Card -->
+  <div id="licenseCard">
     <div style="font-size:20px;font-weight:900;background:linear-gradient(135deg,#fff,#ef4444,#991b1b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:4px">⚡ SPIDEY</div>
     <div style="font-size:12px;color:#9ca3af;margin-bottom:18px">Enter license key to access</div>
     <label style="display:block;font-size:10px;color:#9ca3af;margin-bottom:5px;text-transform:uppercase;letter-spacing:.8px;font-weight:700">License Key</label>
-    <input type="text" id="licenseKeyInput" placeholder="XXXX-XXXX-XXXX-XXXX" style="width:100%;padding:11px 12px;background:rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:#f5f5f5;font-size:14px;outline:none;font-family:monospace;text-transform:uppercase">
+    <input type="text" id="licenseKeyInput" placeholder="XXXX-XXXX-XXXX-XXXX" style="width:100%;padding:11px 12px;background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.15);border-radius:10px;color:#f5f5f5;font-size:14px;outline:none;font-family:monospace;text-transform:uppercase">
     <button id="licenseSubmitBtn" onclick="verifyLicense()" style="width:100%;margin-top:14px;padding:13px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;border:none;background:linear-gradient(135deg,#dc2626,#991b1b);color:#fff;box-shadow:0 4px 20px rgba(220,38,38,.4)">Unlock</button>
     <div id="licenseError" style="display:none;color:#fca5a5;font-size:12px;margin-top:12px;text-align:center"></div>
     <div id="licenseExpiry" style="display:none;color:#86efac;font-size:11px;margin-top:12px;text-align:center"></div>
   </div>
 </div>
-<div id="appContent" style="display:none">
 
+<div id="appContent" style="display:none">
 <div class="topbar">
   <div class="logo">⚡ SPIDEY <span>Private panel</span></div>
   <div class="status-pill">
@@ -217,15 +208,12 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
     <span id="statusText">Not connected</span>
   </div>
 </div>
-
 <div class="tabs">
   <button class="tab active" onclick="switchTab('setup',this)">🔌 API</button>
   <button class="tab" onclick="switchTab('order',this)">📦 Order</button>
   <button class="tab" onclick="switchTab('schedules',this)">🗓 Schedules</button>
   <button class="tab" onclick="switchTab('logs',this)">📋 Logs</button>
 </div>
-
-<!-- TAB 1: API -->
 <div class="tab-content active" id="tab-setup">
   <div class="card">
     <div class="card-title">🔌 API Connection</div>
@@ -240,13 +228,9 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
     <div class="info-box" style="margin-top:14px"><strong>Proxy:</strong> Render backend — CORS bypass enabled</div>
   </div>
 </div>
-
-<!-- TAB 2: NEW ORDER -->
 <div class="tab-content" id="tab-order">
   <div class="card">
     <div class="card-title">📦 Create Order</div>
-
-    <!-- SAVED PRESETS -->
     <div class="presets-box">
       <div class="presets-head" onclick="togglePresets()">
         <div class="presets-head-title">💾 Saved Presets <span id="presetsCountBadge" style="color:#b0a8a8;font-weight:500"></span></div>
@@ -254,19 +238,14 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
       </div>
       <div class="presets-list" id="presetsList"></div>
     </div>
-
     <label>Schedule Name</label>
     <input type="text" id="scheduleName" placeholder="e.g. Reel Daily Push" />
-
     <label>Target Link</label>
     <input type="text" id="targetLink" placeholder="https://instagram.com/p/..." />
-
     <hr class="divider">
     <div class="card-title" style="margin-bottom:8px">🧩 Services</div>
     <div class="svc-slots" id="svcSlots"></div>
     <button class="add-slot-btn" id="addSlotBtn" onclick="addSvcSlot()">➕ Add another service</button>
-
-    <!-- TOTALS SUMMARY (all slots combined) -->
     <div class="totals-box" id="totalsBox" style="display:none">
       <div class="totals-box-title">📊 Combined Totals</div>
       <div class="totals-row"><span>Total quantity (all services)</span><strong id="totQtyAll">—</strong></div>
@@ -274,7 +253,6 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
       <div class="totals-row"><span>Lowest allowed minimum</span><strong id="totMinAll">—</strong></div>
     </div>
     <div class="error-banner" id="globalErrorBanner"><span>⚠️</span><span id="globalErrorText"></span></div>
-
     <hr class="divider">
     <div class="card-title" style="margin-bottom:10px">🎯 Delivery Mode</div>
     <div class="mode-btns">
@@ -284,7 +262,6 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
       <button class="mode-btn slow" onclick="setMode('slow',this)">🐢 Slow Burn</button>
       <button class="mode-btn custom" onclick="setMode('custom',this)">✏️ Custom</button>
     </div>
-
     <div style="margin-top:14px">
       <label>Delivery Speed</label>
       <div class="speed-btns">
@@ -296,7 +273,6 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
         <button class="speed-btn" onclick="setSpeed('custom',this)">Custom</button>
       </div>
     </div>
-
     <div class="row2" style="margin-top:14px">
       <div>
         <label>Number of Legs</label>
@@ -314,7 +290,6 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
         </div>
       </div>
     </div>
-
     <div style="margin-top:14px">
       <label>Random Variance — <span id="varianceVal">22</span>%</label>
       <div class="slider-wrap">
@@ -324,7 +299,6 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
         <div class="slider-labels"><span>5% (safe)</span><span>40% (very random)</span></div>
       </div>
     </div>
-
     <hr class="divider">
     <div class="card-title" style="margin-bottom:8px">📈 Growth Projection</div>
     <div class="graph-actions">
@@ -340,30 +314,23 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
         <div class="legs-side-detail" id="legsSideDetail"></div>
       </div>
     </div>
-
     <div class="svc-leg-select-block" id="multiSlotLegPicker" style="display:none">
       <div class="svc-leg-select-title">🦵 Which leg-count per service</div>
       <div id="multiSlotLegPickerList"></div>
     </div>
-
     <hr class="divider">
-
     <div class="save-direct-row">
       <button class="btn btn-save-preset" onclick="savePreset()">💾 Save Preset</button>
       <button class="btn btn-direct-order" onclick="directOrder()">🚀 Direct Order</button>
     </div>
   </div>
 </div>
-
-<!-- TAB 3 -->
 <div class="tab-content" id="tab-schedules">
   <div class="card">
     <div class="card-title">🗓 Active Schedules</div>
     <div id="schedulesList"><div class="empty-state">No schedules yet</div></div>
   </div>
 </div>
-
-<!-- TAB 4 -->
 <div class="tab-content" id="tab-logs">
   <div class="card">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
@@ -373,15 +340,14 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
     <div class="log-area" id="logArea"><div class="log-line info">[System] SPIDEY ready...</div></div>
   </div>
 </div>
-
-</div><!-- /#appContent -->
+</div>
 
 <script>
-const BACKEND='https://premium-29ko.onrender.com'; // <-- saara backend traffic (proxy + schedules + license) yahan se jaata hai
+const BACKEND='https://premium-29ko.onrender.com';
 let apiUrl='',apiKey='';
 let scheduleRefreshTimer=null;
 let allServices=[];
-let schedules=[]; // <-- ab backend se aate hain (refreshSchedulesFromServer), localStorage se nahi
+let schedules=[];
 let logs=JSON.parse(localStorage.getItem('smm_logs')||'[]');
 let currentMode='viral';
 let currentSpeed='12h';
@@ -393,12 +359,7 @@ let currencyTableOpen=false;
 let activeCurrency='INR';
 const currencyMeta={USD:{symbol:'$',rate:1},INR:{symbol:'₹',rate:null},GBP:{symbol:'£',rate:null},EUR:{symbol:'€',rate:null},AED:{symbol:'AED ',rate:null},PKR:{symbol:'₨',rate:null}};
 let fxRates={USD:1};
-
-// MULTI-SERVICE SLOTS: slot[0] is treated as the "base" (usually Views) — like/save/repost type slots cannot exceed slot0 qty.
-let svcSlots=[
-  {uid:1,service:null,type:'views',qty:0,legOverride:null},
-  {uid:2,service:null,type:'like',qty:0,legOverride:null}
-];
+let svcSlots=[{uid:1,service:null,type:'views',qty:0,legOverride:null},{uid:2,service:null,type:'like',qty:0,legOverride:null}];
 let nextSlotUid=3;
 const slotTypeLabels={views:'👁 Views',like:'❤️ Like',save:'🔖 Save',repost:'🔁 Repost/RT'};
 let presets=JSON.parse(localStorage.getItem('smm_presets')||'[]');
@@ -408,792 +369,101 @@ window.onload=()=>{
   const saved=JSON.parse(localStorage.getItem('smm_api')||'{}');
   if(saved.url){document.getElementById('apiUrl').value=saved.url;apiUrl=saved.url;}
   if(saved.key){document.getElementById('apiKey').value=saved.key;apiKey=saved.key;}
-  const now=new Date();now.setMinutes(now.getMinutes()-now.getTimezoneOffset());
   initChart();renderLogs();renderSvcSlots();renderPresets();
   if(apiUrl&&apiKey){setConnected('Saved — loading...');fetchServices();}
-  // Schedules ab backend se aate hain (server-side processing), local timers nahi chalte
-  refreshSchedulesFromServer();
-  startScheduleAutoRefresh();
-  fetchRate();
+  refreshSchedulesFromServer();startScheduleAutoRefresh();fetchRate();
 };
 
-async function fetchRate(){
-  try{
-    const r=await fetch('https://open.er-api.com/v6/latest/USD');
-    const d=await r.json();
-    if(d&&d.rates){
-      fxRates=d.rates;usdToInr=d.rates.INR||84;
-      updateAllCostBoxes();
-    }
-  }catch(e){}
-}
-
-function switchTab(tab,el){
-  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
-  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-  document.getElementById('tab-'+tab).classList.add('active');
-  if(el)el.classList.add('active');
-  if(tab==='order'&&growthChart)setTimeout(()=>{growthChart.resize();updateGraph();},100);
-}
-
-async function callApi(params){
-  const body=new URLSearchParams({_target:apiUrl,key:apiKey,...params});
-  try{
-    const res=await fetch(BACKEND+'/proxy',{method:'POST',body,signal:AbortSignal.timeout(15000)});
-    return JSON.parse(await res.text());
-  }catch(e){
-    try{
-      const r2=await fetch(apiUrl,{method:'POST',body:new URLSearchParams({key:apiKey,...params}),signal:AbortSignal.timeout(8000)});
-      return await r2.json();
-    }catch(e2){return{error:'Network error: '+e2.message};}
-  }
-}
-
+async function fetchRate(){try{const r=await fetch('https://open.er-api.com/v6/latest/USD');const d=await r.json();if(d&&d.rates){fxRates=d.rates;usdToInr=d.rates.INR||84;updateAllCostBoxes();}}catch(e){}}
+function switchTab(tab,el){document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));document.getElementById('tab-'+tab).classList.add('active');if(el)el.classList.add('active');if(tab==='order'&&growthChart)setTimeout(()=>{growthChart.resize();updateGraph();},100);}
+async function callApi(params){const body=new URLSearchParams({_target:apiUrl,key:apiKey,...params});try{const res=await fetch(BACKEND+'/proxy',{method:'POST',body,signal:AbortSignal.timeout(15000)});return JSON.parse(await res.text());}catch(e){try{const r2=await fetch(apiUrl,{method:'POST',body:new URLSearchParams({key:apiKey,...params}),signal:AbortSignal.timeout(8000)});return await r2.json();}catch(e2){return{error:'Network error: '+e2.message};}}}
 function setConnected(msg){document.getElementById('statusDot').classList.add('on');document.getElementById('statusText').textContent=msg;}
+async function testConnection(){apiUrl=document.getElementById('apiUrl').value.trim();apiKey=document.getElementById('apiKey').value.trim();if(!apiUrl||!apiKey){alert('Enter both URL and API key!');return;}const res=await callApi({action:'balance'});if(res.balance!==undefined){setConnected('Balance: $'+parseFloat(res.balance).toFixed(4));alert('Connected! Balance: $'+res.balance);}else alert('Error: '+JSON.stringify(res));}
+async function saveAndFetch(){apiUrl=document.getElementById('apiUrl').value.trim();apiKey=document.getElementById('apiKey').value.trim();if(!apiUrl||!apiKey){alert('Enter URL and API key!');return;}localStorage.setItem('smm_api',JSON.stringify({url:apiUrl,key:apiKey}));const res=await callApi({action:'balance'});if(res.balance!==undefined)setConnected('Balance: $'+parseFloat(res.balance).toFixed(4));await fetchServices();}
+async function fetchServices(){const res=await callApi({action:'services'});if(Array.isArray(res)&&res.length){allServices=res;addLog('success','✅ '+res.length+' services loaded');}else addLog('error','Services fetch failed: '+JSON.stringify(res));}
 
-async function testConnection(){
-  apiUrl=document.getElementById('apiUrl').value.trim();
-  apiKey=document.getElementById('apiKey').value.trim();
-  if(!apiUrl||!apiKey){alert('Enter both URL and API key!');return;}
-  const res=await callApi({action:'balance'});
-  if(res.balance!==undefined){setConnected('Balance: $'+parseFloat(res.balance).toFixed(4));alert('Connected! Balance: $'+res.balance);}
-  else alert('Error: '+JSON.stringify(res));
-}
-
-async function saveAndFetch(){
-  apiUrl=document.getElementById('apiUrl').value.trim();
-  apiKey=document.getElementById('apiKey').value.trim();
-  if(!apiUrl||!apiKey){alert('Enter URL and API key!');return;}
-  localStorage.setItem('smm_api',JSON.stringify({url:apiUrl,key:apiKey}));
-  const res=await callApi({action:'balance'});
-  if(res.balance!==undefined)setConnected('Balance: $'+parseFloat(res.balance).toFixed(4));
-  await fetchServices();
-}
-
-async function fetchServices(){
-  const res=await callApi({action:'services'});
-  if(Array.isArray(res)&&res.length){
-    allServices=res;
-    addLog('success','✅ '+res.length+' services loaded');
-  }else addLog('error','Services fetch failed: '+JSON.stringify(res));
-}
-
-// ===== MULTI-SERVICE SLOTS =====
 function renderSvcSlots(){
   const wrap=document.getElementById('svcSlots');
   wrap.innerHTML=svcSlots.map((slot,idx)=>{
     const typeOptions=Object.keys(slotTypeLabels).map(t=>`<option value="${t}" ${slot.type===t?'selected':''}>${slotTypeLabels[t]}</option>`).join('');
     const removeBtn=svcSlots.length>2||idx>=2?`<button class="svc-slot-remove" onclick="removeSvcSlot(${slot.uid})">✕</button>`:'';
     const minNote=slot.service?`Min: <strong style="color:#f59e0b">${slot.service.min}</strong> &nbsp;|&nbsp; Max: ${slot.service.max}`:'No service selected yet';
-    return `
-    <div class="svc-slot" id="slot-${slot.uid}">
-      <div class="svc-slot-head">
-        <span class="svc-slot-label">Slot ${idx+1}</span>
-        ${removeBtn}
-      </div>
-      <div class="svc-slot-row">
-        <select class="svc-type-select" onchange="setSlotType(${slot.uid},this.value)">${typeOptions}</select>
-        <div class="service-picker-wrap">
-          <span class="svc-search-icon">🔍</span>
-          <input type="text" class="service-search-input" id="svcSearch-${slot.uid}"
-            placeholder="Type service ID or name..."
-            oninput="onSvcInput(${slot.uid})" onfocus="onSvcFocus(${slot.uid})" onblur="setTimeout(()=>closeSvcDD(${slot.uid}),200)" />
-          <div class="service-dropdown" id="svcDropdown-${slot.uid}"></div>
-        </div>
-      </div>
-      <div class="svc-slot-min">${minNote}</div>
-      <div class="row2" style="margin-top:8px">
-        <div>
-          <label style="margin-top:6px">Quantity</label>
-          <input type="number" id="qty-${slot.uid}" placeholder="e.g. 2000" value="${slot.qty||''}" oninput="onSlotQtyInput(${slot.uid})" />
-        </div>
-        <div>
-          <label style="margin-top:6px">&nbsp;</label>
-          <div class="cost-box" id="costBox-${slot.uid}" style="margin-top:0;display:none">
-            <div class="cost-slot">
-              <div>
-                <div class="cost-slot-main"><span class="cost-slot-usd" id="calcUSD-${slot.uid}">—</span><span class="cost-slot-inr" id="calcINR-${slot.uid}">—</span></div>
-                <div class="cost-slot-meta" id="calcMeta-${slot.uid}">—</div>
-              </div>
-              <button class="cost-expand-btn" id="expandBtn-${slot.uid}" onclick="toggleCurrencyTable(${slot.uid})">▾</button>
-            </div>
-            <div class="currency-table" id="currencyTable-${slot.uid}">
-              <div class="currency-select-row">
-                <label style="margin:0">Currency</label>
-                <select onchange="setActiveCurrency(${slot.uid},this.value)">
-                  ${Object.keys(currencyMeta).map(c=>`<option value="${c}" ${c===activeCurrency?'selected':''}>${c}</option>`).join('')}
-                </select>
-              </div>
-              <table class="ctable" id="ctable-${slot.uid}"></table>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="min-warning" id="minWarning-${slot.uid}">⚠️ <span id="minWarnText-${slot.uid}"></span></div>
-    </div>`;
+    return`<div class="svc-slot" id="slot-${slot.uid}"><div class="svc-slot-head"><span class="svc-slot-label">Slot ${idx+1}</span>${removeBtn}</div><div class="svc-slot-row"><select class="svc-type-select" onchange="setSlotType(${slot.uid},this.value)">${typeOptions}</select><div class="service-picker-wrap"><span class="svc-search-icon">🔍</span><input type="text" class="service-search-input" id="svcSearch-${slot.uid}" placeholder="Type service ID or name..." oninput="onSvcInput(${slot.uid})" onfocus="onSvcFocus(${slot.uid})" onblur="setTimeout(()=>closeSvcDD(${slot.uid}),200)" /><div class="service-dropdown" id="svcDropdown-${slot.uid}"></div></div></div><div class="svc-slot-min">${minNote}</div><div class="row2" style="margin-top:8px"><div><label style="margin-top:6px">Quantity</label><input type="number" id="qty-${slot.uid}" placeholder="e.g. 2000" value="${slot.qty||''}" oninput="onSlotQtyInput(${slot.uid})" /></div><div><label style="margin-top:6px">&nbsp;</label><div class="cost-box" id="costBox-${slot.uid}" style="margin-top:0;display:none"><div class="cost-slot"><div><div class="cost-slot-main"><span class="cost-slot-usd" id="calcUSD-${slot.uid}">—</span><span class="cost-slot-inr" id="calcINR-${slot.uid}">—</span></div><div class="cost-slot-meta" id="calcMeta-${slot.uid}">—</div></div><button class="cost-expand-btn" id="expandBtn-${slot.uid}" onclick="toggleCurrencyTable(${slot.uid})">▾</button></div><div class="currency-table" id="currencyTable-${slot.uid}"><div class="currency-select-row"><label style="margin:0">Currency</label><select onchange="setActiveCurrency(${slot.uid},this.value)">${Object.keys(currencyMeta).map(c=>`<option value="${c}" ${c===activeCurrency?'selected':''}>${c}</option>`).join('')}</select></div><table class="ctable" id="ctable-${slot.uid}"></table></div></div></div></div><div class="min-warning" id="minWarning-${slot.uid}">⚠️ <span id="minWarnText-${slot.uid}"></span></div></div>`;
   }).join('');
-  // re-bind selected display if a slot already has a chosen service
-  svcSlots.forEach(slot=>{
-    if(slot.service){
-      const inp=document.getElementById('svcSearch-'+slot.uid);
-      if(inp)inp.value='#'+slot.service.service+' — '+slot.service.name;
-    }
-  });
-  updateAllCostBoxes();
-  updateTotals();
-  validateAllSlots();
-  renderMultiSlotLegPicker();
+  svcSlots.forEach(slot=>{if(slot.service){const inp=document.getElementById('svcSearch-'+slot.uid);if(inp)inp.value='#'+slot.service.service+' — '+slot.service.name;}});
+  updateAllCostBoxes();updateTotals();validateAllSlots();renderMultiSlotLegPicker();
 }
 
-function addSvcSlot(){
-  if(svcSlots.length>=6){addLog('info','Max 6 services in one schedule');return;}
-  const usedTypes=svcSlots.map(s=>s.type);
-  const freeType=['like','save','repost'].find(t=>!usedTypes.includes(t))||'like';
-  svcSlots.push({uid:nextSlotUid++,service:null,type:freeType,qty:0,legOverride:null});
-  renderSvcSlots();
-  renderMultiSlotLegPicker();
-}
-
-function removeSvcSlot(uid){
-  if(svcSlots.length<=2){addLog('info','Minimum 2 slots required');return;}
-  svcSlots=svcSlots.filter(s=>s.uid!==uid);
-  renderSvcSlots();
-  renderMultiSlotLegPicker();
-}
-
-function setSlotType(uid,type){
-  const slot=svcSlots.find(s=>s.uid===uid);
-  if(slot)slot.type=type;
-  updateTotals();validateAllSlots();
-}
-
+function addSvcSlot(){if(svcSlots.length>=6){addLog('info','Max 6 services');return;}const usedTypes=svcSlots.map(s=>s.type);const freeType=['like','save','repost'].find(t=>!usedTypes.includes(t))||'like';svcSlots.push({uid:nextSlotUid++,service:null,type:freeType,qty:0,legOverride:null});renderSvcSlots();renderMultiSlotLegPicker();}
+function removeSvcSlot(uid){if(svcSlots.length<=2){addLog('info','Minimum 2 slots required');return;}svcSlots=svcSlots.filter(s=>s.uid!==uid);renderSvcSlots();renderMultiSlotLegPicker();}
+function setSlotType(uid,type){const slot=svcSlots.find(s=>s.uid===uid);if(slot)slot.type=type;updateTotals();validateAllSlots();}
 function getSlot(uid){return svcSlots.find(s=>s.uid===uid);}
 
-// SERVICE SEARCH (per slot)
-function renderSvcDD(uid,list){
-  const dd=document.getElementById('svcDropdown-'+uid);
-  if(!dd)return;
-  if(!list.length){dd.innerHTML='<div style="padding:16px;text-align:center;color:#4b5563;font-size:12px">No services found</div>';return;}
-  const slot=getSlot(uid);
-  dd.innerHTML=list.slice(0,120).map(s=>`
-    <div class="svc-item ${slot&&slot.service&&slot.service.service==s.service?'sel':''}"
-      onclick="selectSvc(${uid},${s.service},'${(s.name||'').replace(/'/g,"\\'").replace(/"/g,'&quot;')}',${parseFloat(s.rate||0)},${parseInt(s.min||1)},${parseInt(s.max||999999)})">
-      <span class="svc-id">#${s.service}</span>
-      <span class="svc-name">${s.name||'Unknown'}</span>
-      <span class="svc-price">$${parseFloat(s.rate||0).toFixed(3)}/1k</span>
-      <span class="svc-min">min:${s.min||'?'}</span>
-    </div>`).join('');
-}
+function renderSvcDD(uid,list){const dd=document.getElementById('svcDropdown-'+uid);if(!dd)return;if(!list.length){dd.innerHTML='<div style="padding:16px;text-align:center;color:#4b5563;font-size:12px">No services found</div>';return;}const slot=getSlot(uid);dd.innerHTML=list.slice(0,120).map(s=>`<div class="svc-item ${slot&&slot.service&&slot.service.service==s.service?'sel':''}" onclick="selectSvc(${uid},${s.service},'${(s.name||'').replace(/'/g,"\\'").replace(/"/g,'&quot;')}',${parseFloat(s.rate||0)},${parseInt(s.min||1)},${parseInt(s.max||999999)})"><span class="svc-id">#${s.service}</span><span class="svc-name">${s.name||'Unknown'}</span><span class="svc-price">$${parseFloat(s.rate||0).toFixed(3)}/1k</span><span class="svc-min">min:${s.min||'?'}</span></div>`).join('');}
+function onSvcFocus(uid){if(!allServices.length){addLog('info','Connect API first');return;}document.getElementById('svcSearch-'+uid).classList.add('dd-open');document.getElementById('svcDropdown-'+uid).classList.add('open');renderSvcDD(uid,allServices);}
+function closeSvcDD(uid){const dd=document.getElementById('svcDropdown-'+uid),inp=document.getElementById('svcSearch-'+uid);if(dd)dd.classList.remove('open');if(inp)inp.classList.remove('dd-open');}
+function onSvcInput(uid){const inp=document.getElementById('svcSearch-'+uid);const q=inp.value.trim();document.getElementById('svcDropdown-'+uid).classList.add('open');inp.classList.add('dd-open');if(/^\d+$/.test(q)){const match=allServices.find(s=>String(s.service)===q);if(match)selectSvc(uid,match.service,match.name||'Unknown',parseFloat(match.rate||0),parseInt(match.min||1),parseInt(match.max||999999));}const filtered=allServices.filter(s=>(s.name||'').toLowerCase().includes(q.toLowerCase())||String(s.service).includes(q));renderSvcDD(uid,filtered);}
+function selectSvc(uid,id,name,rate,min,max){const slot=getSlot(uid);if(!slot)return;slot.service={service:id,name,rate,min,max};document.getElementById('svcSearch-'+uid).value='#'+id+' — '+name;closeSvcDD(uid);addLog('info','Slot service selected: #'+id+' — '+name);renderSvcSlots();renderMultiSlotLegPicker();}
+function getSlotMin(uid){const slot=getSlot(uid);return slot&&slot.service?slot.service.min:1;}
+function getBaseSlotQty(){const base=svcSlots[0];return parseInt(document.getElementById('qty-'+base.uid)?.value)||0;}
+function onSlotQtyInput(uid){const slot=getSlot(uid);if(slot)slot.qty=parseInt(document.getElementById('qty-'+uid).value)||0;updateAllCostBoxes();updateTotals();validateAllSlots();updateGraph();previewLegs();}
+function validateAllSlots(){const baseQty=getBaseSlotQty();let errorMsg='';svcSlots.forEach((slot,idx)=>{const qtyInput=document.getElementById('qty-'+slot.uid);const qty=parseInt(qtyInput?.value)||0;const minQ=getSlotMin(slot.uid);const w=document.getElementById('minWarning-'+slot.uid);if(!w)return;let msg='';if(qty>0&&qty<minQ){msg='Minimum '+minQ+' required, you entered '+qty;}if(idx>0&&baseQty>0&&qty>baseQty){msg='Bot detected: '+slotTypeLabels[slot.type].replace(/^[^\s]+\s/,'')+' quantity can not exceed Views quantity ('+baseQty.toLocaleString()+')';qtyInput.value=baseQty;slot.qty=baseQty;errorMsg=msg;}if(msg&&idx===0){w.classList.add('show');document.getElementById('minWarnText-'+slot.uid).textContent=msg;}else{w.classList.remove('show');}});const banner=document.getElementById('globalErrorBanner');if(errorMsg){banner.classList.add('show');document.getElementById('globalErrorText').textContent=errorMsg+' — auto-adjusted to safe value.';updateAllCostBoxes();updateTotals();updateGraph();previewLegs();}else{banner.classList.remove('show');}}
 
-function onSvcFocus(uid){
-  if(!allServices.length){addLog('info','Connect API first');return;}
-  document.getElementById('svcSearch-'+uid).classList.add('dd-open');
-  document.getElementById('svcDropdown-'+uid).classList.add('open');
-  renderSvcDD(uid,allServices);
-}
+function toggleCurrencyTable(uid){const t=document.getElementById('currencyTable-'+uid);const b=document.getElementById('expandBtn-'+uid);const open=t.classList.toggle('open');b.classList.toggle('open',open);if(open)renderCurrencyTable(uid);}
+function setActiveCurrency(uid,cur){activeCurrency=cur;updateAllCostBoxes();}
+function convertFromUsd(usd,cur){if(cur==='USD')return usd;const r=fxRates[cur]||currencyMeta[cur].rate||usdToInr;return usd*r;}
+function updateAllCostBoxes(){svcSlots.forEach(slot=>updateCostBoxForSlot(slot.uid));}
+function updateCostBoxForSlot(uid){const slot=getSlot(uid);const box=document.getElementById('costBox-'+uid);if(!box)return;if(!slot||!slot.service){box.style.display='none';return;}box.style.display='block';const qty=parseInt(document.getElementById('qty-'+uid)?.value)||0;const usd=(qty/1000)*slot.service.rate;const otherVal=convertFromUsd(usd,activeCurrency);document.getElementById('calcUSD-'+uid).textContent=qty?('$'+usd.toFixed(4)):'—';document.getElementById('calcINR-'+uid).textContent=qty?(currencyMeta[activeCurrency].symbol+otherVal.toFixed(2)+' '+activeCurrency):'';document.getElementById('calcMeta-'+uid).textContent='$'+slot.service.rate.toFixed(4)+'/1k • qty '+(qty?qty.toLocaleString():'0');if(document.getElementById('currencyTable-'+uid).classList.contains('open'))renderCurrencyTable(uid);}
+function renderCurrencyTable(uid){const slot=getSlot(uid);if(!slot||!slot.service)return;const qty=parseInt(document.getElementById('qty-'+uid)?.value)||0;const usd=(qty/1000)*slot.service.rate;const t=document.getElementById('ctable-'+uid);t.innerHTML=Object.keys(currencyMeta).map(cur=>{const val=convertFromUsd(usd,cur);return`<tr class="${cur===activeCurrency?'cc-active':''}"><td class="cc-name">${cur}</td><td class="cc-val">${currencyMeta[cur].symbol}${val.toFixed(cur==='USD'?4:2)}</td></tr>`;}).join('');}
+function updateTotals(){const box=document.getElementById('totalsBox');const validSlots=svcSlots.filter(s=>s.service);if(!validSlots.length){box.style.display='none';return;}box.style.display='block';let totalQty=0,totalUsd=0,minMin=Infinity;validSlots.forEach(slot=>{const qty=parseInt(document.getElementById('qty-'+slot.uid)?.value)||0;totalQty+=qty;totalUsd+=(qty/1000)*slot.service.rate;minMin=Math.min(minMin,slot.service.min);});document.getElementById('totQtyAll').textContent=totalQty.toLocaleString();document.getElementById('totCostAll').textContent='$'+totalUsd.toFixed(4)+' ≈ ₹'+(totalUsd*usdToInr).toFixed(2);document.getElementById('totMinAll').textContent=minMin===Infinity?'—':minMin.toLocaleString();}
 
-function closeSvcDD(uid){
-  const dd=document.getElementById('svcDropdown-'+uid),inp=document.getElementById('svcSearch-'+uid);
-  if(dd)dd.classList.remove('open');
-  if(inp)inp.classList.remove('dd-open');
-}
-
-function onSvcInput(uid){
-  const inp=document.getElementById('svcSearch-'+uid);
-  const q=inp.value.trim();
-  document.getElementById('svcDropdown-'+uid).classList.add('open');
-  inp.classList.add('dd-open');
-  if(/^\d+$/.test(q)){
-    const match=allServices.find(s=>String(s.service)===q);
-    if(match)selectSvc(uid,match.service,match.name||'Unknown',parseFloat(match.rate||0),parseInt(match.min||1),parseInt(match.max||999999));
-  }
-  const filtered=allServices.filter(s=>(s.name||'').toLowerCase().includes(q.toLowerCase())||String(s.service).includes(q));
-  renderSvcDD(uid,filtered);
-}
-
-function selectSvc(uid,id,name,rate,min,max){
-  const slot=getSlot(uid);
-  if(!slot)return;
-  slot.service={service:id,name,rate,min,max};
-  document.getElementById('svcSearch-'+uid).value='#'+id+' — '+name;
-  closeSvcDD(uid);
-  addLog('info','Slot service selected: #'+id+' — '+name);
-  renderSvcSlots();
-  renderMultiSlotLegPicker();
-}
-
-function getSlotMin(uid){
-  const slot=getSlot(uid);
-  return slot&&slot.service?slot.service.min:1;
-}
-
-function getBaseSlotQty(){
-  // Slot[0] is the reference "views" quantity that like/save/repost types must not exceed
-  const base=svcSlots[0];
-  return parseInt(document.getElementById('qty-'+base.uid)?.value)||0;
-}
-
-function onSlotQtyInput(uid){
-  const slot=getSlot(uid);
-  if(slot)slot.qty=parseInt(document.getElementById('qty-'+uid).value)||0;
-  updateAllCostBoxes();
-  updateTotals();
-  validateAllSlots();
-  updateGraph();previewLegs();
-}
-
-function validateAllSlots(){
-  const baseQty=getBaseSlotQty();
-  let errorMsg='';
-  svcSlots.forEach((slot,idx)=>{
-    const qtyInput=document.getElementById('qty-'+slot.uid);
-    const qty=parseInt(qtyInput?.value)||0;
-    const minQ=getSlotMin(slot.uid);
-    const w=document.getElementById('minWarning-'+slot.uid);
-    if(!w)return;
-    let msg='';
-    if(qty>0&&qty<minQ){
-      msg='Minimum '+minQ+' required, you entered '+qty;
-    }
-    // non-base types cannot exceed base (views) quantity
-    if(idx>0&&baseQty>0&&qty>baseQty){
-      msg='Bot detected: '+slotTypeLabels[slot.type].replace(/^[^\s]+\s/,'')+' quantity can not exceed Views quantity ('+baseQty.toLocaleString()+')';
-      // auto-correct: clamp this slot's qty down to baseQty so graph never crosses views line
-      qtyInput.value=baseQty;
-      slot.qty=baseQty;
-      errorMsg=msg;
-    }
-    if(msg&&idx===0){
-      w.classList.add('show');
-      document.getElementById('minWarnText-'+slot.uid).textContent=msg;
-    }else{
-      w.classList.remove('show');
-    }
-  });
-  const banner=document.getElementById('globalErrorBanner');
-  if(errorMsg){
-    banner.classList.add('show');
-    document.getElementById('globalErrorText').textContent=errorMsg+' — auto-adjusted to safe value.';
-    updateAllCostBoxes();updateTotals();updateGraph();previewLegs();
-  }else{
-    banner.classList.remove('show');
-  }
-}
-
-// ===== COST BOX / CURRENCY =====
-function toggleCurrencyTable(uid){
-  const t=document.getElementById('currencyTable-'+uid);
-  const b=document.getElementById('expandBtn-'+uid);
-  const open=t.classList.toggle('open');
-  b.classList.toggle('open',open);
-  if(open)renderCurrencyTable(uid);
-}
-
-function setActiveCurrency(uid,cur){
-  activeCurrency=cur;
-  updateAllCostBoxes();
-}
-
-function convertFromUsd(usd,cur){
-  if(cur==='USD')return usd;
-  const r=fxRates[cur]||currencyMeta[cur].rate||usdToInr;
-  return usd*r;
-}
-
-function updateAllCostBoxes(){
-  svcSlots.forEach(slot=>updateCostBoxForSlot(slot.uid));
-}
-
-function updateCostBoxForSlot(uid){
-  const slot=getSlot(uid);
-  const box=document.getElementById('costBox-'+uid);
-  if(!box)return;
-  if(!slot||!slot.service){box.style.display='none';return;}
-  box.style.display='block';
-  const qty=parseInt(document.getElementById('qty-'+uid)?.value)||0;
-  const usd=(qty/1000)*slot.service.rate;
-  const otherVal=convertFromUsd(usd,activeCurrency);
-  document.getElementById('calcUSD-'+uid).textContent=qty?('$'+usd.toFixed(4)):'—';
-  document.getElementById('calcINR-'+uid).textContent=qty?(currencyMeta[activeCurrency].symbol+otherVal.toFixed(2)+' '+activeCurrency):'';
-  document.getElementById('calcMeta-'+uid).textContent='$'+slot.service.rate.toFixed(4)+'/1k • qty '+(qty?qty.toLocaleString():'0');
-  if(document.getElementById('currencyTable-'+uid).classList.contains('open'))renderCurrencyTable(uid);
-}
-
-function renderCurrencyTable(uid){
-  const slot=getSlot(uid);
-  if(!slot||!slot.service)return;
-  const qty=parseInt(document.getElementById('qty-'+uid)?.value)||0;
-  const usd=(qty/1000)*slot.service.rate;
-  const t=document.getElementById('ctable-'+uid);
-  t.innerHTML=Object.keys(currencyMeta).map(cur=>{
-    const val=convertFromUsd(usd,cur);
-    return `<tr class="${cur===activeCurrency?'cc-active':''}"><td class="cc-name">${cur}</td><td class="cc-val">${currencyMeta[cur].symbol}${val.toFixed(cur==='USD'?4:2)}</td></tr>`;
-  }).join('');
-}
-
-function updateTotals(){
-  const box=document.getElementById('totalsBox');
-  const validSlots=svcSlots.filter(s=>s.service);
-  if(!validSlots.length){box.style.display='none';return;}
-  box.style.display='block';
-  let totalQty=0,totalUsd=0,minMin=Infinity;
-  validSlots.forEach(slot=>{
-    const qty=parseInt(document.getElementById('qty-'+slot.uid)?.value)||0;
-    totalQty+=qty;
-    totalUsd+=(qty/1000)*slot.service.rate;
-    minMin=Math.min(minMin,slot.service.min);
-  });
-  document.getElementById('totQtyAll').textContent=totalQty.toLocaleString();
-  document.getElementById('totCostAll').textContent='$'+totalUsd.toFixed(4)+' ≈ ₹'+(totalUsd*usdToInr).toFixed(2);
-  document.getElementById('totMinAll').textContent=minMin===Infinity?'—':minMin.toLocaleString();
-}
-
-// MODES
 const modePresets={viral:{legs:8,duration:3,unit:'hours',speed:'6h',variance:20},fast:{legs:3,duration:1,unit:'hours',speed:'6h',variance:15},trending:{legs:6,duration:6,unit:'hours',speed:'12h',variance:25},slow:{legs:12,duration:12,unit:'hours',speed:'48h',variance:30},custom:{legs:5,duration:30,unit:'minutes',speed:'12h',variance:22}};
-function setMode(mode,el){
-  currentMode=mode;
-  document.querySelectorAll('.mode-btn').forEach(b=>b.className=b.className.replace(' active',''));
-  el.classList.add('active');
-  const p=modePresets[mode];
-  document.getElementById('numLegs').value=p.legs;
-  document.getElementById('legDuration').value=p.duration;
-  document.getElementById('legDurationUnit').value=p.unit;
-  document.getElementById('variance').value=p.variance;
-  document.getElementById('varianceVal').textContent=p.variance;
-  document.getElementById('variance').style.setProperty('--val',p.variance+'%');
-  setSpeedVal(p.speed);updateGraph();previewLegs();renderMultiSlotLegPicker();
-}
+function setMode(mode,el){currentMode=mode;document.querySelectorAll('.mode-btn').forEach(b=>b.className=b.className.replace(' active',''));el.classList.add('active');const p=modePresets[mode];document.getElementById('numLegs').value=p.legs;document.getElementById('legDuration').value=p.duration;document.getElementById('legDurationUnit').value=p.unit;document.getElementById('variance').value=p.variance;document.getElementById('varianceVal').textContent=p.variance;document.getElementById('variance').style.setProperty('--val',p.variance+'%');setSpeedVal(p.speed);updateGraph();previewLegs();renderMultiSlotLegPicker();}
 function setSpeed(speed,el){currentSpeed=speed;document.querySelectorAll('.speed-btn').forEach(b=>b.classList.remove('active'));el.classList.add('active');}
 function setSpeedVal(speed){currentSpeed=speed;document.querySelectorAll('.speed-btn').forEach(b=>{b.classList.toggle('active',b.textContent===speed);});}
 
-// GRAPH — one dataset per active service slot
 const slotColors=['#ef4444','#ffffff','#f59e0b','#fb7185','#fca5a5','#60a5fa'];
-function initChart(){
-  const ctx=document.getElementById('growthChart').getContext('2d');
-  growthChart=new Chart(ctx,{
-    type:'line',
-    data:{labels:[],datasets:[]},
-    options:{
-      responsive:true,maintainAspectRatio:false,
-      interaction:{mode:'index',intersect:false},
-      plugins:{
-        legend:{display:true,position:'top',labels:{color:'#d6cfcf',font:{size:9},boxWidth:8,boxHeight:8,padding:6}},
-        tooltip:{backgroundColor:'rgba(15,5,5,0.95)',borderColor:'rgba(220,38,38,0.4)',borderWidth:1,titleColor:'#fca5a5',bodyColor:'#f5f5f5',padding:10,callbacks:{label:c=>(c.dataset.label||'')+': '+Math.round(c.raw).toLocaleString()}}
-      },
-      scales:{
-        x:{grid:{color:'rgba(255,255,255,0.05)'},ticks:{color:'#9c9494',font:{size:9},maxTicksLimit:6}},
-        y:{grid:{color:'rgba(255,255,255,0.05)'},ticks:{color:'#9c9494',font:{size:9},callback:v=>v>=1000?(v/1000).toFixed(1)+'k':v},beginAtZero:true}
-      },
-      animation:{duration:300,easing:'easeInOutQuart'}
-    }
-  });
-}
-
+function initChart(){const ctx=document.getElementById('growthChart').getContext('2d');growthChart=new Chart(ctx,{type:'line',data:{labels:[],datasets:[]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{display:true,position:'top',labels:{color:'#d6cfcf',font:{size:9},boxWidth:8,boxHeight:8,padding:6}},tooltip:{backgroundColor:'rgba(15,5,5,0.95)',borderColor:'rgba(220,38,38,0.4)',borderWidth:1,titleColor:'#fca5a5',bodyColor:'#f5f5f5',padding:10,callbacks:{label:c=>(c.dataset.label||'')+': '+Math.round(c.raw).toLocaleString()}}},scales:{x:{grid:{color:'rgba(255,255,255,0.05)'},ticks:{color:'#9c9494',font:{size:9},maxTicksLimit:6}},y:{grid:{color:'rgba(255,255,255,0.05)'},ticks:{color:'#9c9494',font:{size:9},callback:v=>v>=1000?(v/1000).toFixed(1)+'k':v},beginAtZero:true}},animation:{duration:300,easing:'easeInOutQuart'}}});}
 function setGMode(mode,el){graphMode=mode;document.querySelectorAll('.gBtn').forEach(b=>b.classList.remove('active'));el.classList.add('active');updateGraph();}
+function buildSeries(totalQty,numLegs,legDur,variance,minQ){const legs=generateLegsFor(totalQty,numLegs,variance,minQ);let cumulative=[0];legs.forEach(l=>cumulative.push(cumulative[cumulative.length-1]+l));if(graphMode==='smooth'){const s=[];for(let i=0;i<cumulative.length-1;i++){for(let j=0;j<4;j++){s.push(cumulative[i]+(cumulative[i+1]-cumulative[i])*(j/4));}}s.push(cumulative[cumulative.length-1]);return{data:s,legs};}else if(graphMode==='organic'){const s=[];for(let i=0;i<cumulative.length-1;i++){for(let j=0;j<6;j++){const t=j/6;const n=(Math.random()-.5)*totalQty*.015;s.push(Math.max(0,cumulative[i]+(cumulative[i+1]-cumulative[i])*t+n));}}s.push(cumulative[cumulative.length-1]);return{data:s,legs};}return{data:cumulative,legs};}
+function updateGraph(){if(!growthChart)return;const numLegs=parseInt(document.getElementById('numLegs').value)||5;const legDur=parseInt(document.getElementById('legDuration').value)||30;const legUnit=document.getElementById('legDurationUnit').value;const variance=parseInt(document.getElementById('variance').value)||22;const dl={minutes:'m',hours:'h',days:'d'}[legUnit]||'h';const validSlots=svcSlots.filter(s=>s.service&&(parseInt(document.getElementById('qty-'+s.uid)?.value)||0)>0);if(!validSlots.length){growthChart.data.datasets=[];growthChart.data.labels=[];growthChart.update('none');updateLegsSidePanel([]);return;}let labelsSet=null;const datasets=validSlots.map((slot,idx)=>{const qty=parseInt(document.getElementById('qty-'+slot.uid).value)||0;const slotLegs=slot.legOverride||numLegs;const minQ=getSlotMin(slot.uid);const{data,legs}=buildSeries(qty,slotLegs,legDur,variance,minQ);if(!labelsSet){const stepsPerLeg=graphMode==='smooth'?4:(graphMode==='organic'?6:1);const lbl=[];if(graphMode==='stepped'){lbl.push('Start');legs.forEach((_,i)=>lbl.push(((i+1)*legDur)+dl));}else{for(let i=0;i<legs.length;i++){for(let j=0;j<stepsPerLeg;j++)lbl.push(j===0?(i===0?'Start':(i*legDur)+dl):'');}lbl.push((legs.length*legDur)+dl);}labelsSet=lbl;}return{label:slotTypeLabels[slot.type].replace(/^[^\s]+\s/,'')+(slot.service?' #'+slot.service.service:''),data,borderColor:slotColors[idx%slotColors.length],backgroundColor:'transparent',borderWidth:2.5,fill:false,tension:graphMode==='smooth'||graphMode==='organic'?.4:0,stepped:graphMode==='stepped'?'before':false,pointRadius:0,pointHoverRadius:4,_legs:legs};});growthChart.data.labels=labelsSet;growthChart.data.datasets=datasets;growthChart.update('none');updateLegsSidePanel(validSlots.map((s,i)=>({slot:s,legs:datasets[i]._legs})));}
 
-function buildSeries(totalQty,numLegs,legDur,variance,minQ){
-  const legs=generateLegsFor(totalQty,numLegs,variance,minQ);
-  let cumulative=[0];legs.forEach(l=>cumulative.push(cumulative[cumulative.length-1]+l));
-  if(graphMode==='smooth'){
-    const s=[];
-    for(let i=0;i<cumulative.length-1;i++){for(let j=0;j<4;j++){s.push(cumulative[i]+(cumulative[i+1]-cumulative[i])*(j/4));}}
-    s.push(cumulative[cumulative.length-1]);return{data:s,legs};
-  }else if(graphMode==='organic'){
-    const s=[];
-    for(let i=0;i<cumulative.length-1;i++){for(let j=0;j<6;j++){const t=j/6;const n=(Math.random()-.5)*totalQty*.015;s.push(Math.max(0,cumulative[i]+(cumulative[i+1]-cumulative[i])*t+n));}}
-    s.push(cumulative[cumulative.length-1]);return{data:s,legs};
-  }
-  return{data:cumulative,legs};
-}
-
-function updateGraph(){
-  if(!growthChart)return;
-  const numLegs=parseInt(document.getElementById('numLegs').value)||5;
-  const legDur=parseInt(document.getElementById('legDuration').value)||30;
-  const legUnit=document.getElementById('legDurationUnit').value;
-  const variance=parseInt(document.getElementById('variance').value)||22;
-  const dl={minutes:'m',hours:'h',days:'d'}[legUnit]||'h';
-  const validSlots=svcSlots.filter(s=>s.service&&(parseInt(document.getElementById('qty-'+s.uid)?.value)||0)>0);
-  if(!validSlots.length){growthChart.data.datasets=[];growthChart.data.labels=[];growthChart.update('none');updateLegsSidePanel([]);return;}
-  let labelsSet=null;
-  const datasets=validSlots.map((slot,idx)=>{
-    const qty=parseInt(document.getElementById('qty-'+slot.uid).value)||0;
-    const slotLegs=slot.legOverride||numLegs;
-    const minQ=getSlotMin(slot.uid);
-    const {data,legs}=buildSeries(qty,slotLegs,legDur,variance,minQ);
-    if(!labelsSet){
-      const stepsPerLeg=graphMode==='smooth'?4:(graphMode==='organic'?6:1);
-      const lbl=[];
-      if(graphMode==='stepped'){lbl.push('Start');legs.forEach((_,i)=>lbl.push(((i+1)*legDur)+dl));}
-      else{for(let i=0;i<legs.length;i++){for(let j=0;j<stepsPerLeg;j++)lbl.push(j===0?(i===0?'Start':(i*legDur)+dl):'');}lbl.push((legs.length*legDur)+dl);}
-      labelsSet=lbl;
-    }
-    return{label:slotTypeLabels[slot.type].replace(/^[^\s]+\s/,'')+(slot.service?' #'+slot.service.service:''),data,borderColor:slotColors[idx%slotColors.length],backgroundColor:'transparent',borderWidth:2.5,fill:false,tension:graphMode==='smooth'||graphMode==='organic'?.4:0,stepped:graphMode==='stepped'?'before':false,pointRadius:0,pointHoverRadius:4,_legs:legs};
-  });
-  growthChart.data.labels=labelsSet;
-  growthChart.data.datasets=datasets;
-  growthChart.update('none');
-  updateLegsSidePanel(validSlots.map((s,i)=>({slot:s,legs:datasets[i]._legs})));
-}
-
-// LEGS SIDE PANEL (compact, expandable)
 let lastLegsData=[];
-function toggleLegsSide(){
-  legsSideOpen=!legsSideOpen;
-  document.getElementById('legsSideDetail').classList.toggle('open',legsSideOpen);
-  document.getElementById('legsSideExpandBtn').classList.toggle('open',legsSideOpen);
-  if(legsSideOpen)renderLegsSideDetail();
-}
-function updateLegsSidePanel(legsData){
-  lastLegsData=legsData;
-  const numLegs=legsData.length?legsData[0].legs.length:0;
-  document.getElementById('legsSideCount').innerHTML=(numLegs||'—')+'<span>legs</span>';
-  if(legsSideOpen)renderLegsSideDetail();
-}
-function renderLegsSideDetail(){
-  const wrap=document.getElementById('legsSideDetail');
-  if(!lastLegsData.length){wrap.innerHTML='<div style="font-size:10px;color:#475569;text-align:center;margin-top:10px">No data</div>';return;}
-  wrap.innerHTML=lastLegsData.map(({slot,legs})=>{
-    const typeName=slotTypeLabels[slot.type].replace(/^[^\s]+\s/,'');
-    const rows=legs.map((q,i)=>`<div class="leg-mini-row"><span>L${i+1}</span><span>${q.toLocaleString()}</span></div>`).join('');
-    return `<div style="margin-bottom:8px"><div style="font-size:9px;color:#fca5a5;font-weight:700;margin-bottom:2px">${typeName}</div>${rows}</div>`;
-  }).join('');
-}
+function toggleLegsSide(){legsSideOpen=!legsSideOpen;document.getElementById('legsSideDetail').classList.toggle('open',legsSideOpen);document.getElementById('legsSideExpandBtn').classList.toggle('open',legsSideOpen);if(legsSideOpen)renderLegsSideDetail();}
+function updateLegsSidePanel(legsData){lastLegsData=legsData;const numLegs=legsData.length?legsData[0].legs.length:0;document.getElementById('legsSideCount').innerHTML=(numLegs||'—')+'<span>legs</span>';if(legsSideOpen)renderLegsSideDetail();}
+function renderLegsSideDetail(){const wrap=document.getElementById('legsSideDetail');if(!lastLegsData.length){wrap.innerHTML='<div style="font-size:10px;color:#475569;text-align:center;margin-top:10px">No data</div>';return;}wrap.innerHTML=lastLegsData.map(({slot,legs})=>{const typeName=slotTypeLabels[slot.type].replace(/^[^\s]+\s/,'');const rows=legs.map((q,i)=>`<div class="leg-mini-row"><span>L${i+1}</span><span>${q.toLocaleString()}</span></div>`).join('');return`<div style="margin-bottom:8px"><div style="font-size:9px;color:#fca5a5;font-weight:700;margin-bottom:2px">${typeName}</div>${rows}</div>`;}).join('');}
+function renderMultiSlotLegPicker(){const block=document.getElementById('multiSlotLegPicker');const list=document.getElementById('multiSlotLegPickerList');if(svcSlots.length<4){block.style.display='none';return;}block.style.display='block';const globalLegs=parseInt(document.getElementById('numLegs').value)||5;list.innerHTML=svcSlots.map(slot=>{const name=slotTypeLabels[slot.type]+(slot.service?' — '+slot.service.name.slice(0,22):'');const opts=[];for(let i=1;i<=Math.max(globalLegs,20);i++)opts.push(`<option value="${i}" ${(slot.legOverride||globalLegs)===i?'selected':''}>${i}</option>`);return`<div class="svc-leg-select-row"><span class="sl-name">${name}</span><select onchange="setSlotLegOverride(${slot.uid},this.value)">${opts.join('')}</select></div>`;}).join('');}
+function setSlotLegOverride(uid,val){const slot=getSlot(uid);if(slot)slot.legOverride=parseInt(val)||null;updateGraph();previewLegs();}
+function generateLegsFor(totalQty,numLegs,variancePct,minQ){if(numLegs<=0||totalQty<=0)return[];minQ=minQ||1;const vp=(variancePct||22)/100;const maxPossibleLegs=Math.max(1,Math.floor(totalQty/minQ));numLegs=Math.min(numLegs,maxPossibleLegs);const base=Math.floor(totalQty/numLegs);let legs=[],remaining=totalQty;for(let i=0;i<numLegs-1;i++){const variation=Math.floor(base*vp);let lq=Math.floor(Math.random()*(variation*2+1))+(base-variation);lq=Math.max(minQ,Math.min(lq,remaining-(numLegs-i-1)*minQ));legs.push(lq);remaining-=lq;}legs.push(Math.max(minQ,remaining));for(let i=legs.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[legs[i],legs[j]]=[legs[j],legs[i]];}return legs;}
+function previewLegs(){renderMultiSlotLegPicker();if(growthChart)updateGraph();}
 
-// MULTI-SLOT PER-SERVICE LEG PICKER (when 4+ slots, allow naming which leg-count each uses)
-function renderMultiSlotLegPicker(){
-  const block=document.getElementById('multiSlotLegPicker');
-  const list=document.getElementById('multiSlotLegPickerList');
-  if(svcSlots.length<4){block.style.display='none';return;}
-  block.style.display='block';
-  const globalLegs=parseInt(document.getElementById('numLegs').value)||5;
-  list.innerHTML=svcSlots.map(slot=>{
-    const name=slotTypeLabels[slot.type]+(slot.service?' — '+slot.service.name.slice(0,22):'');
-    const opts=[];
-    for(let i=1;i<=Math.max(globalLegs,20);i++)opts.push(`<option value="${i}" ${(slot.legOverride||globalLegs)===i?'selected':''}>${i}</option>`);
-    return `<div class="svc-leg-select-row"><span class="sl-name">${name}</span><select onchange="setSlotLegOverride(${slot.uid},this.value)">${opts.join('')}</select></div>`;
-  }).join('');
-}
-function setSlotLegOverride(uid,val){
-  const slot=getSlot(uid);
-  if(slot)slot.legOverride=parseInt(val)||null;
-  updateGraph();previewLegs();
-}
+function togglePresets(){presetsOpen=!presetsOpen;document.getElementById('presetsList').classList.toggle('open',presetsOpen);document.getElementById('presetsExpandBtn').classList.toggle('open',presetsOpen);if(presetsOpen)renderPresets();}
+function renderPresets(){const badge=document.getElementById('presetsCountBadge');badge.textContent=presets.length?'('+presets.length+')':'';const list=document.getElementById('presetsList');if(!presets.length){list.innerHTML='<div class="presets-empty">No presets saved yet</div>';return;}list.innerHTML=presets.map(p=>{const svcSummary=p.slots.filter(s=>s.service).map(s=>(slotTypeLabels[s.type]||s.type).replace(/^[^\s]+\s/,'')+' '+s.qty.toLocaleString()).join(' • ');return`<div class="preset-item" onclick="loadPreset(${p.id})"><div class="preset-item-info"><div class="preset-item-name">${p.name}</div><div class="preset-item-meta">${svcSummary} — ${p.link}</div></div><button class="preset-item-del" onclick="event.stopPropagation();deletePreset(${p.id})">✕</button></div>`;}).join('');}
+function savePreset(){const name=document.getElementById('scheduleName').value.trim();const link=document.getElementById('targetLink').value.trim();if(!name||!link){alert('Please fill in Name and Link before saving a preset!');return;}const activeSlots=svcSlots.filter(s=>s.service);if(!activeSlots.length){alert('Please select at least one service before saving!');return;}const slotsData=svcSlots.map(slot=>({type:slot.type,service:slot.service,qty:parseInt(document.getElementById('qty-'+slot.uid)?.value)||0,legOverride:slot.legOverride}));const preset={id:Date.now(),name,link,slots:slotsData,numLegs:parseInt(document.getElementById('numLegs').value)||5,legDuration:parseInt(document.getElementById('legDuration').value)||30,legDurationUnit:document.getElementById('legDurationUnit').value,variance:parseInt(document.getElementById('variance').value)||22,mode:currentMode};presets.unshift(preset);localStorage.setItem('smm_presets',JSON.stringify(presets));renderPresets();addLog('success','Preset saved: '+name);alert('Preset saved!');}
+function loadPreset(id){const p=presets.find(x=>x.id===id);if(!p)return;document.getElementById('scheduleName').value=p.name;document.getElementById('targetLink').value=p.link;document.getElementById('numLegs').value=p.numLegs;document.getElementById('legDuration').value=p.legDuration;document.getElementById('legDurationUnit').value=p.legDurationUnit;document.getElementById('variance').value=p.variance;document.getElementById('varianceVal').textContent=p.variance;document.getElementById('variance').style.setProperty('--val',p.variance+'%');svcSlots=p.slots.map(s=>({uid:nextSlotUid++,service:s.service,type:s.type,qty:s.qty,legOverride:s.legOverride||null}));renderSvcSlots();svcSlots.forEach(slot=>{const inp=document.getElementById('qty-'+slot.uid);if(inp)inp.value=slot.qty||'';});document.querySelectorAll('.mode-btn').forEach(b=>{b.classList.toggle('active',b.classList.contains(p.mode));});currentMode=p.mode;updateAllCostBoxes();updateTotals();validateAllSlots();updateGraph();previewLegs();renderMultiSlotLegPicker();addLog('info','Preset loaded: '+p.name);}
+function deletePreset(id){if(!confirm('Delete this preset?'))return;presets=presets.filter(x=>x.id!==id);localStorage.setItem('smm_presets',JSON.stringify(presets));renderPresets();}
+function validateOrderForm(){const name=document.getElementById('scheduleName').value.trim();const link=document.getElementById('targetLink').value.trim();if(!name||!link){alert('Please fill in Name and Link!');return null;}const activeSlots=svcSlots.filter(s=>s.service);if(!activeSlots.length){alert('Please select at least one service!');return null;}const baseQty=getBaseSlotQty();if(!baseQty){alert('Please enter the Views (base) quantity!');return null;}for(const slot of activeSlots){const qty=parseInt(document.getElementById('qty-'+slot.uid).value)||0;if(!qty){alert('Please enter quantity for: '+slotTypeLabels[slot.type]);return null;}const minQ=getSlotMin(slot.uid);if(qty<minQ){alert('Quantity ('+qty+') is below minimum for '+slotTypeLabels[slot.type]+'. Min: '+minQ);return null;}}const overLimitSlot=activeSlots.slice(1).find(slot=>(parseInt(document.getElementById('qty-'+slot.uid).value)||0)>baseQty);if(overLimitSlot){alert('Error: Bot detected. '+slotTypeLabels[overLimitSlot.type].replace(/^[^\s]+\s/,'')+' quantity cannot exceed Views quantity.');return null;}return{name,link,activeSlots};}
+async function directOrder(){const form=validateOrderForm();if(!form)return;const{name,link,activeSlots}=form;const numLegsGlobal=parseInt(document.getElementById('numLegs').value)||1;const legDuration=parseInt(document.getElementById('legDuration').value)||30;const legDurationUnit=document.getElementById('legDurationUnit').value;const variance=parseInt(document.getElementById('variance').value)||22;const servicesData=activeSlots.map(slot=>{const qty=parseInt(document.getElementById('qty-'+slot.uid).value)||0;const minQ=getSlotMin(slot.uid);const numLegs=slot.legOverride||numLegsGlobal;const legs=generateLegsFor(qty,numLegs,variance,minQ);return{type:slot.type,serviceId:slot.service.service,serviceName:slot.service.name,rate:slot.service.rate,totalQty:qty,legs,currentLeg:0,ordersPlaced:0};});if(!apiUrl||!apiKey){alert('API not connected!');return;}const result=await createScheduleOnServer({name,link,apiUrl,apiKey,services:servicesData,legDuration,legDurationUnit,mode:currentMode,variance,maxOrders:0});if(!result.success){alert('Order create nahi hua: '+(result.reason||'Unknown error'));return;}const totalQtyAll=servicesData.reduce((a,s)=>a+s.totalQty,0);addLog('success','Direct order placed: '+name+' — '+servicesData.length+' services, '+totalQtyAll.toLocaleString()+' total qty');await refreshSchedulesFromServer();switchTab('schedules',document.querySelectorAll('.tab')[2]);showToast('Order Confirmed 🎉');}
+async function createScheduleOnServer(payload){try{const res=await fetch(BACKEND+'/schedules/create',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});return await res.json();}catch(e){return{success:false,reason:'Network error: '+e.message};}}
+async function refreshSchedulesFromServer(){try{const res=await fetch(BACKEND+'/schedules/list',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({apiUrl})});const data=await res.json();if(data.success){schedules=data.schedules;renderSchedules();}}catch(e){addLog('error','Schedules load nahi hue: '+e.message);}}
+function startScheduleAutoRefresh(){if(scheduleRefreshTimer)clearInterval(scheduleRefreshTimer);scheduleRefreshTimer=setInterval(refreshSchedulesFromServer,30000);}
+function renderSchedules(){const c=document.getElementById('schedulesList');if(!schedules.length){c.innerHTML='<div class="empty-state">No schedules yet</div>';return;}c.innerHTML=schedules.map(s=>{const maxLegs=Math.max(...s.services.map(sv=>sv.legs.length));const pct=maxLegs?Math.round((s.currentLeg/maxLegs)*100):0;const badge=s.active?'<span class="badge badge-green">Active</span>':'<span class="badge badge-yellow">Paused</span>';const svcSummary=s.services.map(sv=>`${slotTypeLabels[sv.type]||sv.type} #${sv.serviceId} (${sv.totalQty.toLocaleString()})`).join(' • ');return`<div class="si"><div class="si-top"><div><div class="si-name">${s.name} ${badge}</div><div class="si-meta">${svcSummary}</div><div class="si-meta">Done: ${s.currentLeg}/${maxLegs} legs • ${s.active?'Next: '+new Date(s.nextRun).toLocaleString():'Paused'}</div><div class="si-meta" style="color:#374151;font-size:10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:240px">${s.link}</div></div><div class="si-actions"><button class="btn btn-sm btn-green" onclick="runNow(${s.id})">▶</button><button class="btn btn-sm btn-outline" onclick="toggleSchedule(${s.id})">${s.active?'⏸':'▶️'}</button><button class="btn btn-sm btn-red" onclick="deleteSchedule(${s.id})">🗑</button></div></div><div class="si-progress"><div class="si-progress-fill" style="width:${pct}%"></div></div></div>`;}).join('');}
+async function toggleSchedule(id){try{const res=await fetch(BACKEND+'/schedules/toggle',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id})});const data=await res.json();if(!data.success){alert('Error: '+(data.reason||'Unknown'));return;}await refreshSchedulesFromServer();}catch(e){alert('Network error: '+e.message);}}
+async function deleteSchedule(id){if(!confirm('Delete?'))return;try{const res=await fetch(BACKEND+'/schedules/delete',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id})});const data=await res.json();if(!data.success){alert('Error: '+(data.reason||'Unknown'));return;}await refreshSchedulesFromServer();}catch(e){alert('Network error: '+e.message);}}
+async function runNow(id){try{const res=await fetch(BACKEND+'/schedules/run_now',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id})});const data=await res.json();if(!data.success){alert('Error: '+(data.reason||'Unknown'));return;}(data.logs||[]).forEach(l=>addLog(l.type,l.message));await refreshSchedulesFromServer();}catch(e){alert('Network error: '+e.message);}}
 
-// LEGS
-function generateLegsFor(totalQty,numLegs,variancePct,minQ){
-  if(numLegs<=0||totalQty<=0)return[];
-  minQ=minQ||1;
-  const vp=(variancePct||22)/100;
-  const maxPossibleLegs=Math.max(1,Math.floor(totalQty/minQ));
-  numLegs=Math.min(numLegs,maxPossibleLegs);
-  const base=Math.floor(totalQty/numLegs);
-  let legs=[],remaining=totalQty;
-  for(let i=0;i<numLegs-1;i++){
-    const variation=Math.floor(base*vp);
-    let lq=Math.floor(Math.random()*(variation*2+1))+(base-variation);
-    lq=Math.max(minQ,Math.min(lq,remaining-(numLegs-i-1)*minQ));
-    legs.push(lq);remaining-=lq;
-  }
-  legs.push(Math.max(minQ,remaining));
-  for(let i=legs.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[legs[i],legs[j]]=[legs[j],legs[i]];}
-  return legs;
-}
-
-function previewLegs(){
-  renderMultiSlotLegPicker();
-  // legs preview now lives in the side panel; just refresh it
-  if(growthChart)updateGraph();
-}
-
-// ADD SCHEDULE
-// ===== PRESETS =====
-function togglePresets(){
-  presetsOpen=!presetsOpen;
-  document.getElementById('presetsList').classList.toggle('open',presetsOpen);
-  document.getElementById('presetsExpandBtn').classList.toggle('open',presetsOpen);
-  if(presetsOpen)renderPresets();
-}
-
-function renderPresets(){
-  const badge=document.getElementById('presetsCountBadge');
-  badge.textContent=presets.length?'('+presets.length+')':'';
-  const list=document.getElementById('presetsList');
-  if(!presets.length){list.innerHTML='<div class="presets-empty">No presets saved yet</div>';return;}
-  list.innerHTML=presets.map(p=>{
-    const svcSummary=p.slots.filter(s=>s.service).map(s=>(slotTypeLabels[s.type]||s.type).replace(/^[^\s]+\s/,'')+' '+s.qty.toLocaleString()).join(' • ');
-    return`<div class="preset-item" onclick="loadPreset(${p.id})">
-      <div class="preset-item-info">
-        <div class="preset-item-name">${p.name}</div>
-        <div class="preset-item-meta">${svcSummary} — ${p.link}</div>
-      </div>
-      <button class="preset-item-del" onclick="event.stopPropagation();deletePreset(${p.id})">✕</button>
-    </div>`;
-  }).join('');
-}
-
-function savePreset(){
-  const name=document.getElementById('scheduleName').value.trim();
-  const link=document.getElementById('targetLink').value.trim();
-  if(!name||!link){alert('Please fill in Name and Link before saving a preset!');return;}
-  const activeSlots=svcSlots.filter(s=>s.service);
-  if(!activeSlots.length){alert('Please select at least one service before saving!');return;}
-  const slotsData=svcSlots.map(slot=>({
-    type:slot.type,
-    service:slot.service,
-    qty:parseInt(document.getElementById('qty-'+slot.uid)?.value)||0,
-    legOverride:slot.legOverride
-  }));
-  const preset={
-    id:Date.now(),name,link,slots:slotsData,
-    numLegs:parseInt(document.getElementById('numLegs').value)||5,
-    legDuration:parseInt(document.getElementById('legDuration').value)||30,
-    legDurationUnit:document.getElementById('legDurationUnit').value,
-    variance:parseInt(document.getElementById('variance').value)||22,
-    mode:currentMode
-  };
-  presets.unshift(preset);
-  localStorage.setItem('smm_presets',JSON.stringify(presets));
-  renderPresets();
-  addLog('success','Preset saved: '+name);
-  alert('Preset saved! Tap it anytime from Saved Presets to reload everything instantly.');
-}
-
-function loadPreset(id){
-  const p=presets.find(x=>x.id===id);
-  if(!p)return;
-  document.getElementById('scheduleName').value=p.name;
-  document.getElementById('targetLink').value=p.link;
-  document.getElementById('numLegs').value=p.numLegs;
-  document.getElementById('legDuration').value=p.legDuration;
-  document.getElementById('legDurationUnit').value=p.legDurationUnit;
-  document.getElementById('variance').value=p.variance;
-  document.getElementById('varianceVal').textContent=p.variance;
-  document.getElementById('variance').style.setProperty('--val',p.variance+'%');
-  // rebuild slots from preset
-  svcSlots=p.slots.map(s=>({uid:nextSlotUid++,service:s.service,type:s.type,qty:s.qty,legOverride:s.legOverride||null}));
-  renderSvcSlots();
-  // fill qty inputs after render (renderSvcSlots already uses slot.qty for value attr, but ensure sync)
-  svcSlots.forEach(slot=>{
-    const inp=document.getElementById('qty-'+slot.uid);
-    if(inp)inp.value=slot.qty||'';
-  });
-  document.querySelectorAll('.mode-btn').forEach(b=>{b.classList.toggle('active',b.classList.contains(p.mode));});
-  currentMode=p.mode;
-  updateAllCostBoxes();updateTotals();validateAllSlots();updateGraph();previewLegs();renderMultiSlotLegPicker();
-  addLog('info','Preset loaded: '+p.name);
-}
-
-function deletePreset(id){
-  if(!confirm('Delete this preset?'))return;
-  presets=presets.filter(x=>x.id!==id);
-  localStorage.setItem('smm_presets',JSON.stringify(presets));
-  renderPresets();
-}
-
-function validateOrderForm(){
-  const name=document.getElementById('scheduleName').value.trim();
-  const link=document.getElementById('targetLink').value.trim();
-  if(!name||!link){alert('Please fill in Name and Link!');return null;}
-
-  const activeSlots=svcSlots.filter(s=>s.service);
-  if(!activeSlots.length){alert('Please select at least one service!');return null;}
-
-  const baseQty=getBaseSlotQty();
-  if(!baseQty){alert('Please enter the Views (base) quantity!');return null;}
-
-  for(const slot of activeSlots){
-    const qty=parseInt(document.getElementById('qty-'+slot.uid).value)||0;
-    if(!qty){alert('Please enter quantity for: '+slotTypeLabels[slot.type]);return null;}
-    const minQ=getSlotMin(slot.uid);
-    if(qty<minQ){alert('Quantity ('+qty+') is below minimum for '+slotTypeLabels[slot.type]+'. Min: '+minQ);return null;}
-  }
-
-  const overLimitSlot=activeSlots.slice(1).find(slot=>(parseInt(document.getElementById('qty-'+slot.uid).value)||0)>baseQty);
-  if(overLimitSlot){
-    alert('Error: Bot detected. '+slotTypeLabels[overLimitSlot.type].replace(/^[^\s]+\s/,'')+' quantity cannot exceed Views quantity. Please lower it below '+baseQty.toLocaleString()+'.');
-    return null;
-  }
-  return{name,link,activeSlots};
-}
-
-// DIRECT ORDER — ab schedule SERVER PE create hota hai (backend ke /schedules/create route se).
-// Backend hi legs ko process karega — browser band hone se koi farak nahi padega.
-async function directOrder(){
-  const form=validateOrderForm();
-  if(!form)return;
-  const{name,link,activeSlots}=form;
-  const numLegsGlobal=parseInt(document.getElementById('numLegs').value)||1;
-  const legDuration=parseInt(document.getElementById('legDuration').value)||30;
-  const legDurationUnit=document.getElementById('legDurationUnit').value;
-  const variance=parseInt(document.getElementById('variance').value)||22;
-
-  const servicesData=activeSlots.map(slot=>{
-    const qty=parseInt(document.getElementById('qty-'+slot.uid).value)||0;
-    const minQ=getSlotMin(slot.uid);
-    const numLegs=slot.legOverride||numLegsGlobal;
-    const legs=generateLegsFor(qty,numLegs,variance,minQ);
-    return{type:slot.type,serviceId:slot.service.service,serviceName:slot.service.name,rate:slot.service.rate,totalQty:qty,legs,currentLeg:0,ordersPlaced:0};
-  });
-
-  if(!apiUrl||!apiKey){alert('API not connected! Pehle Test Connection karo.');return;}
-
-  const result=await createScheduleOnServer({
-    name,link,apiUrl,apiKey,
-    services:servicesData,
-    legDuration,legDurationUnit,mode:currentMode,variance,maxOrders:0
-  });
-
-  if(!result.success){alert('Order create nahi hua: '+(result.reason||'Unknown error'));return;}
-
-  const totalQtyAll=servicesData.reduce((a,s)=>a+s.totalQty,0);
-  addLog('success','Direct order placed: '+name+' — '+servicesData.length+' services, '+totalQtyAll.toLocaleString()+' total qty');
-  await refreshSchedulesFromServer();
-  switchTab('schedules',document.querySelectorAll('.tab')[2]);
-  showToast('Order Confirmed 🎉');
-}
-
-// ===== Backend schedule helpers =====
-async function createScheduleOnServer(payload){
-  try{
-    const res=await fetch(BACKEND+'/schedules/create',{
-      method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify(payload)
-    });
-    return await res.json();
-  }catch(e){return{success:false,reason:'Network error: '+e.message};}
-}
-async function refreshSchedulesFromServer(){
-  try{
-    const res=await fetch(BACKEND+'/schedules/list',{
-      method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({apiUrl})
-    });
-    const data=await res.json();
-    if(data.success){schedules=data.schedules;renderSchedules();}
-  }catch(e){addLog('error','Schedules load nahi hue: '+e.message);}
-}
-// Schedules ko har 30 second me background me refresh karta hai, taaki UI me
-// backend ka progress (jo legs process kar raha hai) dikhta rahe.
-function startScheduleAutoRefresh(){
-  if(scheduleRefreshTimer)clearInterval(scheduleRefreshTimer);
-  scheduleRefreshTimer=setInterval(refreshSchedulesFromServer,30000);
-}
-
-function renderSchedules(){
-  const c=document.getElementById('schedulesList');
-  if(!schedules.length){c.innerHTML='<div class="empty-state">No schedules yet</div>';return;}
-  c.innerHTML=schedules.map(s=>{
-    const maxLegs=Math.max(...s.services.map(sv=>sv.legs.length));
-    const pct=maxLegs?Math.round((s.currentLeg/maxLegs)*100):0;
-    const badge=s.active?'<span class="badge badge-green">Active</span>':'<span class="badge badge-yellow">Paused</span>';
-    const svcSummary=s.services.map(sv=>`${slotTypeLabels[sv.type]||sv.type} #${sv.serviceId} (${sv.totalQty.toLocaleString()})`).join(' • ');
-    return`<div class="si"><div class="si-top"><div>
-      <div class="si-name">${s.name} ${badge}</div>
-      <div class="si-meta">${svcSummary}</div>
-      <div class="si-meta">Done: ${s.currentLeg}/${maxLegs} legs • ${s.active?'Next: '+new Date(s.nextRun).toLocaleString():'Paused'}</div>
-      <div class="si-meta" style="color:#374151;font-size:10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:240px">${s.link}</div>
-    </div><div class="si-actions">
-      <button class="btn btn-sm btn-green" onclick="runNow(${s.id})">▶</button>
-      <button class="btn btn-sm btn-outline" onclick="toggleSchedule(${s.id})">${s.active?'⏸':'▶️'}</button>
-      <button class="btn btn-sm btn-red" onclick="deleteSchedule(${s.id})">🗑</button>
-    </div></div>
-    <div class="si-progress"><div class="si-progress-fill" style="width:${pct}%"></div></div></div>`;
-  }).join('');
-}
-// Sab actions ab backend ko call karte hain — koi local setTimeout/localStorage nahi.
-async function toggleSchedule(id){
-  try{
-    const res=await fetch(BACKEND+'/schedules/toggle',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id})});
-    const data=await res.json();
-    if(!data.success){alert('Error: '+(data.reason||'Unknown'));return;}
-    await refreshSchedulesFromServer();
-  }catch(e){alert('Network error: '+e.message);}
-}
-async function deleteSchedule(id){
-  if(!confirm('Delete?'))return;
-  try{
-    const res=await fetch(BACKEND+'/schedules/delete',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id})});
-    const data=await res.json();
-    if(!data.success){alert('Error: '+(data.reason||'Unknown'));return;}
-    await refreshSchedulesFromServer();
-  }catch(e){alert('Network error: '+e.message);}
-}
-async function runNow(id){
-  try{
-    const res=await fetch(BACKEND+'/schedules/run_now',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id})});
-    const data=await res.json();
-    if(!data.success){alert('Error: '+(data.reason||'Unknown'));return;}
-    (data.logs||[]).forEach(l=>addLog(l.type,l.message));
-    await refreshSchedulesFromServer();
-  }catch(e){alert('Network error: '+e.message);}
-}
-
-function showToast(message,type){
-  const wrap=document.getElementById('toastWrap');
-  const t=document.createElement('div');
-  t.className='toast'+(type==='error'?' error':'');
-  t.textContent=message;
-  wrap.appendChild(t);
-  requestAnimationFrame(()=>t.classList.add('show'));
-  setTimeout(()=>{t.classList.remove('show');setTimeout(()=>t.remove(),350);},2800);
-}
+function showToast(message,type){const wrap=document.getElementById('toastWrap');const t=document.createElement('div');t.className='toast'+(type==='error'?' error':'');t.textContent=message;wrap.appendChild(t);requestAnimationFrame(()=>t.classList.add('show'));setTimeout(()=>{t.classList.remove('show');setTimeout(()=>t.remove(),350);},2800);}
 function addLog(type,message){const time=new Date().toLocaleTimeString();logs.unshift({type,message,time});if(logs.length>200)logs=logs.slice(0,200);localStorage.setItem('smm_logs',JSON.stringify(logs));renderLogs();}
 function renderLogs(){const a=document.getElementById('logArea');if(!logs.length){a.innerHTML='<div class="log-line info">[System] No logs</div>';return;}a.innerHTML=logs.map(l=>`<div class="log-line ${l.type}">[${l.time}] ${l.message}</div>`).join('');}
 function clearLogs(){logs=[];localStorage.setItem('smm_logs','[]');renderLogs();}
 
-// ============================================
-// LICENSE VERIFICATION LOGIC
-// IMPORTANT: change this to your actual InfinityFree URL
-// ============================================
-const LICENSE_API_URL = BACKEND + '/check_license.php'; // <-- ab Render backend pe point karta hai (admin panel jahan keys generate karta hai, wahi hai)
-
-function showApp(){
-  document.getElementById('licenseOverlay').style.display='none';
-  document.getElementById('appContent').style.display='block';
-}
-function showLicenseError(msg){
-  const el=document.getElementById('licenseError');
-  el.textContent=msg;el.style.display='block';
-  document.getElementById('licenseExpiry').style.display='none';
-}
-function clearStoredLicense(){
-  localStorage.removeItem('smm_license_key');
-  localStorage.removeItem('smm_license_expiry');
-}
-
-async function verifyLicense(manualKey){
-  const btn=document.getElementById('licenseSubmitBtn');
-  const key=(manualKey||document.getElementById('licenseKeyInput').value||'').trim().toUpperCase();
-  if(!key){showLicenseError('Enter a key first');return;}
-  btn.disabled=true;btn.textContent='Checking...';
-  try{
-    const res=await fetch(LICENSE_API_URL,{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({action:'verify',key})
-    });
-    const data=await res.json();
-    if(data.valid){
-      localStorage.setItem('smm_license_key',key);
-      localStorage.setItem('smm_license_expiry',data.expires_at);
-      showApp();
-    }else{
-      clearStoredLicense();
-      showLicenseError(data.reason||'Invalid key');
-    }
-  }catch(e){
-    showLicenseError('Could not connect to server. Check your internet connection.');
-  }
-  btn.disabled=false;btn.textContent='Unlock';
-}
-
-// On page load: check if we already have a stored key, re-validate with server
-(async function initLicenseCheck(){
-  const storedKey=localStorage.getItem('smm_license_key');
-  if(!storedKey){return;} // overlay stays visible, user must enter key
-  await verifyLicense(storedKey);
-})();
+// LICENSE
+const LICENSE_API_URL=BACKEND+'/check_license.php';
+function showApp(){document.getElementById('licenseOverlay').style.display='none';document.getElementById('appContent').style.display='block';}
+function showLicenseError(msg){const el=document.getElementById('licenseError');el.textContent=msg;el.style.display='block';document.getElementById('licenseExpiry').style.display='none';}
+function clearStoredLicense(){localStorage.removeItem('smm_license_key');localStorage.removeItem('smm_license_expiry');}
+async function verifyLicense(manualKey){const btn=document.getElementById('licenseSubmitBtn');const key=(manualKey||document.getElementById('licenseKeyInput').value||'').trim().toUpperCase();if(!key){showLicenseError('Enter a key first');return;}btn.disabled=true;btn.textContent='Checking...';try{const res=await fetch(LICENSE_API_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'verify',key})});const data=await res.json();if(data.valid){localStorage.setItem('smm_license_key',key);localStorage.setItem('smm_license_expiry',data.expires_at);showApp();}else{clearStoredLicense();showLicenseError(data.reason||'Invalid key');}}catch(e){showLicenseError('Could not connect to server.');}btn.disabled=false;btn.textContent='Unlock';}
+(async function initLicenseCheck(){const storedKey=localStorage.getItem('smm_license_key');if(!storedKey){return;}await verifyLicense(storedKey);})();
 </script>
 </body>
 </html>
