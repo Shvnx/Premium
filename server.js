@@ -4,7 +4,7 @@ const mysql = require('mysql2/promise');
 const app = express();
 app.use(cors());
 app.use(express.json());
-app.use(express.urlencoded({ extended: true })); // <-- Bas yeh line extra jodhni hai
+app.use(express.urlencoded({ extended: true }));
 
 const dbConfig = {
   host: 'sql12.freesqldatabase.com',
@@ -36,8 +36,6 @@ async function initDB() {
         bound_ip VARCHAR(100) DEFAULT NULL
       )
     `);
-    // NAYA TABLE: schedules ko server-side store karne ke liye, taaki browser band hone pe bhi
-    // legs process hote rahein. Saara schedule state (legs array, currentLeg, timing) JSON me store hota hai.
     await conn.execute(`
       CREATE TABLE IF NOT EXISTS schedules (
         id BIGINT PRIMARY KEY,
@@ -58,6 +56,13 @@ async function initDB() {
         created BIGINT
       )
     `);
+    // ✅ FIX: owner_key column ensure karo (purane DB ke liye)
+    try {
+      await conn.execute(`ALTER TABLE schedules ADD COLUMN owner_key VARCHAR(255) DEFAULT NULL`);
+      console.log('✅ owner_key column added');
+    } catch(e) {
+      // Column already exists — ignore karo
+    }
     console.log('✅ DB connected & table ready');
   } catch(e) {
     console.error('❌ DB init error:', e.message);
@@ -152,16 +157,13 @@ app.post('/delete_license', async (req, res) => {
   }
 });
 
-
 // Proxy route for CORS bypass
-// FIX: frontend bhejta hai "_target" field, isliye dono "url" aur "_target" accept karte hain
 app.post('/proxy', async (req, res) => {
   const { url, params, _target, key, action, ...rest } = req.body || {};
-  const targetUrl = url || _target; // <-- ab "_target" bhi chal jayega
+  const targetUrl = url || _target;
   if (!targetUrl) return res.json({ error: 'No URL provided' });
   try {
     const fetch = (await import('node-fetch')).default;
-    // agar "params" object nahi bheja gaya, to baaki saare fields (key, action, etc.) ko forward karo
     const forwardParams = params || { key, action, ...rest };
     const body = new URLSearchParams(forwardParams);
     const response = await fetch(targetUrl, {
@@ -178,13 +180,13 @@ app.post('/proxy', async (req, res) => {
 });
 
 // =========================================================
-// SCHEDULES — server-side, taaki browser band hone pe bhi
-// legs apne aap process hote rahein (background loop neeche).
+// SCHEDULES
 // =========================================================
 
 function rowToSchedule(row) {
   return {
     id: Number(row.id),
+    ownerKey: row.owner_key || null,
     name: row.name,
     link: row.link,
     apiUrl: row.api_url,
@@ -206,7 +208,6 @@ function getMs(amount, unit) {
   return amount * ({ minutes: 60000, hours: 3600000, days: 86400000 }[unit] || 3600000);
 }
 
-// Ek leg ke liye SMM panel ko seedha call karta hai
 async function callPanelDirect(apiUrl, apiKey, params) {
   try {
     const fetch = (await import('node-fetch')).default;
@@ -224,7 +225,6 @@ async function callPanelDirect(apiUrl, apiKey, params) {
   }
 }
 
-// Ek schedule ke current leg ko execute karta hai — sabhi services ke liye order place karta hai
 async function executeScheduleLeg(schedule) {
   const legIdx = schedule.currentLeg || 0;
   const logsForThisRun = [];
@@ -251,9 +251,9 @@ async function saveScheduleRow(conn, schedule) {
   );
 }
 
-// Naya schedule create karo (jaisa pehle directOrder() browser me karta tha)
+// ✅ FIX: Schedule create karte waqt licenseKey bhi save karo
 app.post('/schedules/create', async (req, res) => {
-  const { name, link, apiUrl, apiKey, services, legDuration, legDurationUnit, mode, variance, maxOrders } = req.body || {};
+  const { name, link, apiUrl, apiKey, services, legDuration, legDurationUnit, mode, variance, maxOrders, licenseKey } = req.body || {};
   if (!apiUrl || !apiKey) return res.json({ success: false, reason: 'API not connected' });
   if (!services || !services.length) return res.json({ success: false, reason: 'No services provided' });
   const id = Date.now();
@@ -261,16 +261,18 @@ app.post('/schedules/create', async (req, res) => {
     id, name, link, apiUrl, apiKey,
     services, legDuration: legDuration || 30, legDurationUnit: legDurationUnit || 'minutes',
     mode: mode || 'custom', variance: variance || 22, maxOrders: maxOrders || 0,
-    currentLeg: 0, active: true, nextRun: Date.now(), created: Date.now()
+    currentLeg: 0, active: true, nextRun: Date.now(), created: Date.now(),
+    ownerKey: (licenseKey || '').trim().toUpperCase() || null  // ✅ license key se bind
   };
   let conn;
   try {
     conn = await mysql.createConnection(dbConfig);
     await conn.execute(
-      `INSERT INTO schedules (id, name, link, api_url, api_key, services_json, leg_duration, leg_duration_unit, mode, variance, max_orders, current_leg, active, next_run, created)
-       VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
-      [schedule.id, schedule.name, schedule.link, schedule.apiUrl, schedule.apiKey, JSON.stringify(schedule.services),
-       schedule.legDuration, schedule.legDurationUnit, schedule.mode, schedule.variance, schedule.maxOrders,
+      `INSERT INTO schedules (id, owner_key, name, link, api_url, api_key, services_json, leg_duration, leg_duration_unit, mode, variance, max_orders, current_leg, active, next_run, created)
+       VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+      [schedule.id, schedule.ownerKey, schedule.name, schedule.link, schedule.apiUrl, schedule.apiKey,
+       JSON.stringify(schedule.services), schedule.legDuration, schedule.legDurationUnit,
+       schedule.mode, schedule.variance, schedule.maxOrders,
        schedule.currentLeg, schedule.active ? 1 : 0, schedule.nextRun, schedule.created]
     );
     return res.json({ success: true, schedule });
@@ -281,14 +283,15 @@ app.post('/schedules/create', async (req, res) => {
   }
 });
 
-// Saare schedules list karo (apiUrl ke hisaab se filter, taaki har user apne hi schedules dekhe)
+// ✅ FIX: List schedules — license_key se filter karo, api_url se nahi
 app.post('/schedules/list', async (req, res) => {
-  const { apiUrl } = req.body || {};
+  const { licenseKey } = req.body || {};
+  const ownerKey = (licenseKey || '').trim().toUpperCase();
   let conn;
   try {
     conn = await mysql.createConnection(dbConfig);
-    const [rows] = apiUrl
-      ? await conn.execute('SELECT * FROM schedules WHERE api_url = ? ORDER BY created DESC', [apiUrl])
+    const [rows] = ownerKey
+      ? await conn.execute('SELECT * FROM schedules WHERE owner_key = ? ORDER BY created DESC', [ownerKey])
       : await conn.execute('SELECT * FROM schedules ORDER BY created DESC');
     return res.json({ success: true, schedules: rows.map(rowToSchedule) });
   } catch (e) {
@@ -298,7 +301,7 @@ app.post('/schedules/list', async (req, res) => {
   }
 });
 
-// Schedule ko pause/resume karo
+// Schedule pause/resume
 app.post('/schedules/toggle', async (req, res) => {
   const { id } = req.body || {};
   let conn;
@@ -318,7 +321,7 @@ app.post('/schedules/toggle', async (req, res) => {
   }
 });
 
-// Schedule delete karo
+// Schedule delete
 app.post('/schedules/delete', async (req, res) => {
   const { id } = req.body || {};
   let conn;
@@ -333,7 +336,7 @@ app.post('/schedules/delete', async (req, res) => {
   }
 });
 
-// Schedule ka current leg turant chalao (manual "Run Now" button)
+// Manual Run Now
 app.post('/schedules/run_now', async (req, res) => {
   const { id } = req.body || {};
   let conn;
@@ -355,9 +358,7 @@ app.post('/schedules/run_now', async (req, res) => {
 });
 
 // =========================================================
-// BACKGROUND LOOP — ye server pe chalta rehta hai (browser se
-// independent). Har minute check karta hai kis schedule ka
-// nextRun time aa gaya hai, aur uska leg execute karta hai.
+// BACKGROUND LOOP
 // =========================================================
 async function processDueSchedules() {
   let conn;
@@ -389,7 +390,6 @@ async function processDueSchedules() {
   }
 }
 
-// Har 60 second me check karta hai — isse legs ka timing zyada precise rehta hai
 setInterval(processDueSchedules, 60 * 1000);
 
 initDB();
