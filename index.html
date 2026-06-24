@@ -278,9 +278,14 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
         <label>Number of Legs</label>
         <div style="display:flex;align-items:center;gap:8px">
           <input type="number" id="numLegs" value="5" min="1" max="50" oninput="updateGraph();previewLegs();renderMultiSlotLegPicker();updateViewsLegsSlot()" style="flex:1" />
-          <div id="viewsLegsSlot" style="display:none;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.35);border-radius:9px;padding:6px 10px;min-width:72px;text-align:center;flex-shrink:0">
+          <div id="viewsLegsSlot" style="background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.35);border-radius:9px;padding:6px 10px;min-width:72px;text-align:center;flex-shrink:0">
             <div style="font-size:9px;color:#fca5a5;font-weight:700;text-transform:uppercase;letter-spacing:.6px;margin-bottom:2px">👁 Views</div>
             <div id="viewsLegsVal" style="font-size:17px;font-weight:800;color:#f5f5f5;line-height:1">5</div>
+            <div style="font-size:9px;color:#b0a8a8;margin-top:1px">legs</div>
+          </div>
+          <div id="likeLegsSlot" style="background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.35);border-radius:9px;padding:6px 10px;min-width:72px;text-align:center;flex-shrink:0">
+            <div style="font-size:9px;color:#fca5a5;font-weight:700;text-transform:uppercase;letter-spacing:.6px;margin-bottom:2px">❤️ Like</div>
+            <div id="likeLegsVal" style="font-size:17px;font-weight:800;color:#f5f5f5;line-height:1">5</div>
             <div style="font-size:9px;color:#b0a8a8;margin-top:1px">legs</div>
           </div>
         </div>
@@ -440,17 +445,18 @@ function toggleLegsSide(){legsSideOpen=!legsSideOpen;document.getElementById('le
 function updateLegsSidePanel(legsData){lastLegsData=legsData;const numLegs=legsData.length?legsData[0].legs.length:0;document.getElementById('legsSideCount').innerHTML=(numLegs||'—')+'<span>legs</span>';if(legsSideOpen)renderLegsSideDetail();}
 function renderLegsSideDetail(){const wrap=document.getElementById('legsSideDetail');if(!lastLegsData.length){wrap.innerHTML='<div style="font-size:10px;color:#475569;text-align:center;margin-top:10px">No data</div>';return;}wrap.innerHTML=lastLegsData.map(({slot,legs})=>{const typeName=slotTypeLabels[slot.type].replace(/^[^\s]+\s/,'');const rows=legs.map((q,i)=>`<div class="leg-mini-row"><span>L${i+1}</span><span>${q.toLocaleString()}</span></div>`).join('');return`<div style="margin-bottom:8px"><div style="font-size:9px;color:#fca5a5;font-weight:700;margin-bottom:2px">${typeName}</div>${rows}</div>`;}).join('');}
 function renderMultiSlotLegPicker(){const block=document.getElementById('multiSlotLegPicker');const list=document.getElementById('multiSlotLegPickerList');if(svcSlots.length<4){block.style.display='none';return;}block.style.display='block';const globalLegs=parseInt(document.getElementById('numLegs').value)||5;list.innerHTML=svcSlots.map(slot=>{const name=slotTypeLabels[slot.type]+(slot.service?' — '+slot.service.name.slice(0,22):'');const opts=[];for(let i=1;i<=Math.max(globalLegs,20);i++)opts.push(`<option value="${i}" ${(slot.legOverride||globalLegs)===i?'selected':''}>${i}</option>`);return`<div class="svc-leg-select-row"><span class="sl-name">${name}</span><select onchange="setSlotLegOverride(${slot.uid},this.value)">${opts.join('')}</select></div>`;}).join('');}
-function setSlotLegOverride(uid,val){const slot=getSlot(uid);if(slot)slot.legOverride=parseInt(val)||null;updateGraph();previewLegs();}
+function setSlotLegOverride(uid,val){const slot=getSlot(uid);if(slot)slot.legOverride=parseInt(val)||null;updateGraph();previewLegs();updateViewsLegsSlot();}
 function generateLegsFor(totalQty,numLegs,variancePct,minQ){if(numLegs<=0||totalQty<=0)return[];minQ=minQ||1;const vp=(variancePct||22)/100;const maxPossibleLegs=Math.max(1,Math.floor(totalQty/minQ));numLegs=Math.min(numLegs,maxPossibleLegs);const base=Math.floor(totalQty/numLegs);let legs=[],remaining=totalQty;for(let i=0;i<numLegs-1;i++){const variation=Math.floor(base*vp);let lq=Math.floor(Math.random()*(variation*2+1))+(base-variation);lq=Math.max(minQ,Math.min(lq,remaining-(numLegs-i-1)*minQ));legs.push(lq);remaining-=lq;}legs.push(Math.max(minQ,remaining));for(let i=legs.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[legs[i],legs[j]]=[legs[j],legs[i]];}return legs;}
 function previewLegs(){renderMultiSlotLegPicker();if(growthChart)updateGraph();}
 
 function updateViewsLegsSlot(){
-  var viewsSlot=svcSlots.find(function(s){return s.type==='views';});
-  var qty=viewsSlot?parseInt(document.getElementById('qty-'+viewsSlot.uid)&&document.getElementById('qty-'+viewsSlot.uid).value)||0:0;
-  var numLegs=parseInt(document.getElementById('numLegs').value)||5;
-  var slot=document.getElementById('viewsLegsSlot');
-  var val=document.getElementById('viewsLegsVal');
-  if(qty>0){slot.style.display='block';val.textContent=numLegs;}else{slot.style.display='none';}
+  const n=parseInt(document.getElementById('numLegs').value)||5;
+  const vEl=document.getElementById('viewsLegsVal');
+  const lEl=document.getElementById('likeLegsVal');
+  const viewsSlot=svcSlots.find(s=>s.type==='views');
+  const likeSlot=svcSlots.find(s=>s.type==='like');
+  if(vEl)vEl.textContent=viewsSlot?.legOverride||n;
+  if(lEl)lEl.textContent=likeSlot?.legOverride||n;
 }
 
 function togglePresets(){presetsOpen=!presetsOpen;document.getElementById('presetsList').classList.toggle('open',presetsOpen);document.getElementById('presetsExpandBtn').classList.toggle('open',presetsOpen);if(presetsOpen)renderPresets();}
