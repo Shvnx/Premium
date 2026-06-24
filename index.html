@@ -371,19 +371,13 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
 </div><!-- /#appContent -->
 
 <script>
-const PROXY='https://premium-29ko.onrender.com/proxy';
+const PROXY='https://spidey.infinityfree.me/proxy.php';
+const BACKEND='https://premium-29ko.onrender.com'; // <-- schedules ab yahan server-side process hote hain
 let apiUrl='',apiKey='';
+let scheduleRefreshTimer=null;
 let allServices=[];
-let schedules=migrateSchedules(JSON.parse(localStorage.getItem('smm_schedules')||'[]'));
-function migrateSchedules(list){
-  return list.map(s=>{
-    if(s.services)return s;
-    // old single-service format -> wrap into services[]
-    return{...s,services:[{type:'views',serviceId:s.serviceId,serviceName:s.serviceName,rate:0,totalQty:s.totalQty||0,legs:s.legs||[],ordersPlaced:s.ordersPlaced||0}],currentLeg:s.currentLeg||0};
-  });
-}
+let schedules=[]; // <-- ab backend se aate hain (refreshSchedulesFromServer), localStorage se nahi
 let logs=JSON.parse(localStorage.getItem('smm_logs')||'[]');
-let timers={};
 let currentMode='viral';
 let currentSpeed='12h';
 let graphMode='smooth';
@@ -410,9 +404,11 @@ window.onload=()=>{
   if(saved.url){document.getElementById('apiUrl').value=saved.url;apiUrl=saved.url;}
   if(saved.key){document.getElementById('apiKey').value=saved.key;apiKey=saved.key;}
   const now=new Date();now.setMinutes(now.getMinutes()-now.getTimezoneOffset());
-  initChart();renderSchedules();renderLogs();renderSvcSlots();renderPresets();
+  initChart();renderLogs();renderSvcSlots();renderPresets();
   if(apiUrl&&apiKey){setConnected('Saved — loading...');fetchServices();}
-  startAllSchedules();
+  // Schedules ab backend se aate hain (server-side processing), local timers nahi chalte
+  refreshSchedulesFromServer();
+  startScheduleAutoRefresh();
   fetchRate();
 };
 
@@ -1016,8 +1012,9 @@ function validateOrderForm(){
   return{name,link,activeSlots};
 }
 
-// DIRECT ORDER — fires immediately, runs through legs starting now
-function directOrder(){
+// DIRECT ORDER — ab schedule SERVER PE create hota hai (backend ke /schedules/create route se).
+// Backend hi legs ko process karega — browser band hone se koi farak nahi padega.
+async function directOrder(){
   const form=validateOrderForm();
   if(!form)return;
   const{name,link,activeSlots}=form;
@@ -1034,48 +1031,49 @@ function directOrder(){
     return{type:slot.type,serviceId:slot.service.service,serviceName:slot.service.name,rate:slot.service.rate,totalQty:qty,legs,currentLeg:0,ordersPlaced:0};
   });
 
-  const schedule={
-    id:Date.now(),name,link,
+  if(!apiUrl||!apiKey){alert('API not connected! Pehle Test Connection karo.');return;}
+
+  const result=await createScheduleOnServer({
+    name,link,apiUrl,apiKey,
     services:servicesData,
-    legDuration,legDurationUnit,mode:currentMode,variance,maxOrders:0,
-    active:true,currentLeg:0,
-    nextRun:Date.now(),created:Date.now()
-  };
-  schedules.push(schedule);saveSchedules();renderSchedules();startScheduleTimer(schedule);
+    legDuration,legDurationUnit,mode:currentMode,variance,maxOrders:0
+  });
+
+  if(!result.success){alert('Order create nahi hua: '+(result.reason||'Unknown error'));return;}
+
   const totalQtyAll=servicesData.reduce((a,s)=>a+s.totalQty,0);
   addLog('success','Direct order placed: '+name+' — '+servicesData.length+' services, '+totalQtyAll.toLocaleString()+' total qty');
+  await refreshSchedulesFromServer();
   switchTab('schedules',document.querySelectorAll('.tab')[2]);
-  alert('Order placed!\n'+servicesData.length+' services • '+totalQtyAll.toLocaleString()+' total quantity\nStarting now.');
+  alert('Order placed!\n'+servicesData.length+' services • '+totalQtyAll.toLocaleString()+' total quantity\nStarting now. Ye backend pe chalega, browser band karne pe bhi nahi rukega.');
 }
 
-function startAllSchedules(){schedules.forEach(s=>{if(s.active)startScheduleTimer(s);});}
-function startScheduleTimer(schedule){
-  if(timers[schedule.id])clearTimeout(timers[schedule.id]);
-  const delay=Math.max(0,schedule.nextRun-Date.now());
-  timers[schedule.id]=setTimeout(async()=>{
-    await executeOrder(schedule);
-    schedule.currentLeg++;
-    const maxLegs=Math.max(...schedule.services.map(s=>s.legs.length));
-    const done=schedule.currentLeg>=maxLegs||(schedule.maxOrders>0&&schedule.currentLeg>=schedule.maxOrders);
-    if(done){schedule.active=false;addLog('info','Completed: '+schedule.name);}
-    else{schedule.nextRun=Date.now()+getMs(schedule.legDuration,schedule.legDurationUnit);startScheduleTimer(schedule);}
-    saveSchedules();renderSchedules();
-  },delay);
+// ===== Backend schedule helpers =====
+async function createScheduleOnServer(payload){
+  try{
+    const res=await fetch(BACKEND+'/schedules/create',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(payload)
+    });
+    return await res.json();
+  }catch(e){return{success:false,reason:'Network error: '+e.message};}
 }
-async function executeOrder(schedule){
-  if(!apiUrl||!apiKey){addLog('error','API not connected!');return;}
-  const legIdx=schedule.currentLeg||0;
-  for(const svc of schedule.services){
-    if(legIdx>=svc.legs.length)continue;
-    const qty=svc.legs[legIdx]||svc.legs[svc.legs.length-1];
-    const typeName=slotTypeLabels[svc.type]||svc.type;
-    addLog('info','Leg '+(legIdx+1)+'/'+svc.legs.length+' | '+schedule.name+' | '+typeName+' #'+svc.serviceId+' | '+qty);
-    const res=await callApi({action:'add',service:svc.serviceId,link:schedule.link,quantity:qty});
-    if(res.order){svc.ordersPlaced=(svc.ordersPlaced||0)+1;addLog('success','Order #'+res.order+' | Leg '+(legIdx+1)+' — '+typeName+' — '+qty);}
-    else addLog('error','Failed ('+typeName+'): '+JSON.stringify(res));
-  }
+async function refreshSchedulesFromServer(){
+  try{
+    const res=await fetch(BACKEND+'/schedules/list',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({apiUrl})
+    });
+    const data=await res.json();
+    if(data.success){schedules=data.schedules;renderSchedules();}
+  }catch(e){addLog('error','Schedules load nahi hue: '+e.message);}
 }
-function getMs(amount,unit){return amount*({minutes:60000,hours:3600000,days:86400000}[unit]||3600000);}
+// Schedules ko har 30 second me background me refresh karta hai, taaki UI me
+// backend ka progress (jo legs process kar raha hai) dikhta rahe.
+function startScheduleAutoRefresh(){
+  if(scheduleRefreshTimer)clearInterval(scheduleRefreshTimer);
+  scheduleRefreshTimer=setInterval(refreshSchedulesFromServer,30000);
+}
 
 function renderSchedules(){
   const c=document.getElementById('schedulesList');
@@ -1098,20 +1096,43 @@ function renderSchedules(){
     <div class="si-progress"><div class="si-progress-fill" style="width:${pct}%"></div></div></div>`;
   }).join('');
 }
-function toggleSchedule(id){const s=schedules.find(x=>x.id==id);if(!s)return;s.active=!s.active;if(s.active){s.nextRun=Date.now()+getMs(s.legDuration,s.legDurationUnit);startScheduleTimer(s);}else if(timers[id]){clearTimeout(timers[id]);delete timers[id];}saveSchedules();renderSchedules();}
-function deleteSchedule(id){if(!confirm('Delete?'))return;if(timers[id]){clearTimeout(timers[id]);delete timers[id];}schedules=schedules.filter(x=>x.id!=id);saveSchedules();renderSchedules();}
-async function runNow(id){const s=schedules.find(x=>x.id==id);if(!s)return;await executeOrder(s);s.currentLeg++;s.nextRun=Date.now()+getMs(s.legDuration,s.legDurationUnit);saveSchedules();renderSchedules();}
+// Sab actions ab backend ko call karte hain — koi local setTimeout/localStorage nahi.
+async function toggleSchedule(id){
+  try{
+    const res=await fetch(BACKEND+'/schedules/toggle',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id})});
+    const data=await res.json();
+    if(!data.success){alert('Error: '+(data.reason||'Unknown'));return;}
+    await refreshSchedulesFromServer();
+  }catch(e){alert('Network error: '+e.message);}
+}
+async function deleteSchedule(id){
+  if(!confirm('Delete?'))return;
+  try{
+    const res=await fetch(BACKEND+'/schedules/delete',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id})});
+    const data=await res.json();
+    if(!data.success){alert('Error: '+(data.reason||'Unknown'));return;}
+    await refreshSchedulesFromServer();
+  }catch(e){alert('Network error: '+e.message);}
+}
+async function runNow(id){
+  try{
+    const res=await fetch(BACKEND+'/schedules/run_now',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id})});
+    const data=await res.json();
+    if(!data.success){alert('Error: '+(data.reason||'Unknown'));return;}
+    (data.logs||[]).forEach(l=>addLog(l.type,l.message));
+    await refreshSchedulesFromServer();
+  }catch(e){alert('Network error: '+e.message);}
+}
 
 function addLog(type,message){const time=new Date().toLocaleTimeString();logs.unshift({type,message,time});if(logs.length>200)logs=logs.slice(0,200);localStorage.setItem('smm_logs',JSON.stringify(logs));renderLogs();}
 function renderLogs(){const a=document.getElementById('logArea');if(!logs.length){a.innerHTML='<div class="log-line info">[System] No logs</div>';return;}a.innerHTML=logs.map(l=>`<div class="log-line ${l.type}">[${l.time}] ${l.message}</div>`).join('');}
 function clearLogs(){logs=[];localStorage.setItem('smm_logs','[]');renderLogs();}
-function saveSchedules(){localStorage.setItem('smm_schedules',JSON.stringify(schedules));}
 
 // ============================================
 // LICENSE VERIFICATION LOGIC
 // IMPORTANT: change this to your actual InfinityFree URL
 // ============================================
-const LICENSE_API_URL = 'https://premium-29ko.onrender.com/check_license.php';
+const LICENSE_API_URL = 'http://spidey.infinityfree.me/check_license.php';
 
 function showApp(){
   document.getElementById('licenseOverlay').style.display='none';
