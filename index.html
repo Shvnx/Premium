@@ -29,6 +29,7 @@ body::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;bac
 label{display:block;font-size:10px;color:#9ca3af;margin-bottom:5px;margin-top:12px;text-transform:uppercase;letter-spacing:.8px;font-weight:700}
 label:first-of-type{margin-top:0}
 input,select{width:100%;padding:10px 12px;background:rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:#f5f5f5;font-size:13px;outline:none;transition:all .2s}
+input:disabled,select:disabled{color:#f5f5f5;-webkit-text-fill-color:#f5f5f5;opacity:1;background:rgba(0,0,0,.45);cursor:not-allowed}
 input:focus,select:focus{border-color:rgba(220,38,38,.7);background:rgba(220,38,38,.08);box-shadow:0 0 0 3px rgba(220,38,38,.12)}
 select option{background:#140505}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
@@ -82,6 +83,21 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
 .preset-item-meta{font-size:10px;color:#b0a8a8;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .preset-item-del{background:rgba(127,29,29,.4);border:1px solid rgba(127,29,29,.6);color:#fca5a5;width:24px;height:24px;border-radius:7px;cursor:pointer;font-size:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .presets-empty{font-size:11px;color:#9c9494;text-align:center;padding:10px}
+.api-profiles-row{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;align-items:center}
+.api-profile-chip{position:relative;display:flex;align-items:center;gap:7px;padding:9px 14px 9px 12px;border-radius:12px;background:linear-gradient(135deg,rgba(34,197,94,.22),rgba(20,83,45,.35));border:1px solid rgba(34,197,94,.4);cursor:pointer;transition:all .2s;font-size:12px;font-weight:700;color:#86efac;box-shadow:0 4px 14px rgba(34,197,94,.12)}
+.api-profile-chip:hover{border-color:rgba(34,197,94,.7);box-shadow:0 4px 18px rgba(34,197,94,.25)}
+.api-profile-chip .api-profile-del{background:none;border:none;color:#bbf7d0;opacity:.7;font-size:12px;cursor:pointer;padding:0;margin-left:2px;line-height:1}
+.api-profile-chip .api-profile-del:hover{opacity:1;color:#fca5a5}
+.api-profile-add{width:38px;height:38px;border-radius:12px;background:rgba(255,255,255,.04);border:1px dashed rgba(34,197,94,.4);color:#86efac;font-size:18px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.api-profile-add:hover{background:rgba(34,197,94,.1);border-color:rgba(34,197,94,.7)}
+.api-profile-add:disabled{opacity:.35;cursor:not-allowed}
+.extra-legs-box{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:10px 12px;margin-top:10px}
+.extra-legs-head{display:flex;align-items:center;justify-content:space-between;cursor:pointer}
+.extra-legs-head-title{font-size:11px;font-weight:700;color:#fca5a5;text-transform:uppercase;letter-spacing:.6px;display:flex;align-items:center;gap:6px}
+.extra-legs-expand{background:none;border:none;color:#d6cfcf;cursor:pointer;font-size:13px;padding:2px;transition:transform .2s}
+.extra-legs-expand.open{transform:rotate(180deg);color:#fca5a5}
+.extra-legs-list{display:none;margin-top:10px;flex-direction:column;gap:7px}
+.extra-legs-list.open{display:flex}
 .save-direct-row{display:flex;gap:10px;margin-top:14px}
 .btn-save-preset{flex:1;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);color:#f5f5f5}
 .btn-save-preset:hover{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.25)}
@@ -193,7 +209,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
     <div style="font-size:20px;font-weight:900;background:linear-gradient(135deg,#fff,#ef4444,#991b1b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:4px">⚡ SPIDEY</div>
     <div style="font-size:12px;color:#9ca3af;margin-bottom:18px">Enter license key to access</div>
     <label style="display:block;font-size:10px;color:#9ca3af;margin-bottom:5px;text-transform:uppercase;letter-spacing:.8px;font-weight:700">License Key</label>
-    <input type="text" id="licenseKeyInput" placeholder="XXXX-XXXX-XXXX-XXXX" style="width:100%;padding:11px 12px;background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.15);border-radius:10px;color:#f5f5f5;font-size:14px;outline:none;font-family:monospace;text-transform:uppercase">
+    <input type="text" id="licenseKeyInput" autocomplete="off" placeholder="XXXX-XXXX-XXXX-XXXX" style="width:100%;padding:11px 12px;background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.15);border-radius:10px;color:#f5f5f5;font-size:14px;outline:none;font-family:monospace;text-transform:uppercase">
     <button id="licenseSubmitBtn" onclick="verifyLicense()" style="width:100%;margin-top:14px;padding:13px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;border:none;background:linear-gradient(135deg,#dc2626,#991b1b);color:#fff;box-shadow:0 4px 20px rgba(220,38,38,.4)">Unlock</button>
     <div id="licenseError" style="display:none;color:#fca5a5;font-size:12px;margin-top:12px;text-align:center"></div>
     <div id="licenseExpiry" style="display:none;color:#86efac;font-size:11px;margin-top:12px;text-align:center"></div>
@@ -218,14 +234,15 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
   <div class="card">
     <div class="card-title">🔌 API Connection</div>
     <label>Panel URL</label>
-    <input type="text" id="apiUrl" placeholder="https://yoyomedia.in/api/v2" />
+    <input type="text" id="apiUrl" autocomplete="off" placeholder="https://yoyomedia.in/api/v2" />
     <label>API Key</label>
-    <input type="password" id="apiKey" placeholder="Your API key" />
+    <input type="password" id="apiKey" autocomplete="off" placeholder="Your API key" />
     <div class="row2" style="margin-top:14px;gap:10px">
       <button class="btn btn-outline" onclick="testConnection()">Test Connection</button>
       <button class="btn btn-primary" style="margin-top:0" onclick="saveAndFetch()">Connect & Load</button>
     </div>
     <div class="info-box" style="margin-top:14px"><strong>Proxy:</strong> Render backend — CORS bypass enabled</div>
+    <div class="api-profiles-row" id="apiProfilesRow"></div>
   </div>
 </div>
 <div class="tab-content" id="tab-order">
@@ -239,9 +256,9 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
       <div class="presets-list" id="presetsList"></div>
     </div>
     <label>Schedule Name</label>
-    <input type="text" id="scheduleName" placeholder="e.g. Reel Daily Push" />
+    <input type="text" id="scheduleName" autocomplete="off" placeholder="e.g. Reel Daily Push" />
     <label>Target Link</label>
-    <input type="text" id="targetLink" placeholder="https://instagram.com/p/..." />
+    <input type="text" id="targetLink" autocomplete="off" placeholder="https://instagram.com/p/..." />
     <hr class="divider">
     <div class="card-title" style="margin-bottom:8px">🧩 Services</div>
     <div class="svc-slots" id="svcSlots"></div>
@@ -267,25 +284,31 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
     </div>
     <div style="margin-top:14px;position:relative" id="legsSection">
       <!-- Lock overlay -->
-      <div id="legsLockOverlay" style="position:absolute;inset:0;z-index:10;background:rgba(0,0,0,0.55);backdrop-filter:blur(2px);border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:10px;pointer-events:all;border:1px solid rgba(220,38,38,0.18)">
-        <div style="font-size:22px;margin-bottom:4px">🔒</div>
-        <div style="font-size:10px;color:#fca5a5;font-weight:700;text-transform:uppercase;letter-spacing:.6px;text-align:center">Auto — select <em>Manual</em> to edit</div>
+      <div id="legsLockOverlay" style="position:absolute;inset:0;z-index:10;background:rgba(0,0,0,0.18);backdrop-filter:blur(0.5px);border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:6px;pointer-events:all;border:1px solid rgba(220,38,38,0.18)">
+        <div style="font-size:9px;color:#fca5a5;font-weight:700;text-transform:uppercase;letter-spacing:.6px;text-align:center;background:rgba(0,0,0,0.45);padding:3px 10px;border-radius:100px;display:flex;align-items:center;gap:5px">🔒 Auto — select <em style="font-style:normal;color:#fff">Manual</em> to edit</div>
       </div>
       <div class="row2">
         <div>
           <label>Number of Legs</label>
-          <input type="number" id="numLegs" value="5" min="1" max="50" oninput="updateGraph();previewLegs();renderMultiSlotLegPicker();updateViewsLegsSlot()" />
+          <input type="number" id="numLegs" autocomplete="off" value="5" min="1" max="50" oninput="updateGraph();previewLegs();renderMultiSlotLegPicker();updateViewsLegsSlot()" />
         </div>
         <div>
           <label>Like — Number of Legs</label>
-          <input type="number" id="numLegsLike" value="5" min="1" max="50" oninput="updateViewsLegsSlot();updateGraph();previewLegs()" />
+          <input type="number" id="numLegsLike" autocomplete="off" value="5" min="1" max="50" oninput="updateViewsLegsSlot();updateGraph();previewLegs()" />
         </div>
+      </div>
+      <div class="extra-legs-box" id="multiSlotLegPicker" style="display:none">
+        <div class="extra-legs-head" onclick="toggleExtraLegs()">
+          <div class="extra-legs-head-title">🦵 Extra Services — Legs <span id="extraLegsCountBadge" style="color:#b0a8a8;font-weight:500"></span></div>
+          <button class="extra-legs-expand" id="extraLegsExpandBtn">▾</button>
+        </div>
+        <div class="extra-legs-list" id="multiSlotLegPickerList"></div>
       </div>
       <div class="row2" style="margin-top:14px">
         <div>
           <label>Leg Duration</label>
           <div class="row2" style="gap:6px">
-            <input type="number" id="legDuration" value="30" min="1" oninput="updateGraph();previewLegs()" />
+            <input type="number" id="legDuration" autocomplete="off" value="30" min="1" oninput="updateGraph();previewLegs()" />
             <select id="legDurationUnit" onchange="updateGraph();previewLegs()">
               <option value="minutes">Min</option>
               <option value="hours" selected>Hrs</option>
@@ -318,10 +341,6 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
         <div class="legs-side-count" id="legsSideCount">—<span>legs</span></div>
         <div class="legs-side-detail" id="legsSideDetail"></div>
       </div>
-    </div>
-    <div class="svc-leg-select-block" id="multiSlotLegPicker" style="display:none">
-      <div class="svc-leg-select-title">🦵 Which leg-count per service</div>
-      <div id="multiSlotLegPickerList"></div>
     </div>
     <hr class="divider">
     <div class="save-direct-row">
@@ -360,6 +379,7 @@ let graphMode='smooth';
 let growthChart=null;
 let usdToInr=84;
 let legsSideOpen=false;
+let extraLegsOpen=false;
 let currencyTableOpen=false;
 let activeCurrency='INR';
 const currencyMeta={USD:{symbol:'$',rate:1},INR:{symbol:'₹',rate:null},GBP:{symbol:'£',rate:null},EUR:{symbol:'€',rate:null},AED:{symbol:'AED ',rate:null},PKR:{symbol:'₨',rate:null}};
@@ -369,12 +389,13 @@ let nextSlotUid=3;
 const slotTypeLabels={views:'👁 Views',like:'❤️ Like',save:'🔖 Save',repost:'🔁 Repost/RT'};
 let presets=JSON.parse(localStorage.getItem('smm_presets')||'[]');
 let presetsOpen=false;
+let apiProfiles=JSON.parse(localStorage.getItem('smm_api_profiles')||'[]');
 
 window.onload=()=>{
   const saved=JSON.parse(localStorage.getItem('smm_api')||'{}');
   if(saved.url){document.getElementById('apiUrl').value=saved.url;apiUrl=saved.url;}
   if(saved.key){document.getElementById('apiKey').value=saved.key;apiKey=saved.key;}
-  initChart();renderLogs();renderSvcSlots();renderPresets();updateViewsLegsSlot();
+  initChart();renderLogs();renderSvcSlots();renderPresets();renderApiProfiles();updateViewsLegsSlot();
   setLegsLock(true); // default speed is 12h (not manual)
   applySpeedPreset('12h');
   if(apiUrl&&apiKey){setConnected('Saved — loading...');fetchServices();}
@@ -387,6 +408,38 @@ async function callApi(params){const body=new URLSearchParams({_target:apiUrl,ke
 function setConnected(msg){document.getElementById('statusDot').classList.add('on');document.getElementById('statusText').textContent=msg;}
 async function testConnection(){apiUrl=document.getElementById('apiUrl').value.trim();apiKey=document.getElementById('apiKey').value.trim();if(!apiUrl||!apiKey){alert('Enter both URL and API key!');return;}const res=await callApi({action:'balance'});if(res.balance!==undefined){setConnected('Balance: $'+parseFloat(res.balance).toFixed(4));alert('Connected! Balance: $'+res.balance);}else alert('Error: '+JSON.stringify(res));}
 async function saveAndFetch(){apiUrl=document.getElementById('apiUrl').value.trim();apiKey=document.getElementById('apiKey').value.trim();if(!apiUrl||!apiKey){alert('Enter URL and API key!');return;}localStorage.setItem('smm_api',JSON.stringify({url:apiUrl,key:apiKey}));const res=await callApi({action:'balance'});if(res.balance!==undefined)setConnected('Balance: $'+parseFloat(res.balance).toFixed(4));await fetchServices();}
+function renderApiProfiles(){
+  const row=document.getElementById('apiProfilesRow');
+  let html=apiProfiles.map((p,i)=>`<div class="api-profile-chip" onclick="useApiProfile(${i})"><span>🟢 ${p.name}</span><button class="api-profile-del" onclick="event.stopPropagation();deleteApiProfile(${i})">✕</button></div>`).join('');
+  if(apiProfiles.length<3){html+=`<button class="api-profile-add" onclick="addApiProfile()" title="Save current URL/Key as a new profile">+</button>`;}
+  row.innerHTML=html;
+}
+function addApiProfile(){
+  if(apiProfiles.length>=3){addLog('info','Max 3 API profiles');return;}
+  const url=document.getElementById('apiUrl').value.trim();
+  const key=document.getElementById('apiKey').value.trim();
+  if(!url||!key){alert('Enter Panel URL and API Key above first, then click + to save it as a profile!');return;}
+  const name='API X'+(apiProfiles.length+1);
+  apiProfiles.push({name,url,key});
+  localStorage.setItem('smm_api_profiles',JSON.stringify(apiProfiles));
+  renderApiProfiles();
+  addLog('success','Saved profile: '+name);
+}
+async function useApiProfile(idx){
+  const p=apiProfiles[idx];if(!p)return;
+  document.getElementById('apiUrl').value=p.url;
+  document.getElementById('apiKey').value=p.key;
+  addLog('info','Loaded profile: '+p.name);
+  await saveAndFetch();
+}
+function deleteApiProfile(idx){
+  const p=apiProfiles[idx];if(!p)return;
+  if(!confirm('Delete profile "'+p.name+'"?'))return;
+  apiProfiles.splice(idx,1);
+  apiProfiles.forEach((p,i)=>p.name='API X'+(i+1));
+  localStorage.setItem('smm_api_profiles',JSON.stringify(apiProfiles));
+  renderApiProfiles();
+}
 async function fetchServices(){const res=await callApi({action:'services'});if(Array.isArray(res)&&res.length){allServices=res;addLog('success','✅ '+res.length+' services loaded');}else addLog('error','Services fetch failed: '+JSON.stringify(res));}
 
 function renderSvcSlots(){
@@ -395,25 +448,25 @@ function renderSvcSlots(){
     const typeOptions=Object.keys(slotTypeLabels).map(t=>`<option value="${t}" ${slot.type===t?'selected':''}>${slotTypeLabels[t]}</option>`).join('');
     const removeBtn=svcSlots.length>2||idx>=2?`<button class="svc-slot-remove" onclick="removeSvcSlot(${slot.uid})">✕</button>`:'';
     const minNote=slot.service?`Min: <strong style="color:#f59e0b">${slot.service.min}</strong> &nbsp;|&nbsp; Max: ${slot.service.max}`:'No service selected yet';
-    return`<div class="svc-slot" id="slot-${slot.uid}"><div class="svc-slot-head"><span class="svc-slot-label">Slot ${idx+1}</span>${removeBtn}</div><div class="svc-slot-row"><select class="svc-type-select" onchange="setSlotType(${slot.uid},this.value)">${typeOptions}</select><div class="service-picker-wrap"><span class="svc-search-icon">🔍</span><input type="text" class="service-search-input" autocomplete="off" id="svcSearch-${slot.uid}" placeholder="Type service ID or name..." oninput="onSvcInput(${slot.uid})" onfocus="onSvcFocus(${slot.uid})" onblur="setTimeout(()=>closeSvcDD(${slot.uid}),200)" /><div class="service-dropdown" id="svcDropdown-${slot.uid}"></div></div></div><div class="svc-slot-min">${minNote}</div><div class="row2" style="margin-top:8px"><div><label style="margin-top:6px">Quantity</label><input type="number" id="qty-${slot.uid}" placeholder="e.g. 2000" value="${slot.qty||''}" oninput="onSlotQtyInput(${slot.uid})" /></div><div><label style="margin-top:6px">&nbsp;</label><div class="cost-box" id="costBox-${slot.uid}" style="margin-top:0;display:none"><div class="cost-slot"><div><div class="cost-slot-main"><span class="cost-slot-usd" id="calcUSD-${slot.uid}">—</span><span class="cost-slot-inr" id="calcINR-${slot.uid}">—</span></div><div class="cost-slot-meta" id="calcMeta-${slot.uid}">—</div></div><button class="cost-expand-btn" id="expandBtn-${slot.uid}" onclick="toggleCurrencyTable(${slot.uid})">▾</button></div><div class="currency-table" id="currencyTable-${slot.uid}"><div class="currency-select-row"><label style="margin:0">Currency</label><select onchange="setActiveCurrency(${slot.uid},this.value)">${Object.keys(currencyMeta).map(c=>`<option value="${c}" ${c===activeCurrency?'selected':''}>${c}</option>`).join('')}</select></div><table class="ctable" id="ctable-${slot.uid}"></table></div></div></div></div><div class="min-warning" id="minWarning-${slot.uid}">⚠️ <span id="minWarnText-${slot.uid}"></span></div></div>`;
+    return`<div class="svc-slot" id="slot-${slot.uid}"><div class="svc-slot-head"><span class="svc-slot-label">Slot ${idx+1}</span>${removeBtn}</div><div class="svc-slot-row"><select class="svc-type-select" onchange="setSlotType(${slot.uid},this.value)">${typeOptions}</select><div class="service-picker-wrap"><span class="svc-search-icon">🔍</span><input type="text" class="service-search-input" autocomplete="off" id="svcSearch-${slot.uid}" placeholder="Type service ID or name..." oninput="onSvcInput(${slot.uid})" onfocus="onSvcFocus(${slot.uid})" onblur="setTimeout(()=>closeSvcDD(${slot.uid}),200)" /><div class="service-dropdown" id="svcDropdown-${slot.uid}"></div></div></div><div class="svc-slot-min">${minNote}</div><div class="row2" style="margin-top:8px"><div><label style="margin-top:6px">Quantity</label><input type="number" id="qty-${slot.uid}" autocomplete="off" placeholder="e.g. 2000" value="${slot.qty||''}" oninput="onSlotQtyInput(${slot.uid})" /></div><div><label style="margin-top:6px">&nbsp;</label><div class="cost-box" id="costBox-${slot.uid}" style="margin-top:0;display:none"><div class="cost-slot"><div><div class="cost-slot-main"><span class="cost-slot-usd" id="calcUSD-${slot.uid}">—</span><span class="cost-slot-inr" id="calcINR-${slot.uid}">—</span></div><div class="cost-slot-meta" id="calcMeta-${slot.uid}">—</div></div><button class="cost-expand-btn" id="expandBtn-${slot.uid}" onclick="toggleCurrencyTable(${slot.uid})">▾</button></div><div class="currency-table" id="currencyTable-${slot.uid}"><div class="currency-select-row"><label style="margin:0">Currency</label><select onchange="setActiveCurrency(${slot.uid},this.value)">${Object.keys(currencyMeta).map(c=>`<option value="${c}" ${c===activeCurrency?'selected':''}>${c}</option>`).join('')}</select></div><table class="ctable" id="ctable-${slot.uid}"></table></div></div></div></div><div class="min-warning" id="minWarning-${slot.uid}">⚠️ <span id="minWarnText-${slot.uid}"></span></div></div>`;
   }).join('');
   svcSlots.forEach(slot=>{if(slot.service){const inp=document.getElementById('svcSearch-'+slot.uid);if(inp)inp.value='#'+slot.service.service+' — '+slot.service.name;}});
   updateAllCostBoxes();updateTotals();validateAllSlots();renderMultiSlotLegPicker();
 }
 
-function addSvcSlot(){if(svcSlots.length>=6){addLog('info','Max 6 services');return;}const usedTypes=svcSlots.map(s=>s.type);const freeType=['like','save','repost'].find(t=>!usedTypes.includes(t))||'like';svcSlots.push({uid:nextSlotUid++,service:null,type:freeType,qty:0,legOverride:null});renderSvcSlots();renderMultiSlotLegPicker();}
-function removeSvcSlot(uid){if(svcSlots.length<=2){addLog('info','Minimum 2 slots required');return;}svcSlots=svcSlots.filter(s=>s.uid!==uid);renderSvcSlots();renderMultiSlotLegPicker();}
-function setSlotType(uid,type){const slot=svcSlots.find(s=>s.uid===uid);if(slot)slot.type=type;updateTotals();validateAllSlots();}
+function addSvcSlot(){if(svcSlots.length>=6){addLog('info','Max 6 services');return;}const usedTypes=svcSlots.map(s=>s.type);const freeType=['like','save','repost'].find(t=>!usedTypes.includes(t))||'like';svcSlots.push({uid:nextSlotUid++,service:null,type:freeType,qty:0,legOverride:null});renderSvcSlots();renderMultiSlotLegPicker();updateGraph();}
+function removeSvcSlot(uid){if(svcSlots.length<=2){addLog('info','Minimum 2 slots required');return;}svcSlots=svcSlots.filter(s=>s.uid!==uid);renderSvcSlots();renderMultiSlotLegPicker();updateGraph();}
+function setSlotType(uid,type){const slot=svcSlots.find(s=>s.uid===uid);if(slot)slot.type=type;updateTotals();validateAllSlots();updateGraph();previewLegs();}
 function getSlot(uid){return svcSlots.find(s=>s.uid===uid);}
 
 function renderSvcDD(uid,list){const dd=document.getElementById('svcDropdown-'+uid);if(!dd)return;if(!list.length){dd.innerHTML='<div style="padding:16px;text-align:center;color:#4b5563;font-size:12px">No services found</div>';return;}const slot=getSlot(uid);dd.innerHTML=list.slice(0,120).map(s=>`<div class="svc-item ${slot&&slot.service&&slot.service.service==s.service?'sel':''}" onclick="selectSvc(${uid},${s.service},'${(s.name||'').replace(/'/g,"\\'").replace(/"/g,'&quot;')}',${parseFloat(s.rate||0)},${parseInt(s.min||1)},${parseInt(s.max||999999)})"><span class="svc-id">#${s.service}</span><span class="svc-name">${s.name||'Unknown'}</span><span class="svc-price">$${parseFloat(s.rate||0).toFixed(3)}/1k</span><span class="svc-min">min:${s.min||'?'}</span></div>`).join('');}
 function onSvcFocus(uid){if(!allServices.length){addLog('info','Connect API first');return;}document.getElementById('svcSearch-'+uid).classList.add('dd-open');document.getElementById('svcDropdown-'+uid).classList.add('open');renderSvcDD(uid,allServices);}
 function closeSvcDD(uid){const dd=document.getElementById('svcDropdown-'+uid),inp=document.getElementById('svcSearch-'+uid);if(dd)dd.classList.remove('open');if(inp)inp.classList.remove('dd-open');}
 function onSvcInput(uid){const inp=document.getElementById('svcSearch-'+uid);const q=inp.value.trim();document.getElementById('svcDropdown-'+uid).classList.add('open');inp.classList.add('dd-open');if(/^\d+$/.test(q)){const match=allServices.find(s=>String(s.service)===q);if(match)selectSvc(uid,match.service,match.name||'Unknown',parseFloat(match.rate||0),parseInt(match.min||1),parseInt(match.max||999999));}const filtered=allServices.filter(s=>(s.name||'').toLowerCase().includes(q.toLowerCase())||String(s.service).includes(q));renderSvcDD(uid,filtered);}
-function selectSvc(uid,id,name,rate,min,max){const slot=getSlot(uid);if(!slot)return;slot.service={service:id,name,rate,min,max};document.getElementById('svcSearch-'+uid).value='#'+id+' — '+name;closeSvcDD(uid);addLog('info','Slot service selected: #'+id+' — '+name);renderSvcSlots();renderMultiSlotLegPicker();}
+function selectSvc(uid,id,name,rate,min,max){const slot=getSlot(uid);if(!slot)return;slot.service={service:id,name,rate,min,max};document.getElementById('svcSearch-'+uid).value='#'+id+' — '+name;closeSvcDD(uid);addLog('info','Slot service selected: #'+id+' — '+name);renderSvcSlots();renderMultiSlotLegPicker();updateGraph();previewLegs();}
 function getSlotMin(uid){const slot=getSlot(uid);return slot&&slot.service?slot.service.min:1;}
 function getBaseSlotQty(){const base=svcSlots[0];return parseInt(document.getElementById('qty-'+base.uid)?.value)||0;}
-function onSlotQtyInput(uid){const slot=getSlot(uid);if(slot)slot.qty=parseInt(document.getElementById('qty-'+uid).value)||0;updateAllCostBoxes();updateTotals();validateAllSlots();updateGraph();previewLegs();updateViewsLegsSlot();}
+function onSlotQtyInput(uid){const slot=getSlot(uid);if(slot)slot.qty=parseInt(document.getElementById('qty-'+uid).value)||0;if(currentSpeed&&currentSpeed!=='manual')applySpeedPreset(currentSpeed);updateAllCostBoxes();updateTotals();validateAllSlots();updateGraph();previewLegs();updateViewsLegsSlot();}
 function validateAllSlots(){
   const baseQty=getBaseSlotQty();
   const maxEngagement=baseQty>0?Math.floor(baseQty*0.034):0; // 3.4% cap
@@ -457,8 +510,45 @@ function updateTotals(){const box=document.getElementById('totalsBox');const val
 
 const modePresets={viral:{legs:8,duration:3,unit:'hours',speed:'6h',variance:20},fast:{legs:3,duration:1,unit:'hours',speed:'6h',variance:15},trending:{legs:6,duration:6,unit:'hours',speed:'12h',variance:25},slow:{legs:12,duration:12,unit:'hours',speed:'48h',variance:30},custom:{legs:5,duration:30,unit:'minutes',speed:'manual',variance:22}};
 function setMode(mode,el){currentMode=mode;document.querySelectorAll('.mode-btn').forEach(b=>b.className=b.className.replace(' active',''));el.classList.add('active');const p=modePresets[mode];document.getElementById('numLegs').value=p.legs;document.getElementById('legDuration').value=p.duration;document.getElementById('legDurationUnit').value=p.unit;document.getElementById('variance').value=p.variance;document.getElementById('varianceVal').textContent=p.variance;document.getElementById('variance').style.setProperty('--val',p.variance+'%');setSpeedVal(p.speed);updateGraph();previewLegs();renderMultiSlotLegPicker();}
-const speedPresets={'1h':{legs:2,duration:30,unit:'minutes'},'6h':{legs:4,duration:90,unit:'minutes'},'12h':{legs:6,duration:2,unit:'hours'},'24h':{legs:8,duration:3,unit:'hours'},'48h':{legs:12,duration:4,unit:'hours'}};
-function applySpeedPreset(speed){const p=speedPresets[speed];if(!p)return;document.getElementById('numLegs').value=p.legs;document.getElementById('numLegsLike').value=p.legs;document.getElementById('legDuration').value=p.duration;document.getElementById('legDurationUnit').value=p.unit;updateGraph();previewLegs();renderMultiSlotLegPicker();updateViewsLegsSlot();}
+const speedPresets={'1h':{duration:30,unit:'minutes'},'6h':{duration:90,unit:'minutes'},'12h':{duration:2,unit:'hours'},'24h':{duration:3,unit:'hours'},'48h':{duration:4,unit:'hours'}};
+const LEG_RATIO_MIN=0.77,LEG_RATIO_MAX=0.92;
+// Calculates an auto leg count for a slot: never the theoretical max possible legs,
+// never below ~77% of it — always lands between 77% and 92% of max-possible-legs.
+function autoCalcLegs(qty,minQ){
+  minQ=minQ||1;
+  const maxPossible=Math.max(1,Math.floor(qty/minQ));
+  if(maxPossible<=1)return 1;
+  let lo=Math.ceil(maxPossible*LEG_RATIO_MIN);
+  let hi=Math.floor(maxPossible*LEG_RATIO_MAX);
+  if(hi>=maxPossible)hi=maxPossible-1; // never touch true max
+  if(hi<1)hi=1;
+  if(lo>hi)lo=hi;
+  if(lo<1)lo=1;
+  return Math.floor(Math.random()*(hi-lo+1))+lo;
+}
+function applySpeedPreset(speed){
+  const p=speedPresets[speed];if(!p)return;
+  document.getElementById('legDuration').value=p.duration;
+  document.getElementById('legDurationUnit').value=p.unit;
+  const viewsSlot=svcSlots.find(s=>s.type==='views');
+  const likeSlot=svcSlots.find(s=>s.type==='like');
+  const viewsQty=viewsSlot?(parseInt(document.getElementById('qty-'+viewsSlot.uid)?.value)||0):0;
+  const likeQty=likeSlot?(parseInt(document.getElementById('qty-'+likeSlot.uid)?.value)||0):0;
+  const viewsMin=viewsSlot?getSlotMin(viewsSlot.uid):1;
+  const likeMin=likeSlot?getSlotMin(likeSlot.uid):1;
+  const autoViewsLegs=viewsQty>0?autoCalcLegs(viewsQty,viewsMin):5;
+  const autoLikeLegs=likeQty>0?autoCalcLegs(likeQty,likeMin):autoViewsLegs;
+  document.getElementById('numLegs').value=autoViewsLegs;
+  document.getElementById('numLegsLike').value=autoLikeLegs;
+  // also auto-fill legOverride for any other active slots (save/repost etc.)
+  svcSlots.forEach(slot=>{
+    if(slot.type==='views'||slot.type==='like')return;
+    if(!slot.service)return;
+    const q=parseInt(document.getElementById('qty-'+slot.uid)?.value)||0;
+    if(q>0)slot.legOverride=autoCalcLegs(q,getSlotMin(slot.uid));
+  });
+  updateGraph();previewLegs();renderMultiSlotLegPicker();updateViewsLegsSlot();
+}
 function setLegsLock(locked){const overlay=document.getElementById('legsLockOverlay');if(overlay)overlay.style.display=locked?'flex':'none';['numLegs','numLegsLike','legDuration','legDurationUnit'].forEach(id=>{const el=document.getElementById(id);if(el)el.disabled=locked;});}
 function setSpeed(speed,el){currentSpeed=speed;document.querySelectorAll('.speed-btn').forEach(b=>b.classList.remove('active'));el.classList.add('active');if(speed==='manual'){setLegsLock(false);}else{applySpeedPreset(speed);setLegsLock(true);}}
 function setSpeedVal(speed){currentSpeed=speed;const labelMap={'1h':'1 Hr','6h':'6 Hr','12h':'12 Hr','24h':'24 Hr','48h':'48 Hr','manual':'Manual'};document.querySelectorAll('.speed-btn').forEach(b=>{b.classList.toggle('active',b.textContent.trim()===(labelMap[speed]||speed));});if(speed==='manual'){setLegsLock(false);}else{applySpeedPreset(speed);setLegsLock(true);}}
@@ -524,7 +614,31 @@ function renderLegsSideDetail(){
   });
   wrap.innerHTML=html;
 }
-function renderMultiSlotLegPicker(){const block=document.getElementById('multiSlotLegPicker');const list=document.getElementById('multiSlotLegPickerList');if(svcSlots.length<4){block.style.display='none';return;}block.style.display='block';const globalLegs=parseInt(document.getElementById('numLegs').value)||5;list.innerHTML=svcSlots.map(slot=>{const name=slotTypeLabels[slot.type]+(slot.service?' — '+slot.service.name.slice(0,22):'');const opts=[];for(let i=1;i<=Math.max(globalLegs,20);i++)opts.push(`<option value="${i}" ${(slot.legOverride||globalLegs)===i?'selected':''}>${i}</option>`);return`<div class="svc-leg-select-row"><span class="sl-name">${name}</span><select onchange="setSlotLegOverride(${slot.uid},this.value)">${opts.join('')}</select></div>`;}).join('');}
+function toggleExtraLegs(){extraLegsOpen=!extraLegsOpen;document.getElementById('multiSlotLegPickerList').classList.toggle('open',extraLegsOpen);document.getElementById('extraLegsExpandBtn').classList.toggle('open',extraLegsOpen);}
+function renderMultiSlotLegPicker(){
+  const block=document.getElementById('multiSlotLegPicker');
+  const list=document.getElementById('multiSlotLegPickerList');
+  const badge=document.getElementById('extraLegsCountBadge');
+  // Only slots other than views/like, with a service chosen AND a qty>0 entered
+  const extraSlots=svcSlots.filter(s=>s.type!=='views'&&s.type!=='like'&&s.service&&(parseInt(document.getElementById('qty-'+s.uid)?.value)||0)>0);
+  if(!extraSlots.length){block.style.display='none';return;}
+  block.style.display='block';
+  badge.textContent='('+extraSlots.length+')';
+  const isManual=currentSpeed==='manual';
+  const globalLegs=parseInt(document.getElementById('numLegs').value)||5;
+  list.innerHTML=extraSlots.map(slot=>{
+    const name=slotTypeLabels[slot.type]+(slot.service?' — '+slot.service.name.slice(0,22):'');
+    const qty=parseInt(document.getElementById('qty-'+slot.uid)?.value)||0;
+    const minQ=getSlotMin(slot.uid);
+    if(!isManual&&slot.legOverride==null){slot.legOverride=autoCalcLegs(qty,minQ);}
+    const val=slot.legOverride||globalLegs;
+    if(isManual){
+      const opts=[];for(let i=1;i<=Math.max(globalLegs,20);i++)opts.push(`<option value="${i}" ${val===i?'selected':''}>${i}</option>`);
+      return`<div class="svc-leg-select-row"><span class="sl-name">${name}</span><select onchange="setSlotLegOverride(${slot.uid},this.value)">${opts.join('')}</select></div>`;
+    }
+    return`<div class="svc-leg-select-row"><span class="sl-name">${name}</span><input type="number" autocomplete="off" value="${val}" disabled style="width:90px;padding:6px 8px;font-size:11px" /></div>`;
+  }).join('');
+}
 function setSlotLegOverride(uid,val){const slot=getSlot(uid);if(slot)slot.legOverride=parseInt(val)||null;updateGraph();previewLegs();updateViewsLegsSlot();}
 function generateLegsFor(totalQty,numLegs,variancePct,minQ){if(numLegs<=0||totalQty<=0)return[];minQ=minQ||1;const vp=(variancePct||22)/100;const maxPossibleLegs=Math.max(1,Math.floor(totalQty/minQ));numLegs=Math.min(numLegs,maxPossibleLegs);const base=Math.floor(totalQty/numLegs);let legs=[],remaining=totalQty;for(let i=0;i<numLegs-1;i++){const variation=Math.floor(base*vp);let lq=Math.floor(Math.random()*(variation*2+1))+(base-variation);lq=Math.max(minQ,Math.min(lq,remaining-(numLegs-i-1)*minQ));legs.push(lq);remaining-=lq;}legs.push(Math.max(minQ,remaining));for(let i=legs.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[legs[i],legs[j]]=[legs[j],legs[i]];}return legs;}
 function previewLegs(){renderMultiSlotLegPicker();if(growthChart)updateGraph();}
