@@ -36,6 +36,28 @@ async function initDB() {
         bound_ip VARCHAR(100) DEFAULT NULL
       )
     `);
+    // NAYA TABLE: schedules ko server-side store karne ke liye, taaki browser band hone pe bhi
+    // legs process hote rahein. Saara schedule state (legs array, currentLeg, timing) JSON me store hota hai.
+    await conn.execute(`
+      CREATE TABLE IF NOT EXISTS schedules (
+        id BIGINT PRIMARY KEY,
+        owner_key VARCHAR(255) DEFAULT NULL,
+        name VARCHAR(255),
+        link TEXT,
+        api_url TEXT,
+        api_key TEXT,
+        services_json LONGTEXT,
+        leg_duration INT,
+        leg_duration_unit VARCHAR(20),
+        mode VARCHAR(50),
+        variance INT,
+        max_orders INT DEFAULT 0,
+        current_leg INT DEFAULT 0,
+        active TINYINT(1) DEFAULT 1,
+        next_run BIGINT,
+        created BIGINT
+      )
+    `);
     console.log('✅ DB connected & table ready');
   } catch(e) {
     console.error('❌ DB init error:', e.message);
@@ -154,6 +176,221 @@ app.post('/proxy', async (req, res) => {
     res.json({ error: 'Proxy error: ' + e.message });
   }
 });
+
+// =========================================================
+// SCHEDULES — server-side, taaki browser band hone pe bhi
+// legs apne aap process hote rahein (background loop neeche).
+// =========================================================
+
+function rowToSchedule(row) {
+  return {
+    id: Number(row.id),
+    name: row.name,
+    link: row.link,
+    apiUrl: row.api_url,
+    apiKey: row.api_key,
+    services: JSON.parse(row.services_json || '[]'),
+    legDuration: row.leg_duration,
+    legDurationUnit: row.leg_duration_unit,
+    mode: row.mode,
+    variance: row.variance,
+    maxOrders: row.max_orders,
+    currentLeg: row.current_leg,
+    active: !!row.active,
+    nextRun: Number(row.next_run),
+    created: Number(row.created)
+  };
+}
+
+function getMs(amount, unit) {
+  return amount * ({ minutes: 60000, hours: 3600000, days: 86400000 }[unit] || 3600000);
+}
+
+// Ek leg ke liye SMM panel ko seedha call karta hai
+async function callPanelDirect(apiUrl, apiKey, params) {
+  try {
+    const fetch = (await import('node-fetch')).default;
+    const body = new URLSearchParams({ key: apiKey, ...params });
+    const response = await fetch(apiUrl, {
+      method: 'POST',
+      body,
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      signal: AbortSignal.timeout(15000)
+    });
+    const text = await response.text();
+    try { return JSON.parse(text); } catch { return { error: 'Invalid panel response' }; }
+  } catch (e) {
+    return { error: 'Network error: ' + e.message };
+  }
+}
+
+// Ek schedule ke current leg ko execute karta hai — sabhi services ke liye order place karta hai
+async function executeScheduleLeg(schedule) {
+  const legIdx = schedule.currentLeg || 0;
+  const logsForThisRun = [];
+  for (const svc of schedule.services) {
+    if (legIdx >= svc.legs.length) continue;
+    const qty = svc.legs[legIdx] || svc.legs[svc.legs.length - 1];
+    const res = await callPanelDirect(schedule.apiUrl, schedule.apiKey, {
+      action: 'add', service: svc.serviceId, link: schedule.link, quantity: qty
+    });
+    if (res.order) {
+      svc.ordersPlaced = (svc.ordersPlaced || 0) + 1;
+      logsForThisRun.push({ type: 'success', message: `Order #${res.order} | Leg ${legIdx + 1} — ${svc.serviceName || svc.type} — ${qty}` });
+    } else {
+      logsForThisRun.push({ type: 'error', message: `Failed (${svc.serviceName || svc.type}): ${JSON.stringify(res)}` });
+    }
+  }
+  return logsForThisRun;
+}
+
+async function saveScheduleRow(conn, schedule) {
+  await conn.execute(
+    `UPDATE schedules SET services_json=?, current_leg=?, active=?, next_run=? WHERE id=?`,
+    [JSON.stringify(schedule.services), schedule.currentLeg, schedule.active ? 1 : 0, schedule.nextRun, schedule.id]
+  );
+}
+
+// Naya schedule create karo (jaisa pehle directOrder() browser me karta tha)
+app.post('/schedules/create', async (req, res) => {
+  const { name, link, apiUrl, apiKey, services, legDuration, legDurationUnit, mode, variance, maxOrders } = req.body || {};
+  if (!apiUrl || !apiKey) return res.json({ success: false, reason: 'API not connected' });
+  if (!services || !services.length) return res.json({ success: false, reason: 'No services provided' });
+  const id = Date.now();
+  const schedule = {
+    id, name, link, apiUrl, apiKey,
+    services, legDuration: legDuration || 30, legDurationUnit: legDurationUnit || 'minutes',
+    mode: mode || 'custom', variance: variance || 22, maxOrders: maxOrders || 0,
+    currentLeg: 0, active: true, nextRun: Date.now(), created: Date.now()
+  };
+  let conn;
+  try {
+    conn = await mysql.createConnection(dbConfig);
+    await conn.execute(
+      `INSERT INTO schedules (id, name, link, api_url, api_key, services_json, leg_duration, leg_duration_unit, mode, variance, max_orders, current_leg, active, next_run, created)
+       VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+      [schedule.id, schedule.name, schedule.link, schedule.apiUrl, schedule.apiKey, JSON.stringify(schedule.services),
+       schedule.legDuration, schedule.legDurationUnit, schedule.mode, schedule.variance, schedule.maxOrders,
+       schedule.currentLeg, schedule.active ? 1 : 0, schedule.nextRun, schedule.created]
+    );
+    return res.json({ success: true, schedule });
+  } catch (e) {
+    return res.json({ success: false, reason: e.message });
+  } finally {
+    if (conn) await conn.end();
+  }
+});
+
+// Saare schedules list karo (apiUrl ke hisaab se filter, taaki har user apne hi schedules dekhe)
+app.post('/schedules/list', async (req, res) => {
+  const { apiUrl } = req.body || {};
+  let conn;
+  try {
+    conn = await mysql.createConnection(dbConfig);
+    const [rows] = apiUrl
+      ? await conn.execute('SELECT * FROM schedules WHERE api_url = ? ORDER BY created DESC', [apiUrl])
+      : await conn.execute('SELECT * FROM schedules ORDER BY created DESC');
+    return res.json({ success: true, schedules: rows.map(rowToSchedule) });
+  } catch (e) {
+    return res.json({ success: false, reason: e.message });
+  } finally {
+    if (conn) await conn.end();
+  }
+});
+
+// Schedule ko pause/resume karo
+app.post('/schedules/toggle', async (req, res) => {
+  const { id } = req.body || {};
+  let conn;
+  try {
+    conn = await mysql.createConnection(dbConfig);
+    const [rows] = await conn.execute('SELECT * FROM schedules WHERE id = ?', [id]);
+    if (!rows.length) return res.json({ success: false, reason: 'Not found' });
+    const schedule = rowToSchedule(rows[0]);
+    schedule.active = !schedule.active;
+    if (schedule.active) schedule.nextRun = Date.now() + getMs(schedule.legDuration, schedule.legDurationUnit);
+    await saveScheduleRow(conn, schedule);
+    return res.json({ success: true, schedule });
+  } catch (e) {
+    return res.json({ success: false, reason: e.message });
+  } finally {
+    if (conn) await conn.end();
+  }
+});
+
+// Schedule delete karo
+app.post('/schedules/delete', async (req, res) => {
+  const { id } = req.body || {};
+  let conn;
+  try {
+    conn = await mysql.createConnection(dbConfig);
+    await conn.execute('DELETE FROM schedules WHERE id = ?', [id]);
+    return res.json({ success: true });
+  } catch (e) {
+    return res.json({ success: false, reason: e.message });
+  } finally {
+    if (conn) await conn.end();
+  }
+});
+
+// Schedule ka current leg turant chalao (manual "Run Now" button)
+app.post('/schedules/run_now', async (req, res) => {
+  const { id } = req.body || {};
+  let conn;
+  try {
+    conn = await mysql.createConnection(dbConfig);
+    const [rows] = await conn.execute('SELECT * FROM schedules WHERE id = ?', [id]);
+    if (!rows.length) return res.json({ success: false, reason: 'Not found' });
+    const schedule = rowToSchedule(rows[0]);
+    const logs = await executeScheduleLeg(schedule);
+    schedule.currentLeg++;
+    schedule.nextRun = Date.now() + getMs(schedule.legDuration, schedule.legDurationUnit);
+    await saveScheduleRow(conn, schedule);
+    return res.json({ success: true, schedule, logs });
+  } catch (e) {
+    return res.json({ success: false, reason: e.message });
+  } finally {
+    if (conn) await conn.end();
+  }
+});
+
+// =========================================================
+// BACKGROUND LOOP — ye server pe chalta rehta hai (browser se
+// independent). Har minute check karta hai kis schedule ka
+// nextRun time aa gaya hai, aur uska leg execute karta hai.
+// =========================================================
+async function processDueSchedules() {
+  let conn;
+  try {
+    conn = await mysql.createConnection(dbConfig);
+    const [rows] = await conn.execute('SELECT * FROM schedules WHERE active = 1 AND next_run <= ?', [Date.now()]);
+    for (const row of rows) {
+      const schedule = rowToSchedule(row);
+      try {
+        await executeScheduleLeg(schedule);
+        schedule.currentLeg++;
+        const maxLegs = Math.max(...schedule.services.map(s => s.legs.length));
+        const done = schedule.currentLeg >= maxLegs || (schedule.maxOrders > 0 && schedule.currentLeg >= schedule.maxOrders);
+        if (done) {
+          schedule.active = false;
+        } else {
+          schedule.nextRun = Date.now() + getMs(schedule.legDuration, schedule.legDurationUnit);
+        }
+        await saveScheduleRow(conn, schedule);
+        console.log(`✅ Processed leg for schedule ${schedule.id} (${schedule.name})`);
+      } catch (e) {
+        console.error(`❌ Error processing schedule ${schedule.id}:`, e.message);
+      }
+    }
+  } catch (e) {
+    console.error('❌ processDueSchedules error:', e.message);
+  } finally {
+    if (conn) await conn.end();
+  }
+}
+
+// Har 60 second me check karta hai — isse legs ka timing zyada precise rehta hai
+setInterval(processDueSchedules, 60 * 1000);
 
 initDB();
 const PORT = process.env.PORT || 3000;
