@@ -343,10 +343,21 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
       </div>
       <div class="row2" style="margin-top:14px">
         <div>
-          <label>Leg Duration</label>
+          <label>👁 Views — Leg Duration</label>
           <div class="row2" style="gap:6px">
             <input type="number" id="legDuration" autocomplete="off" value="30" min="1" oninput="updateGraph();previewLegs()" />
             <select id="legDurationUnit" onchange="updateGraph();previewLegs()">
+              <option value="minutes">Min</option>
+              <option value="hours" selected>Hrs</option>
+              <option value="days">Days</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label>❤️ Like — Leg Duration</label>
+          <div class="row2" style="gap:6px">
+            <input type="number" id="legDurationLike" autocomplete="off" value="30" min="1" oninput="updateGraph();previewLegs()" />
+            <select id="legDurationUnitLike" onchange="updateGraph();previewLegs()">
               <option value="minutes">Min</option>
               <option value="hours" selected>Hrs</option>
               <option value="days">Days</option>
@@ -525,8 +536,11 @@ function getSlotMin(uid){const slot=getSlot(uid);return slot&&slot.service?slot.
 function getBaseSlotQty(){const base=svcSlots[0];return parseInt(document.getElementById('qty-'+base.uid)?.value)||0;}
 function onSlotQtyInput(uid){const slot=getSlot(uid);if(slot)slot.qty=parseInt(document.getElementById('qty-'+uid).value)||0;if(currentSpeed&&currentSpeed!=='manual')applySpeedPreset(currentSpeed);updateAllCostBoxes();updateTotals();validateAllSlots();updateGraph();previewLegs();updateViewsLegsSlot();}
 function validateAllSlots(){
-  const baseQty=getBaseSlotQty();
-  const maxEngagement=baseQty>0?Math.floor(baseQty*0.034):0; // 3.4% cap
+  // Views slot ki quantity check karo — sirf tab 3.4% rule lagega
+  const viewsSlot=svcSlots.find(s=>s.type==='views');
+  const viewsQty=viewsSlot?(parseInt(document.getElementById('qty-'+viewsSlot.uid)?.value)||0):0;
+  const maxEngagement=viewsQty>0?Math.floor(viewsQty*0.034):0; // 3.4% of views, only if views entered
+
   let errorMsg='';
   svcSlots.forEach((slot,idx)=>{
     const qtyInput=document.getElementById('qty-'+slot.uid);
@@ -535,25 +549,28 @@ function validateAllSlots(){
     const w=document.getElementById('minWarning-'+slot.uid);
     if(!w)return;
     let msg='';
-    // Min check (views slot)
-    if(qty>0&&qty<minQ){msg='Minimum '+minQ+' required, you entered '+qty;}
-    // Old bot check: non-views can't exceed views total
-    if(idx>0&&baseQty>0&&qty>baseQty){
-      msg='Bot detected: '+slotTypeLabels[slot.type].replace(/^[^\s]+\s/,'')+' quantity can not exceed Views quantity ('+baseQty.toLocaleString()+')';
-      qtyInput.value=baseQty;slot.qty=baseQty;errorMsg=msg;
+
+    // Min quantity check — har slot ke liye
+    if(qty>0&&qty<minQ){
+      msg='Minimum '+minQ+' required, you entered '+qty;
+      errorMsg=msg;
     }
-    // NEW: 3.4% organic cap for all non-views slots
-    if(idx>0&&baseQty>0&&qty>maxEngagement){
+
+    // 3.4% cap — SIRF tab jab views ki quantity daali ho
+    if(slot.type!=='views'&&viewsQty>0&&qty>maxEngagement){
       const capped=maxEngagement;
       qtyInput.value=capped;slot.qty=capped;
-      msg='⚠️ Not Organic — max '+maxEngagement.toLocaleString()+' allowed (3.4% of '+baseQty.toLocaleString()+' views). Auto-reset!';
-      errorMsg='Not Organic: '+slotTypeLabels[slot.type].replace(/^[^\s]+\s/,'')+' capped to '+capped.toLocaleString()+' (3.4% of Views)';
+      msg='⚠️ Max '+maxEngagement.toLocaleString()+' allowed (3.4% of '+viewsQty.toLocaleString()+' views). Auto-set!';
+      errorMsg='3.4% cap: '+slotTypeLabels[slot.type].replace(/^[^\s]+\s/,'')+' → '+capped.toLocaleString();
+      updateAllCostBoxes();updateTotals();updateGraph();previewLegs();
     }
+
     if(msg){w.classList.add('show');document.getElementById('minWarnText-'+slot.uid).textContent=msg;}
     else{w.classList.remove('show');}
   });
+
   const banner=document.getElementById('globalErrorBanner');
-  if(errorMsg){banner.classList.add('show');document.getElementById('globalErrorText').textContent=errorMsg;updateAllCostBoxes();updateTotals();updateGraph();previewLegs();}
+  if(errorMsg){banner.classList.add('show');document.getElementById('globalErrorText').textContent=errorMsg;}
   else{banner.classList.remove('show');}
 }
 
@@ -587,6 +604,7 @@ function applySpeedPreset(speed){
   const p=speedPresets[speed];if(!p)return;
   document.getElementById('legDuration').value=p.duration;
   document.getElementById('legDurationUnit').value=p.unit;
+  const likeD=document.getElementById('legDurationLike');const likeU=document.getElementById('legDurationUnitLike');if(likeD&&likeU){likeD.value=p.duration;likeU.value=p.unit;}
   const viewsSlot=svcSlots.find(s=>s.type==='views');
   const likeSlot=svcSlots.find(s=>s.type==='like');
   const viewsQty=viewsSlot?(parseInt(document.getElementById('qty-'+viewsSlot.uid)?.value)||0):0;
@@ -606,7 +624,7 @@ function applySpeedPreset(speed){
   });
   updateGraph();previewLegs();renderMultiSlotLegPicker();updateViewsLegsSlot();
 }
-function setLegsLock(locked){const overlay=document.getElementById('legsLockOverlay');if(overlay)overlay.style.display=locked?'flex':'none';['numLegs','numLegsLike','legDuration','legDurationUnit'].forEach(id=>{const el=document.getElementById(id);if(el)el.disabled=locked;});}
+function setLegsLock(locked){const overlay=document.getElementById('legsLockOverlay');if(overlay)overlay.style.display=locked?'flex':'none';['numLegs','numLegsLike','legDuration','legDurationUnit','legDurationLike','legDurationUnitLike'].forEach(id=>{const el=document.getElementById(id);if(el)el.disabled=locked;});}
 function setSpeed(speed,el){currentSpeed=speed;document.querySelectorAll('.speed-btn').forEach(b=>b.classList.remove('active'));el.classList.add('active');if(speed==='manual'){setLegsLock(false);}else{applySpeedPreset(speed);setLegsLock(true);}}
 function setSpeedVal(speed){currentSpeed=speed;const labelMap={'1h':'1 Hr','6h':'6 Hr','12h':'12 Hr','24h':'24 Hr','48h':'48 Hr','manual':'Manual'};document.querySelectorAll('.speed-btn').forEach(b=>{b.classList.toggle('active',b.textContent.trim()===(labelMap[speed]||speed));});if(speed==='manual'){setLegsLock(false);}else{applySpeedPreset(speed);setLegsLock(true);}}
 
@@ -625,14 +643,21 @@ function getLegDurationMs(){
   const mult={minutes:60000,hours:3600000,days:86400000}[unit]||3600000;
   return legDur*mult;
 }
+function getLikeLegDurationMs(){
+  const legDur=parseInt(document.getElementById('legDurationLike')?.value)||30;
+  const unit=document.getElementById('legDurationUnitLike')?.value||'hours';
+  const mult={minutes:60000,hours:3600000,days:86400000}[unit]||3600000;
+  return legDur*mult;
+}
 function formatLegTime(date){
   const hh=String(date.getHours()).padStart(2,'0');
   const mm=String(date.getMinutes()).padStart(2,'0');
   return hh+':'+mm;
 }
-function legRunTime(legIndex){
+function legRunTime(legIndex,slotType){
   // legIndex is 0-based; leg N runs after N legDuration intervals from now
-  const ms=getLegDurationMs();
+  // Like uses its own separate duration
+  const ms=(slotType==='like')?getLikeLegDurationMs():getLegDurationMs();
   const t=new Date(Date.now()+legIndex*ms);
   return formatLegTime(t);
 }
@@ -655,13 +680,12 @@ function renderLegsSideDetail(){
       const hasBoth=v!==undefined&&l!==undefined;
       const hasOnlyV=v!==undefined&&l===undefined;
       if(hasBoth){
-        // Views + Like together on same leg
+        // Views + Like — alag alag time dikhao
         html+=`<div class="leg-mini-row" style="gap:4px">
           <span style="color:#dc2626;font-weight:700;min-width:22px">L${i+1}</span>
-          <span style="color:#ef4444">👁 ${v.toLocaleString()}</span>
+          <span style="color:#ef4444">👁 ${v.toLocaleString()} <span style="font-size:8px;color:#7dd3fc">🕐${legRunTime(i,'views')}</span></span>
           <span style="color:#9ca3af;font-size:9px">+</span>
-          <span style="color:#f87171">❤️ ${l.toLocaleString()}</span>
-          <span class="leg-time">🕐 ${legRunTime(i)}</span>
+          <span style="color:#f87171">❤️ ${l.toLocaleString()} <span style="font-size:8px;color:#f9a8d4">🕐${legRunTime(i,'like')}</span></span>
         </div>`;
       } else if(hasOnlyV){
         // Only views remaining
@@ -669,14 +693,14 @@ function renderLegsSideDetail(){
           <span style="color:#dc2626;font-weight:700;min-width:22px">L${i+1}</span>
           <span style="color:#ef4444">👁 ${v.toLocaleString()}</span>
           <span style="color:#374151;font-size:9px;margin-left:4px">views only</span>
-          <span class="leg-time">🕐 ${legRunTime(i)}</span>
+          <span class="leg-time">🕐 ${legRunTime(i,'views')}</span>
         </div>`;
       } else if(l!==undefined){
         // Only like remaining (edge case)
         html+=`<div class="leg-mini-row">
           <span style="color:#dc2626;font-weight:700;min-width:22px">L${i+1}</span>
           <span style="color:#f87171">❤️ ${l.toLocaleString()}</span>
-          <span class="leg-time">🕐 ${legRunTime(i)}</span>
+          <span class="leg-time">🕐 ${legRunTime(i,'like')}</span>
         </div>`;
       }
     }
@@ -686,7 +710,7 @@ function renderLegsSideDetail(){
   others.forEach(({slot,legs})=>{
     const typeName=slotTypeLabels[slot.type].replace(/^[^\s]+\s/,'');
     html+=`<div style="margin-bottom:6px"><div style="font-size:9px;color:#fca5a5;font-weight:700;margin-bottom:2px">${typeName}</div>`;
-    html+=legs.map((q,i)=>`<div class="leg-mini-row"><span>L${i+1}</span><span>${q.toLocaleString()}</span><span class="leg-time">🕐 ${legRunTime(i)}</span></div>`).join('');
+    html+=legs.map((q,i)=>`<div class="leg-mini-row"><span>L${i+1}</span><span>${q.toLocaleString()}</span><span class="leg-time">🕐 ${legRunTime(i,slot.type)}</span></div>`).join('');
     html+='</div>';
   });
   wrap.innerHTML=html;
@@ -731,11 +755,11 @@ function updateViewsLegsSlot(){
 
 function togglePresets(){presetsOpen=!presetsOpen;document.getElementById('presetsList').classList.toggle('open',presetsOpen);document.getElementById('presetsExpandBtn').classList.toggle('open',presetsOpen);if(presetsOpen)renderPresets();}
 function renderPresets(){const badge=document.getElementById('presetsCountBadge');badge.textContent=presets.length?'('+presets.length+')':'';const list=document.getElementById('presetsList');if(!presets.length){list.innerHTML='<div class="presets-empty">No presets saved yet</div>';return;}list.innerHTML=presets.map(p=>{const svcSummary=p.slots.filter(s=>s.service).map(s=>(slotTypeLabels[s.type]||s.type).replace(/^[^\s]+\s/,'')+' '+s.qty.toLocaleString()).join(' • ');return`<div class="preset-item" onclick="loadPreset(${p.id})"><div class="preset-item-info"><div class="preset-item-name">${p.name}</div><div class="preset-item-meta">${svcSummary} — ${p.link}</div></div><button class="preset-item-del" onclick="event.stopPropagation();deletePreset(${p.id})">✕</button></div>`;}).join('');}
-function savePreset(){const name=document.getElementById('scheduleName').value.trim();const link=document.getElementById('targetLink').value.trim();if(!name||!link){alert('Please fill in Name and Link before saving a preset!');return;}const activeSlots=svcSlots.filter(s=>s.service);if(!activeSlots.length){alert('Please select at least one service before saving!');return;}const slotsData=svcSlots.map(slot=>({type:slot.type,service:slot.service,qty:parseInt(document.getElementById('qty-'+slot.uid)?.value)||0,legOverride:slot.legOverride}));const preset={id:Date.now(),name,link,slots:slotsData,numLegs:parseInt(document.getElementById('numLegs').value)||5,legDuration:parseInt(document.getElementById('legDuration').value)||30,legDurationUnit:document.getElementById('legDurationUnit').value,variance:parseInt(document.getElementById('variance').value)||22,mode:currentMode};presets.unshift(preset);localStorage.setItem('smm_presets',JSON.stringify(presets));renderPresets();addLog('success','Preset saved: '+name);alert('Preset saved!');}
-function loadPreset(id){const p=presets.find(x=>x.id===id);if(!p)return;document.getElementById('scheduleName').value=p.name;document.getElementById('targetLink').value=p.link;document.getElementById('numLegs').value=p.numLegs;document.getElementById('legDuration').value=p.legDuration;document.getElementById('legDurationUnit').value=p.legDurationUnit;document.getElementById('variance').value=p.variance;document.getElementById('varianceVal').textContent=p.variance;document.getElementById('variance').style.setProperty('--val',p.variance+'%');svcSlots=p.slots.map(s=>({uid:nextSlotUid++,service:s.service,type:s.type,qty:s.qty,legOverride:s.legOverride||null}));renderSvcSlots();svcSlots.forEach(slot=>{const inp=document.getElementById('qty-'+slot.uid);if(inp)inp.value=slot.qty||'';});document.querySelectorAll('.mode-btn').forEach(b=>{b.classList.toggle('active',b.classList.contains(p.mode));});currentMode=p.mode;updateAllCostBoxes();updateTotals();validateAllSlots();updateGraph();previewLegs();renderMultiSlotLegPicker();addLog('info','Preset loaded: '+p.name);}
+function savePreset(){const name=document.getElementById('scheduleName').value.trim();const link=document.getElementById('targetLink').value.trim();if(!name||!link){alert('Please fill in Name and Link before saving a preset!');return;}const activeSlots=svcSlots.filter(s=>s.service);if(!activeSlots.length){alert('Please select at least one service before saving!');return;}const slotsData=svcSlots.map(slot=>({type:slot.type,service:slot.service,qty:parseInt(document.getElementById('qty-'+slot.uid)?.value)||0,legOverride:slot.legOverride}));const preset={id:Date.now(),name,link,slots:slotsData,numLegs:parseInt(document.getElementById('numLegs').value)||5,numLegsLike:parseInt(document.getElementById('numLegsLike').value)||5,legDuration:parseInt(document.getElementById('legDuration').value)||30,legDurationUnit:document.getElementById('legDurationUnit').value,legDurationLike:parseInt(document.getElementById('legDurationLike').value)||30,legDurationUnitLike:document.getElementById('legDurationUnitLike').value,variance:parseInt(document.getElementById('variance').value)||22,mode:currentMode};presets.unshift(preset);localStorage.setItem('smm_presets',JSON.stringify(presets));renderPresets();addLog('success','Preset saved: '+name);alert('Preset saved!');}
+function loadPreset(id){const p=presets.find(x=>x.id===id);if(!p)return;document.getElementById('scheduleName').value=p.name;document.getElementById('targetLink').value=p.link;document.getElementById('numLegs').value=p.numLegs;document.getElementById('numLegsLike').value=p.numLegsLike||p.numLegs;document.getElementById('legDuration').value=p.legDuration;document.getElementById('legDurationUnit').value=p.legDurationUnit;document.getElementById('legDurationLike').value=p.legDurationLike||p.legDuration;document.getElementById('legDurationUnitLike').value=p.legDurationUnitLike||p.legDurationUnit;document.getElementById('variance').value=p.variance;document.getElementById('varianceVal').textContent=p.variance;document.getElementById('variance').style.setProperty('--val',p.variance+'%');svcSlots=p.slots.map(s=>({uid:nextSlotUid++,service:s.service,type:s.type,qty:s.qty,legOverride:s.legOverride||null}));renderSvcSlots();svcSlots.forEach(slot=>{const inp=document.getElementById('qty-'+slot.uid);if(inp)inp.value=slot.qty||'';});document.querySelectorAll('.mode-btn').forEach(b=>{b.classList.toggle('active',b.classList.contains(p.mode));});currentMode=p.mode;updateAllCostBoxes();updateTotals();validateAllSlots();updateGraph();previewLegs();renderMultiSlotLegPicker();addLog('info','Preset loaded: '+p.name);}
 function deletePreset(id){if(!confirm('Delete this preset?'))return;presets=presets.filter(x=>x.id!==id);localStorage.setItem('smm_presets',JSON.stringify(presets));renderPresets();}
-function validateOrderForm(){const name=document.getElementById('scheduleName').value.trim();const link=document.getElementById('targetLink').value.trim();if(!name||!link){alert('Please fill in Name and Link!');return null;}const activeSlots=svcSlots.filter(s=>s.service);if(!activeSlots.length){alert('Please select at least one service!');return null;}const baseQty=getBaseSlotQty();if(!baseQty){alert('Please enter the Views (base) quantity!');return null;}for(const slot of activeSlots){const qty=parseInt(document.getElementById('qty-'+slot.uid).value)||0;if(!qty){alert('Please enter quantity for: '+slotTypeLabels[slot.type]);return null;}const minQ=getSlotMin(slot.uid);if(qty<minQ){alert('Quantity ('+qty+') is below minimum for '+slotTypeLabels[slot.type]+'. Min: '+minQ);return null;}}const overLimitSlot=activeSlots.slice(1).find(slot=>(parseInt(document.getElementById('qty-'+slot.uid).value)||0)>baseQty);if(overLimitSlot){alert('Error: Bot detected. '+slotTypeLabels[overLimitSlot.type].replace(/^[^\s]+\s/,'')+' quantity cannot exceed Views quantity.');return null;}return{name,link,activeSlots};}
-async function directOrder(){const form=validateOrderForm();if(!form)return;const{name,link,activeSlots}=form;const numLegsGlobal=parseInt(document.getElementById('numLegs').value)||1;const legDuration=parseInt(document.getElementById('legDuration').value)||30;const legDurationUnit=document.getElementById('legDurationUnit').value;const variance=parseInt(document.getElementById('variance').value)||22;const servicesData=activeSlots.map(slot=>{const qty=parseInt(document.getElementById('qty-'+slot.uid).value)||0;const minQ=getSlotMin(slot.uid);const numLegs=slot.legOverride||numLegsGlobal;const legs=generateLegsFor(qty,numLegs,variance,minQ);return{type:slot.type,serviceId:slot.service.service,serviceName:slot.service.name,rate:slot.service.rate,totalQty:qty,legs,currentLeg:0,ordersPlaced:0};});if(!apiUrl||!apiKey){alert('API not connected!');return;}const result=await createScheduleOnServer({name,link,apiUrl,apiKey,services:servicesData,legDuration,legDurationUnit,mode:currentMode,variance,maxOrders:0});if(!result.success){alert('Order create nahi hua: '+(result.reason||'Unknown error'));return;}const totalQtyAll=servicesData.reduce((a,s)=>a+s.totalQty,0);addLog('success','Direct order placed: '+name+' — '+servicesData.length+' services, '+totalQtyAll.toLocaleString()+' total qty');await refreshSchedulesFromServer();switchTab('schedules',document.querySelectorAll('.tab')[2]);showToast('Order Confirmed 🎉');}
+function validateOrderForm(){const name=document.getElementById('scheduleName').value.trim();const link=document.getElementById('targetLink').value.trim();if(!name||!link){alert('Please fill in Name and Link!');return null;}const activeSlots=svcSlots.filter(s=>s.service);if(!activeSlots.length){alert('Please select at least one service!');return null;}for(const slot of activeSlots){const qty=parseInt(document.getElementById('qty-'+slot.uid).value)||0;if(!qty){alert('Please enter quantity for: '+slotTypeLabels[slot.type]);return null;}const minQ=getSlotMin(slot.uid);if(qty<minQ){alert('Quantity ('+qty+') is below minimum for '+slotTypeLabels[slot.type]+'. Min: '+minQ);return null;}}return{name,link,activeSlots};}
+async function directOrder(){const form=validateOrderForm();if(!form)return;const{name,link,activeSlots}=form;const numLegsGlobal=parseInt(document.getElementById('numLegs').value)||1;const legDuration=parseInt(document.getElementById('legDuration').value)||30;const legDurationUnit=document.getElementById('legDurationUnit').value;const legDurationLike=parseInt(document.getElementById('legDurationLike').value)||30;const legDurationUnitLike=document.getElementById('legDurationUnitLike').value;const variance=parseInt(document.getElementById('variance').value)||22;const servicesData=activeSlots.map(slot=>{const qty=parseInt(document.getElementById('qty-'+slot.uid).value)||0;const minQ=getSlotMin(slot.uid);const numLegs=slot.legOverride||numLegsGlobal;const legs=generateLegsFor(qty,numLegs,variance,minQ);return{type:slot.type,serviceId:slot.service.service,serviceName:slot.service.name,rate:slot.service.rate,totalQty:qty,legs,currentLeg:0,ordersPlaced:0};});if(!apiUrl||!apiKey){alert('API not connected!');return;}const result=await createScheduleOnServer({name,link,apiUrl,apiKey,services:servicesData,legDuration,legDurationUnit,legDurationLike,legDurationUnitLike,mode:currentMode,variance,maxOrders:0});if(!result.success){alert('Order create nahi hua: '+(result.reason||'Unknown error'));return;}const totalQtyAll=servicesData.reduce((a,s)=>a+s.totalQty,0);addLog('success','Direct order placed: '+name+' — '+servicesData.length+' services, '+totalQtyAll.toLocaleString()+' total qty');await refreshSchedulesFromServer();switchTab('schedules',document.querySelectorAll('.tab')[2]);showToast('Order Confirmed 🎉');}
 async function createScheduleOnServer(payload){try{const licenseKey=localStorage.getItem('smm_license_key')||'';const res=await fetch(BACKEND+'/schedules/create',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...payload,licenseKey})});return await res.json();}catch(e){return{success:false,reason:'Network error: '+e.message};}}
 async function refreshSchedulesFromServer(){try{const licenseKey=localStorage.getItem('smm_license_key')||'';const res=await fetch(BACKEND+'/schedules/list',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({licenseKey})});const data=await res.json();if(data.success){schedules=data.schedules;renderSchedules();}}catch(e){addLog('error','Schedules load nahi hue: '+e.message);}}
 function startScheduleAutoRefresh(){if(scheduleRefreshTimer)clearInterval(scheduleRefreshTimer);scheduleRefreshTimer=setInterval(refreshSchedulesFromServer,30000);}
