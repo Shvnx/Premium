@@ -327,11 +327,11 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
       <div class="row2">
         <div>
           <label>Number of Legs</label>
-          <input type="number" id="numLegs" autocomplete="off" value="5" min="1" max="50" oninput="updateGraph();previewLegs();renderMultiSlotLegPicker();updateViewsLegsSlot()" />
+          <input type="number" id="numLegs" autocomplete="off" value="5" min="1" max="50" oninput="validateAndFixDuration('views');updateGraph();previewLegs();renderMultiSlotLegPicker();updateViewsLegsSlot()" />
         </div>
         <div>
           <label>Like — Number of Legs</label>
-          <input type="number" id="numLegsLike" autocomplete="off" value="5" min="1" max="50" oninput="updateViewsLegsSlot();updateGraph();previewLegs()" />
+          <input type="number" id="numLegsLike" autocomplete="off" value="5" min="1" max="50" oninput="validateAndFixDuration('like');updateViewsLegsSlot();updateGraph();previewLegs()" />
         </div>
       </div>
       <div class="extra-legs-box" id="multiSlotLegPicker" style="display:none">
@@ -343,25 +343,42 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
       </div>
       <div class="row2" style="margin-top:14px">
         <div>
-          <label>👁 Views — Leg Duration</label>
+          <label>👁 Views — Total Time</label>
           <div class="row2" style="gap:6px">
-            <input type="number" id="legDuration" autocomplete="off" value="30" min="1" oninput="updateGraph();previewLegs()" />
-            <select id="legDurationUnit" onchange="updateGraph();previewLegs()">
-              <option value="minutes">Min</option>
-              <option value="hours" selected>Hrs</option>
+            <input type="number" id="legDuration" autocomplete="off" value="0" min="1" oninput="validateAndFixDuration('views');updateGraph();previewLegs()" />
+            <select id="legDurationUnit" onchange="validateAndFixDuration('views');updateGraph();previewLegs()">
+              <option value="minutes" selected>Min</option>
+              <option value="hours">Hrs</option>
               <option value="days">Days</option>
             </select>
           </div>
         </div>
         <div>
-          <label>❤️ Like — Leg Duration</label>
+          <label>❤️ Like — Total Time</label>
           <div class="row2" style="gap:6px">
-            <input type="number" id="legDurationLike" autocomplete="off" value="30" min="1" oninput="updateGraph();previewLegs()" />
-            <select id="legDurationUnitLike" onchange="updateGraph();previewLegs()">
-              <option value="minutes">Min</option>
-              <option value="hours" selected>Hrs</option>
+            <input type="number" id="legDurationLike" autocomplete="off" value="0" min="1" oninput="validateAndFixDuration('like');updateGraph();previewLegs()" />
+            <select id="legDurationUnitLike" onchange="validateAndFixDuration('like');updateGraph();previewLegs()">
+              <option value="minutes" selected>Min</option>
+              <option value="hours">Hrs</option>
               <option value="days">Days</option>
             </select>
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:14px">
+        <label>⏱ Leg Gap Mode</label>
+        <div class="speed-btns">
+          <button type="button" class="speed-btn active" id="gapModeAutoBtn" onclick="setGapMode('auto')">Auto (14–24 min)</button>
+          <button type="button" class="speed-btn" id="gapModeManualBtn" onclick="setGapMode('manual')">Manual</button>
+        </div>
+        <div class="row2" id="manualGapBox" style="display:none;margin-top:10px">
+          <div>
+            <label>Min Gap (min)</label>
+            <input type="number" id="manualMinGap" autocomplete="off" value="14" min="1" oninput="onManualGapInput()" />
+          </div>
+          <div>
+            <label>Max Gap (min)</label>
+            <input type="number" id="manualMaxGap" autocomplete="off" value="24" min="1" oninput="onManualGapInput()" />
           </div>
         </div>
       </div>
@@ -534,7 +551,7 @@ function onSvcInput(uid){const inp=document.getElementById('svcSearch-'+uid);con
 function selectSvc(uid,id,name,rate,min,max){const slot=getSlot(uid);if(!slot)return;slot.service={service:id,name,rate,min,max};document.getElementById('svcSearch-'+uid).value='#'+id+' — '+name;closeSvcDD(uid);addLog('info','Slot service selected: #'+id+' — '+name);renderSvcSlots();renderMultiSlotLegPicker();updateGraph();previewLegs();}
 function getSlotMin(uid){const slot=getSlot(uid);return slot&&slot.service?slot.service.min:1;}
 function getBaseSlotQty(){const base=svcSlots[0];return parseInt(document.getElementById('qty-'+base.uid)?.value)||0;}
-function onSlotQtyInput(uid){const slot=getSlot(uid);if(slot)slot.qty=parseInt(document.getElementById('qty-'+uid).value)||0;if(currentSpeed&&currentSpeed!=='manual')applySpeedPreset(currentSpeed);updateAllCostBoxes();updateTotals();validateAllSlots();updateGraph();previewLegs();updateViewsLegsSlot();}
+function onSlotQtyInput(uid){const slot=getSlot(uid);if(slot)slot.qty=parseInt(document.getElementById('qty-'+uid).value)||0;if(currentSpeed&&currentSpeed!=='manual')applySpeedPreset(currentSpeed);if(slot&&slot.type==='views')validateAndFixDuration('views');if(slot&&slot.type==='like')validateAndFixDuration('like');updateAllCostBoxes();updateTotals();validateAllSlots();updateGraph();previewLegs();updateViewsLegsSlot();}
 function validateAllSlots(){
   // Views slot ki quantity check karo — sirf tab 3.4% rule lagega
   const viewsSlot=svcSlots.find(s=>s.type==='views');
@@ -582,8 +599,8 @@ function updateCostBoxForSlot(uid){const slot=getSlot(uid);const box=document.ge
 function renderCurrencyTable(uid){const slot=getSlot(uid);if(!slot||!slot.service)return;const qty=parseInt(document.getElementById('qty-'+uid)?.value)||0;const usd=(qty/1000)*slot.service.rate;const t=document.getElementById('ctable-'+uid);t.innerHTML=Object.keys(currencyMeta).map(cur=>{const val=convertFromUsd(usd,cur);return`<tr class="${cur===activeCurrency?'cc-active':''}"><td class="cc-name">${cur}</td><td class="cc-val">${currencyMeta[cur].symbol}${val.toFixed(cur==='USD'?4:2)}</td></tr>`;}).join('');}
 function updateTotals(){const box=document.getElementById('totalsBox');const validSlots=svcSlots.filter(s=>s.service);if(!validSlots.length){box.style.display='none';return;}box.style.display='block';let totalQty=0,totalUsd=0,minMin=Infinity;validSlots.forEach(slot=>{const qty=parseInt(document.getElementById('qty-'+slot.uid)?.value)||0;totalQty+=qty;totalUsd+=(qty/1000)*slot.service.rate;minMin=Math.min(minMin,slot.service.min);});document.getElementById('totQtyAll').textContent=totalQty.toLocaleString();document.getElementById('totCostAll').textContent='$'+totalUsd.toFixed(4)+' ≈ ₹'+(totalUsd*usdToInr).toFixed(2);document.getElementById('totMinAll').textContent=minMin===Infinity?'—':minMin.toLocaleString();}
 
-const modePresets={viral:{legs:8,duration:3,unit:'hours',speed:'6h',variance:20},fast:{legs:3,duration:1,unit:'hours',speed:'6h',variance:15},trending:{legs:6,duration:6,unit:'hours',speed:'12h',variance:25},slow:{legs:12,duration:12,unit:'hours',speed:'48h',variance:30},custom:{legs:5,duration:30,unit:'minutes',speed:'manual',variance:22}};
-function setMode(mode,el){currentMode=mode;document.querySelectorAll('.mode-btn').forEach(b=>b.className=b.className.replace(' active',''));el.classList.add('active');const p=modePresets[mode];document.getElementById('numLegs').value=p.legs;document.getElementById('legDuration').value=p.duration;document.getElementById('legDurationUnit').value=p.unit;document.getElementById('variance').value=p.variance;document.getElementById('varianceVal').textContent=p.variance;document.getElementById('variance').style.setProperty('--val',p.variance+'%');setSpeedVal(p.speed);updateGraph();previewLegs();renderMultiSlotLegPicker();}
+const modePresets={viral:{legs:8,duration:133,unit:'minutes',speed:'6h',variance:20},fast:{legs:3,duration:38,unit:'minutes',speed:'6h',variance:15},trending:{legs:6,duration:95,unit:'minutes',speed:'12h',variance:25},slow:{legs:12,duration:200,unit:'minutes',speed:'48h',variance:30},custom:{legs:5,duration:70,unit:'minutes',speed:'manual',variance:22}};
+function setMode(mode,el){currentMode=mode;document.querySelectorAll('.mode-btn').forEach(b=>b.className=b.className.replace(' active',''));el.classList.add('active');const p=modePresets[mode];document.getElementById('numLegs').value=p.legs;document.getElementById('legDuration').value=p.duration;document.getElementById('legDurationUnit').value=p.unit;document.getElementById('variance').value=p.variance;document.getElementById('varianceVal').textContent=p.variance;document.getElementById('variance').style.setProperty('--val',p.variance+'%');setSpeedVal(p.speed);validateAndFixDuration('views');updateGraph();previewLegs();renderMultiSlotLegPicker();}
 const speedPresets={'1h':{duration:30,unit:'minutes'},'6h':{duration:90,unit:'minutes'},'12h':{duration:2,unit:'hours'},'24h':{duration:3,unit:'hours'},'48h':{duration:4,unit:'hours'}};
 const LEG_RATIO_MIN=0.77,LEG_RATIO_MAX=0.92;
 // Calculates an auto leg count for a slot: never the theoretical max possible legs,
@@ -623,6 +640,7 @@ function applySpeedPreset(speed){
     if(q>0)slot.legOverride=autoCalcLegs(q,getSlotMin(slot.uid));
   });
   updateGraph();previewLegs();renderMultiSlotLegPicker();updateViewsLegsSlot();
+  validateAndFixDuration('views');validateAndFixDuration('like');
 }
 function setLegsLock(locked){const overlay=document.getElementById('legsLockOverlay');if(overlay)overlay.style.display=locked?'flex':'none';['numLegs','numLegsLike','legDuration','legDurationUnit','legDurationLike','legDurationUnitLike'].forEach(id=>{const el=document.getElementById(id);if(el)el.disabled=locked;});}
 function setSpeed(speed,el){currentSpeed=speed;document.querySelectorAll('.speed-btn').forEach(b=>b.classList.remove('active'));el.classList.add('active');if(speed==='manual'){setLegsLock(false);}else{applySpeedPreset(speed);setLegsLock(true);}}
@@ -649,16 +667,124 @@ function getLikeLegDurationMs(){
   const mult={minutes:60000,hours:3600000,days:86400000}[unit]||3600000;
   return legDur*mult;
 }
+const DEFAULT_MIN_GAP_MIN=14,DEFAULT_MAX_GAP_MIN=24;
+let gapMode='auto'; // 'auto' | 'manual'
+function unitToMinMult(unit){return{minutes:1,hours:60,days:1440}[unit]||60;}
+function getTotalMinutes(kind){
+  if(kind==='like'){const v=parseInt(document.getElementById('legDurationLike')?.value)||0;const u=document.getElementById('legDurationUnitLike')?.value||'minutes';return v*unitToMinMult(u);}
+  const v=parseInt(document.getElementById('legDuration')?.value)||0;const u=document.getElementById('legDurationUnit')?.value||'minutes';return v*unitToMinMult(u);
+}
+function getNumLegsFor(kind){
+  if(kind==='like')return parseInt(document.getElementById('numLegsLike')?.value)||1;
+  return parseInt(document.getElementById('numLegs')?.value)||1;
+}
+function appIsUnlocked(){const overlay=document.getElementById('licenseOverlay');return overlay&&overlay.style.display==='none';}
+function slotHasQty(kind){
+  const slot=svcSlots.find(s=>s.type===kind);
+  if(!slot)return false;
+  const q=parseInt(document.getElementById('qty-'+slot.uid)?.value)||0;
+  return q>0;
+}
+// ---- Gap Mode (Auto / Manual) ----
+function setGapMode(mode){
+  gapMode=mode;
+  document.getElementById('gapModeAutoBtn').classList.toggle('active',mode==='auto');
+  document.getElementById('gapModeManualBtn').classList.toggle('active',mode==='manual');
+  document.getElementById('manualGapBox').style.display=mode==='manual'?'flex':'none';
+  resetScheduleCache();
+  validateAndFixDuration('views');
+  validateAndFixDuration('like');
+  if(growthChart)updateGraph();
+  previewLegs();
+}
+function onManualGapInput(){
+  let min=parseInt(document.getElementById('manualMinGap').value)||1;
+  let max=parseInt(document.getElementById('manualMaxGap').value)||1;
+  if(min<1)min=1;
+  if(max<=min){
+    max=min+5;
+    document.getElementById('manualMaxGap').value=max;
+    showToast('⚠ Max must be greater than Min — auto set to '+max+' min','error');
+  }
+  document.getElementById('manualMinGap').value=min;
+  resetScheduleCache();
+  validateAndFixDuration('views');
+  validateAndFixDuration('like');
+  if(growthChart)updateGraph();
+  previewLegs();
+}
+function getActiveGapRange(){
+  if(gapMode==='manual'){
+    const min=parseInt(document.getElementById('manualMinGap')?.value)||DEFAULT_MIN_GAP_MIN;
+    const max=parseInt(document.getElementById('manualMaxGap')?.value)||DEFAULT_MAX_GAP_MIN;
+    return{min:Math.max(1,min),max:Math.max(min+1,max)};
+  }
+  return{min:DEFAULT_MIN_GAP_MIN,max:DEFAULT_MAX_GAP_MIN};
+}
+function validateAndFixDuration(kind){
+  if(!appIsUnlocked())return;
+  if(!slotHasQty(kind))return;
+  const numLegs=getNumLegsFor(kind);
+  const totalMin=getTotalMinutes(kind);
+  if(numLegs<=1)return;
+  if(totalMin<=0)return;
+  const{min:gMin,max:gMax}=getActiveGapRange();
+  // Bare minimum possible total if every gap = gMin. We require at least 30% buffer above this
+  // so randomization has room to vary gaps between legs.
+  const bareMin=gMin*numLegs;
+  const minRequired=Math.ceil(bareMin*1.3);
+  const maxAllowed=gMax*numLegs;
+  if(totalMin<minRequired||totalMin>maxAllowed){
+    const fixedMin=totalMin<minRequired?minRequired:maxAllowed;
+    const inputId=kind==='like'?'legDurationLike':'legDuration';
+    const unitId=kind==='like'?'legDurationUnitLike':'legDurationUnit';
+    document.getElementById(unitId).value='minutes';
+    document.getElementById(inputId).value=fixedMin;
+    showToast('⚠ No match — auto set to '+fixedMin+' min ('+numLegs+' legs, min gap '+gMin+'m)','error');
+    resetScheduleCache();
+    return false;
+  }
+  resetScheduleCache();
+  return true;
+}
+let scheduleCache={};
+function resetScheduleCache(){scheduleCache={};}
+function generateRandomOffsets(numLegs,totalMinutes){
+  if(numLegs<=1)return[0];
+  const{min:gMin,max:gMax}=getActiveGapRange();
+  const gapsCount=numLegs-1;
+  let gaps=[];
+  for(let i=0;i<gapsCount;i++){gaps.push(gMin+Math.floor(Math.random()*(gMax-gMin+1)));}
+  let diff=Math.round(totalMinutes)-gaps.reduce((a,b)=>a+b,0);
+  let guard=0;
+  while(diff!==0&&guard<8000){
+    const idx=Math.floor(Math.random()*gapsCount);
+    if(diff>0&&gaps[idx]<gMax){gaps[idx]++;diff--;}
+    else if(diff<0&&gaps[idx]>gMin){gaps[idx]--;diff++;}
+    guard++;
+  }
+  const offsets=[0];let cum=0;
+  for(let i=0;i<gaps.length;i++){cum+=gaps[i];offsets.push(cum);}
+  return offsets;
+}
+function getScheduleOffsetsMin(numLegs,slotType){
+  const totalMin=getTotalMinutes(slotType==='like'?'like':'views');
+  const key=slotType+'_'+numLegs+'_'+totalMin+'_'+gapMode;
+  if(!scheduleCache[key])scheduleCache[key]=generateRandomOffsets(numLegs,totalMin);
+  return scheduleCache[key];
+}
 function formatLegTime(date){
   const hh=String(date.getHours()).padStart(2,'0');
   const mm=String(date.getMinutes()).padStart(2,'0');
   return hh+':'+mm;
 }
-function legRunTime(legIndex,slotType){
-  // legIndex is 0-based; leg N runs after N legDuration intervals from now
-  // Like uses its own separate duration
-  const ms=(slotType==='like')?getLikeLegDurationMs():getLegDurationMs();
-  const t=new Date(Date.now()+legIndex*ms);
+function legRunTime(legIndex,slotType,totalLegsCount){
+  // legIndex is 0-based; offsets come from a randomized schedule that respects
+  // a min 14 min / max 24 min gap between consecutive legs, summing to the chosen total time.
+  const numLegs=totalLegsCount||getNumLegsFor(slotType==='like'?'like':'views');
+  const offsets=getScheduleOffsetsMin(numLegs,slotType);
+  const offsetMin=offsets[legIndex]!==undefined?offsets[legIndex]:offsets[offsets.length-1];
+  const t=new Date(Date.now()+offsetMin*60000);
   return formatLegTime(t);
 }
 function renderLegsSideDetail(){
@@ -683,9 +809,9 @@ function renderLegsSideDetail(){
         // Views + Like — alag alag time dikhao
         html+=`<div class="leg-mini-row" style="gap:4px">
           <span style="color:#dc2626;font-weight:700;min-width:22px">L${i+1}</span>
-          <span style="color:#ef4444">👁 ${v.toLocaleString()} <span style="font-size:8px;color:#7dd3fc">🕐${legRunTime(i,'views')}</span></span>
+          <span style="color:#ef4444">👁 ${v.toLocaleString()} <span style="font-size:8px;color:#7dd3fc">🕐${legRunTime(i,'views',vLegs.length)}</span></span>
           <span style="color:#9ca3af;font-size:9px">+</span>
-          <span style="color:#f87171">❤️ ${l.toLocaleString()} <span style="font-size:8px;color:#f9a8d4">🕐${legRunTime(i,'like')}</span></span>
+          <span style="color:#f87171">❤️ ${l.toLocaleString()} <span style="font-size:8px;color:#f9a8d4">🕐${legRunTime(i,'like',lLegs.length)}</span></span>
         </div>`;
       } else if(hasOnlyV){
         // Only views remaining
@@ -693,14 +819,14 @@ function renderLegsSideDetail(){
           <span style="color:#dc2626;font-weight:700;min-width:22px">L${i+1}</span>
           <span style="color:#ef4444">👁 ${v.toLocaleString()}</span>
           <span style="color:#374151;font-size:9px;margin-left:4px">views only</span>
-          <span class="leg-time">🕐 ${legRunTime(i,'views')}</span>
+          <span class="leg-time">🕐 ${legRunTime(i,'views',vLegs.length)}</span>
         </div>`;
       } else if(l!==undefined){
         // Only like remaining (edge case)
         html+=`<div class="leg-mini-row">
           <span style="color:#dc2626;font-weight:700;min-width:22px">L${i+1}</span>
           <span style="color:#f87171">❤️ ${l.toLocaleString()}</span>
-          <span class="leg-time">🕐 ${legRunTime(i,'like')}</span>
+          <span class="leg-time">🕐 ${legRunTime(i,'like',lLegs.length)}</span>
         </div>`;
       }
     }
@@ -710,7 +836,7 @@ function renderLegsSideDetail(){
   others.forEach(({slot,legs})=>{
     const typeName=slotTypeLabels[slot.type].replace(/^[^\s]+\s/,'');
     html+=`<div style="margin-bottom:6px"><div style="font-size:9px;color:#fca5a5;font-weight:700;margin-bottom:2px">${typeName}</div>`;
-    html+=legs.map((q,i)=>`<div class="leg-mini-row"><span>L${i+1}</span><span>${q.toLocaleString()}</span><span class="leg-time">🕐 ${legRunTime(i,slot.type)}</span></div>`).join('');
+    html+=legs.map((q,i)=>`<div class="leg-mini-row"><span>L${i+1}</span><span>${q.toLocaleString()}</span><span class="leg-time">🕐 ${legRunTime(i,slot.type,legs.length)}</span></div>`).join('');
     html+='</div>';
   });
   wrap.innerHTML=html;
@@ -775,10 +901,18 @@ function clearLogs(){logs=[];localStorage.setItem('smm_logs','[]');renderLogs();
 
 // LICENSE
 const LICENSE_API_URL=BACKEND+'/check_license.php';
+function getDeviceId(){
+  let id=localStorage.getItem('smm_device_id');
+  if(!id){
+    id=(crypto.randomUUID?crypto.randomUUID():('dev-'+Date.now()+'-'+Math.random().toString(36).slice(2)));
+    localStorage.setItem('smm_device_id',id);
+  }
+  return id;
+}
 function showApp(){document.getElementById('licenseOverlay').style.display='none';document.getElementById('appContent').style.display='block';const waBtn=document.getElementById('waBtnFloat');if(waBtn)waBtn.style.display='flex';}
 function showLicenseError(msg){const el=document.getElementById('licenseError');el.style.display='block';document.getElementById('licenseExpiry').style.display='none';}
 function clearStoredLicense(){localStorage.removeItem('smm_license_key');localStorage.removeItem('smm_license_expiry');}
-async function verifyLicense(manualKey){const btn=document.getElementById('licenseSubmitBtn');const key=(manualKey||document.getElementById('licenseKeyInput').value||'').trim().toUpperCase();if(!key){showLicenseError('Enter a key first');return;}btn.disabled=true;btn.textContent='Checking...';try{const res=await fetch(LICENSE_API_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'verify',key})});const data=await res.json();if(data.valid){localStorage.setItem('smm_license_key',key);localStorage.setItem('smm_license_expiry',data.expires_at);showApp();}else{clearStoredLicense();showLicenseError(data.reason||'Invalid key');}}catch(e){showLicenseError('Could not connect to server.');}btn.disabled=false;btn.textContent='Unlock';}
+async function verifyLicense(manualKey){const btn=document.getElementById('licenseSubmitBtn');const key=(manualKey||document.getElementById('licenseKeyInput').value||'').trim().toUpperCase();if(!key){showLicenseError('Enter a key first');return;}btn.disabled=true;btn.textContent='Checking...';try{const deviceId=getDeviceId();const res=await fetch(LICENSE_API_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'verify',key,deviceId})});const data=await res.json();if(data.valid){localStorage.setItem('smm_license_key',key);localStorage.setItem('smm_license_expiry',data.expires_at);showApp();}else{clearStoredLicense();showLicenseError(data.reason||'Invalid key');}}catch(e){showLicenseError('Could not connect to server.');}btn.disabled=false;btn.textContent='Unlock';}
 (async function initLicenseCheck(){const storedKey=localStorage.getItem('smm_license_key');if(!storedKey){return;}await verifyLicense(storedKey);})();
 </script>
 </body>
