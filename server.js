@@ -228,6 +228,18 @@ function getMs(amount, unit) {
   return amount * ({ minutes: 60000, hours: 3600000, days: 86400000 }[unit] || 3600000);
 }
 
+// Uses the exact per-leg offsets (in minutes from schedule creation time) that the
+// frontend already computed and showed in the preview, instead of blindly waiting
+// a flat `legDuration` gap after every leg. Falls back to the old flat-gap behavior
+// only if a schedule has no offsets stored (e.g. older schedules created before this fix).
+function getNextRunForLeg(schedule, nextLegIdx) {
+  const svcWithOffsets = (schedule.services || []).find(s => Array.isArray(s.legOffsetsMin) && s.legOffsetsMin.length);
+  if (svcWithOffsets && nextLegIdx < svcWithOffsets.legOffsetsMin.length) {
+    return schedule.created + svcWithOffsets.legOffsetsMin[nextLegIdx] * 60000;
+  }
+  return Date.now() + getMs(schedule.legDuration, schedule.legDurationUnit);
+}
+
 async function callPanelDirect(apiUrl, apiKey, params) {
   try {
     const fetch = (await import('node-fetch')).default;
@@ -331,7 +343,7 @@ app.post('/schedules/toggle', async (req, res) => {
     if (!rows.length) return res.json({ success: false, reason: 'Not found' });
     const schedule = rowToSchedule(rows[0]);
     schedule.active = !schedule.active;
-    if (schedule.active) schedule.nextRun = Date.now() + getMs(schedule.legDuration, schedule.legDurationUnit);
+    if (schedule.active) schedule.nextRun = getNextRunForLeg(schedule, schedule.currentLeg);
     await saveScheduleRow(conn, schedule);
     return res.json({ success: true, schedule });
   } catch (e) {
@@ -367,7 +379,7 @@ app.post('/schedules/run_now', async (req, res) => {
     const schedule = rowToSchedule(rows[0]);
     const logs = await executeScheduleLeg(schedule);
     schedule.currentLeg++;
-    schedule.nextRun = Date.now() + getMs(schedule.legDuration, schedule.legDurationUnit);
+    schedule.nextRun = getNextRunForLeg(schedule, schedule.currentLeg);
     await saveScheduleRow(conn, schedule);
     return res.json({ success: true, schedule, logs });
   } catch (e) {
@@ -395,7 +407,7 @@ async function processDueSchedules() {
         if (done) {
           schedule.active = false;
         } else {
-          schedule.nextRun = Date.now() + getMs(schedule.legDuration, schedule.legDurationUnit);
+          schedule.nextRun = getNextRunForLeg(schedule, schedule.currentLeg);
         }
         await saveScheduleRow(conn, schedule);
         console.log(`✅ Processed leg for schedule ${schedule.id} (${schedule.name})`);
