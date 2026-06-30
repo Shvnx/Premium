@@ -105,9 +105,24 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
 .api-profile-add:hover{background:rgba(34,197,94,.1);border-color:rgba(34,197,94,.7)}
 .api-profile-add:disabled{opacity:.35;cursor:not-allowed}
 .section-head-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:8px}
-.live-clock-box{display:flex;align-items:center;gap:8px;background:linear-gradient(135deg,rgba(37,99,235,.28),rgba(13,148,136,.28));border:1px solid rgba(56,189,248,.35);border-radius:100px;padding:6px 14px;font-size:12px;font-weight:700;color:#bae6fd;box-shadow:0 4px 14px rgba(37,99,235,.15);white-space:nowrap}
+.live-clock-box{display:flex;align-items:center;gap:8px;background:linear-gradient(135deg,rgba(37,99,235,.28),rgba(13,148,136,.28));border:1px solid rgba(56,189,248,.35);border-radius:100px;padding:6px 14px;font-size:12px;font-weight:700;color:#bae6fd;box-shadow:0 4px 14px rgba(37,99,235,.15);white-space:nowrap;position:relative}
 .live-clock-box .lc-date{color:#7dd3fc;font-weight:600;font-size:10px}
 .live-clock-box .lc-time{color:#fff;font-family:monospace;letter-spacing:.5px}
+.lc-tz-toggle{display:flex;align-items:center;gap:4px;background:rgba(255,255,255,.08);border:1px solid rgba(56,189,248,.3);border-radius:100px;padding:3px 9px 3px 9px;cursor:pointer;color:#bae6fd;font-size:9px;font-weight:700;letter-spacing:.3px;transition:all .2s;max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lc-tz-toggle:hover{background:rgba(255,255,255,.14);border-color:rgba(56,189,248,.6)}
+.lc-tz-toggle svg{flex-shrink:0;transition:transform .2s}
+.lc-tz-toggle.open svg{transform:rotate(180deg)}
+.lc-tz-panel{position:absolute;top:calc(100% + 8px);right:0;width:280px;max-height:340px;background:linear-gradient(160deg,#1a0606,#0e0202);border:1px solid rgba(56,189,248,.35);border-radius:14px;box-shadow:0 14px 40px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.03);z-index:60;display:none;flex-direction:column;overflow:hidden}
+.lc-tz-panel.open{display:flex}
+.lc-tz-search-wrap{padding:10px;border-bottom:1px solid rgba(255,255,255,.07);flex-shrink:0}
+.lc-tz-search{width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(56,189,248,.25);border-radius:9px;padding:8px 10px;color:#f5f5f5;font-size:12px;outline:none}
+.lc-tz-search:focus{border-color:rgba(56,189,248,.6)}
+.lc-tz-list{overflow-y:auto;flex:1;padding:6px}
+.lc-tz-item{padding:8px 10px;border-radius:8px;font-size:11.5px;color:#e5e5e5;cursor:pointer;display:flex;justify-content:space-between;gap:8px;align-items:center}
+.lc-tz-item:hover{background:rgba(56,189,248,.14)}
+.lc-tz-item.selected{background:rgba(56,189,248,.22);color:#bae6fd;font-weight:700}
+.lc-tz-item .lc-tz-offset{font-family:monospace;font-size:10px;color:#7dd3fc;flex-shrink:0}
+.lc-tz-empty{padding:14px;text-align:center;color:#9c9494;font-size:11px}
 .leg-mini-row .leg-time{color:#7dd3fc;font-size:9px;margin-left:auto;padding-left:6px;white-space:nowrap}
 .extra-legs-box{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:10px 12px;margin-top:10px}
 .extra-legs-head{display:flex;align-items:center;justify-content:space-between;cursor:pointer}
@@ -383,7 +398,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
     <hr class="divider">
     <div class="section-head-row">
       <div class="card-title" style="margin-bottom:0">📈 Growth Projection</div>
-      <div class="live-clock-box" id="liveClockBox"><span class="lc-date" id="liveClockDate">—</span><span class="lc-time" id="liveClockTime">--:--:--</span></div>
+      <div class="live-clock-box" id="liveClockBox"><span class="lc-date" id="liveClockDate">—</span><span class="lc-time" id="liveClockTime">--:--:--</span><div class="lc-tz-toggle" id="lcTzToggle" onclick="toggleTzPanel(event)"><span id="lcTzLabel">IST</span><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></div><div class="lc-tz-panel" id="lcTzPanel"><div class="lc-tz-search-wrap"><input type="text" class="lc-tz-search" id="lcTzSearch" placeholder="Search timezone or city..." oninput="renderTzList()" /></div><div class="lc-tz-list" id="lcTzList"></div></div></div>
     </div>
     <div class="graph-actions">
       <button class="gBtn active" onclick="setGMode('smooth',this)">Smooth</button>
@@ -459,18 +474,102 @@ window.onload=()=>{
   if(document.getElementById('licenseOverlay').style.display!=='none'){if(waBtn)waBtn.style.display='flex';}
 };
 
-function startLiveClock(){
-  function tick(){
-    const now=new Date();
+// ---- Timezone selector for live clock ----
+const TZ_LIST=[
+  {z:'Pacific/Midway',l:'Midway Island',o:-11},
+  {z:'Pacific/Honolulu',l:'Honolulu (USA)',o:-10},
+  {z:'America/Anchorage',l:'Anchorage (USA)',o:-9},
+  {z:'America/Los_Angeles',l:'Los Angeles (USA)',o:-8},
+  {z:'America/Tijuana',l:'Tijuana (Mexico)',o:-8},
+  {z:'America/Denver',l:'Denver (USA)',o:-7},
+  {z:'America/Phoenix',l:'Phoenix (USA)',o:-7},
+  {z:'America/Chicago',l:'Chicago (USA)',o:-6},
+  {z:'America/Mexico_City',l:'Mexico City',o:-6},
+  {z:'America/New_York',l:'New York (USA)',o:-5},
+  {z:'America/Toronto',l:'Toronto (Canada)',o:-5},
+  {z:'America/Bogota',l:'Bogota (Colombia)',o:-5},
+  {z:'America/Lima',l:'Lima (Peru)',o:-5},
+  {z:'America/Caracas',l:'Caracas (Venezuela)',o:-4},
+  {z:'America/Santiago',l:'Santiago (Chile)',o:-4},
+  {z:'America/Halifax',l:'Halifax (Canada)',o:-4},
+  {z:'America/Sao_Paulo',l:'Sao Paulo (Brazil)',o:-3},
+  {z:'America/Argentina/Buenos_Aires',l:'Buenos Aires',o:-3},
+  {z:'Atlantic/South_Georgia',l:'South Georgia',o:-2},
+  {z:'Atlantic/Azores',l:'Azores',o:-1},
+  {z:'Atlantic/Cape_Verde',l:'Cape Verde',o:-1},
+  {z:'UTC',l:'UTC / GMT',o:0},
+  {z:'Europe/London',l:'London (UK)',o:0},
+  {z:'Africa/Casablanca',l:'Casablanca (Morocco)',o:0},
+  {z:'Europe/Lisbon',l:'Lisbon (Portugal)',o:0},
+  {z:'Europe/Paris',l:'Paris (France)',o:1},
+  {z:'Europe/Berlin',l:'Berlin (Germany)',o:1},
+  {z:'Europe/Madrid',l:'Madrid (Spain)',o:1},
+  {z:'Europe/Rome',l:'Rome (Italy)',o:1},
+  {z:'Africa/Lagos',l:'Lagos (Nigeria)',o:1},
+  {z:'Europe/Athens',l:'Athens (Greece)',o:2},
+  {z:'Europe/Istanbul',l:'Istanbul (Turkey)',o:3},
+  {z:'Europe/Moscow',l:'Moscow (Russia)',o:3},
+  {z:'Africa/Cairo',l:'Cairo (Egypt)',o:2},
+  {z:'Africa/Johannesburg',l:'Johannesburg (S. Africa)',o:2},
+  {z:'Asia/Jerusalem',l:'Jerusalem (Israel)',o:2},
+  {z:'Asia/Riyadh',l:'Riyadh (Saudi Arabia)',o:3},
+  {z:'Asia/Baghdad',l:'Baghdad (Iraq)',o:3},
+  {z:'Asia/Tehran',l:'Tehran (Iran)',o:3.5},
+  {z:'Asia/Dubai',l:'Dubai (UAE)',o:4},
+  {z:'Asia/Baku',l:'Baku (Azerbaijan)',o:4},
+  {z:'Asia/Kabul',l:'Kabul (Afghanistan)',o:4.5},
+  {z:'Asia/Karachi',l:'Karachi (Pakistan)',o:5},
+  {z:'Asia/Tashkent',l:'Tashkent (Uzbekistan)',o:5},
+  {z:'Asia/Kolkata',l:'India - Kolkata/Delhi/Mumbai',o:5.5},
+  {z:'Asia/Colombo',l:'Colombo (Sri Lanka)',o:5.5},
+  {z:'Asia/Kathmandu',l:'Kathmandu (Nepal)',o:5.75},
+  {z:'Asia/Dhaka',l:'Dhaka (Bangladesh)',o:6},
+  {z:'Asia/Yangon',l:'Yangon (Myanmar)',o:6.5},
+  {z:'Asia/Bangkok',l:'Bangkok (Thailand)',o:7},
+  {z:'Asia/Jakarta',l:'Jakarta (Indonesia)',o:7},
+  {z:'Asia/Shanghai',l:'China - Beijing/Shanghai',o:8},
+  {z:'Asia/Singapore',l:'Singapore',o:8},
+  {z:'Asia/Hong_Kong',l:'Hong Kong',o:8},
+  {z:'Asia/Manila',l:'Manila (Philippines)',o:8},
+  {z:'Asia/Kuala_Lumpur',l:'Kuala Lumpur (Malaysia)',o:8},
+  {z:'Australia/Perth',l:'Perth (Australia)',o:8},
+  {z:'Asia/Tokyo',l:'Tokyo (Japan)',o:9},
+  {z:'Asia/Seoul',l:'Seoul (South Korea)',o:9},
+  {z:'Australia/Adelaide',l:'Adelaide (Australia)',o:9.5},
+  {z:'Australia/Sydney',l:'Sydney (Australia)',o:10},
+  {z:'Australia/Brisbane',l:'Brisbane (Australia)',o:10},
+  {z:'Pacific/Guam',l:'Guam',o:10},
+  {z:'Pacific/Noumea',l:'Noumea (New Caledonia)',o:11},
+  {z:'Pacific/Auckland',l:'Auckland (New Zealand)',o:12},
+  {z:'Pacific/Fiji',l:'Fiji',o:12},
+  {z:'Pacific/Tongatapu',l:'Tongatapu (Tonga)',o:13}
+];
+let selectedTz=localStorage.getItem('smm_tz')||'Asia/Kolkata';
+function fmtOffset(o){const sign=o<0?'-':'+';const abs=Math.abs(o);const h=Math.floor(abs);const m=Math.round((abs-h)*60);return 'GMT'+sign+h+(m?':'+String(m).padStart(2,'0'):':00');}
+function tzShortLabel(z){const f=TZ_LIST.find(t=>t.z===z);if(!f)return z;const city=f.l.split(/[\/\-]/)[0].trim();return city;}
+function toggleTzPanel(e){if(e)e.stopPropagation();const panel=document.getElementById('lcTzPanel');const toggle=document.getElementById('lcTzToggle');const willOpen=!panel.classList.contains('open');panel.classList.toggle('open',willOpen);toggle.classList.toggle('open',willOpen);if(willOpen){renderTzList();setTimeout(()=>document.getElementById('lcTzSearch').focus(),50);document.addEventListener('click',closeTzPanelOnOutside);}else{document.removeEventListener('click',closeTzPanelOnOutside);}}
+function closeTzPanelOnOutside(e){const box=document.getElementById('liveClockBox');if(box&&!box.contains(e.target)){document.getElementById('lcTzPanel').classList.remove('open');document.getElementById('lcTzToggle').classList.remove('open');document.removeEventListener('click',closeTzPanelOnOutside);}}
+function renderTzList(){const q=(document.getElementById('lcTzSearch').value||'').trim().toLowerCase();const list=document.getElementById('lcTzList');const filtered=TZ_LIST.filter(t=>!q||t.l.toLowerCase().includes(q)||t.z.toLowerCase().includes(q)||fmtOffset(t.o).toLowerCase().includes(q));if(!filtered.length){list.innerHTML='<div class="lc-tz-empty">No timezone found</div>';return;}list.innerHTML=filtered.map(t=>`<div class="lc-tz-item${t.z===selectedTz?' selected':''}" onclick="selectTz('${t.z}')"><span>${t.l}</span><span class="lc-tz-offset">${fmtOffset(t.o)}</span></div>`).join('');}
+function selectTz(z){selectedTz=z;localStorage.setItem('smm_tz',z);document.getElementById('lcTzLabel').textContent=tzShortLabel(z);document.getElementById('lcTzPanel').classList.remove('open');document.getElementById('lcTzToggle').classList.remove('open');document.removeEventListener('click',closeTzPanelOnOutside);tickClock();}
+function tickClock(){
+  const now=new Date();
+  try{
+    const timeStr=now.toLocaleTimeString('en-GB',{timeZone:selectedTz,hour12:false,hour:'2-digit',minute:'2-digit',second:'2-digit'});
+    const dateStr=now.toLocaleDateString('en-GB',{timeZone:selectedTz,day:'2-digit',month:'short',year:'numeric'});
+    document.getElementById('liveClockTime').textContent=timeStr;
+    document.getElementById('liveClockDate').textContent=dateStr;
+  }catch(e){
     const hh=String(now.getHours()).padStart(2,'0');
     const mm=String(now.getMinutes()).padStart(2,'0');
     const ss=String(now.getSeconds()).padStart(2,'0');
-    const dateStr=now.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
     document.getElementById('liveClockTime').textContent=hh+':'+mm+':'+ss;
-    document.getElementById('liveClockDate').textContent=dateStr;
+    document.getElementById('liveClockDate').textContent=now.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
   }
-  tick();
-  setInterval(tick,1000);
+}
+function startLiveClock(){
+  document.getElementById('lcTzLabel').textContent=tzShortLabel(selectedTz);
+  tickClock();
+  setInterval(tickClock,1000);
 }
 
 async function fetchRate(){try{const r=await fetch('https://open.er-api.com/v6/latest/USD');const d=await r.json();if(d&&d.rates){fxRates=d.rates;usdToInr=d.rates.INR||84;updateAllCostBoxes();}}catch(e){}}
@@ -604,10 +703,15 @@ function autoCalcLegs(qty,minQ){
 }
 
 const slotColors=['#ef4444','#ffffff','#f59e0b','#fb7185','#fca5a5','#60a5fa'];
-function initChart(){const ctx=document.getElementById('growthChart').getContext('2d');growthChart=new Chart(ctx,{type:'line',data:{labels:[],datasets:[]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{display:true,position:'top',labels:{color:'#d6cfcf',font:{size:9},boxWidth:8,boxHeight:8,padding:6}},tooltip:{backgroundColor:'rgba(15,5,5,0.95)',borderColor:'rgba(220,38,38,0.4)',borderWidth:1,titleColor:'#fca5a5',bodyColor:'#f5f5f5',padding:10,callbacks:{label:c=>(c.dataset.label||'')+': '+Math.round(c.raw).toLocaleString()}}},scales:{x:{grid:{color:'rgba(255,255,255,0.05)'},ticks:{color:'#9c9494',font:{size:9},maxTicksLimit:6}},y:{grid:{color:'rgba(255,255,255,0.05)'},ticks:{color:'#9c9494',font:{size:9},callback:v=>v>=1000?(v/1000).toFixed(1)+'k':v},beginAtZero:true}},animation:{duration:300,easing:'easeInOutQuart'}}});}
+const typeLineColors={views:'#22c55e',like:'#3b82f6',save:'#f59e0b',repost:'#fb7185'};
+function hexToRgbParts(hex){hex=(hex||'#ffffff').replace('#','');if(hex.length===3)hex=hex.split('').map(c=>c+c).join('');const num=parseInt(hex,16)||0xffffff;return{r:(num>>16)&255,g:(num>>8)&255,b:num&255};}
+function shimmerRgba(hex,alpha,bright){const{r,g,b}=hexToRgbParts(hex);if(bright){const mr=Math.round(r+(255-r)*0.9);const mg=Math.round(g+(255-g)*0.9);const mb=Math.round(b+(255-b)*0.9);return'rgba('+mr+','+mg+','+mb+','+alpha+')';}return'rgba('+r+','+g+','+b+','+alpha+')';}
+const shimmerLinePlugin={id:'shimmerLine',afterDatasetsDraw(chart){const ctx=chart.ctx;const period=2200;const width=0.16;const now=performance.now();chart.data.datasets.forEach((ds,i)=>{const meta=chart.getDatasetMeta(i);if(!meta||meta.hidden)return;const pts=meta.data;if(!pts||pts.length<2)return;const x0=pts[0].x,x1=pts[pts.length-1].x;if(x1<=x0)return;const phase=((now+i*350)%period)/period;const center=phase*(1+width*2)-width;ctx.save();ctx.beginPath();ctx.moveTo(pts[0].x,pts[0].y);for(let p=1;p<pts.length;p++){ctx.lineTo(pts[p].x,pts[p].y);}const grad=ctx.createLinearGradient(x0,0,x1,0);const baseColor=ds.borderColor;const offs=[center-width,center,center+width].map(o=>Math.min(1,Math.max(0,o)));try{grad.addColorStop(offs[0],shimmerRgba(baseColor,0));grad.addColorStop(offs[1],shimmerRgba(baseColor,0.95,true));grad.addColorStop(offs[2],shimmerRgba(baseColor,0));}catch(e){}ctx.strokeStyle=grad;ctx.lineWidth=(ds.borderWidth||1.5)+1.6;ctx.lineCap='round';ctx.lineJoin='round';ctx.stroke();ctx.restore();});}};
+function startShimmerLoop(){function loop(){if(growthChart&&growthChart.data.datasets.length){growthChart.draw();}requestAnimationFrame(loop);}requestAnimationFrame(loop);}
+function initChart(){const ctx=document.getElementById('growthChart').getContext('2d');growthChart=new Chart(ctx,{type:'line',data:{labels:[],datasets:[]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{display:true,position:'top',labels:{color:'#d6cfcf',font:{size:9},boxWidth:8,boxHeight:8,padding:6}},tooltip:{backgroundColor:'rgba(15,5,5,0.95)',borderColor:'rgba(220,38,38,0.4)',borderWidth:1,titleColor:'#fca5a5',bodyColor:'#f5f5f5',padding:10,callbacks:{label:c=>(c.dataset.label||'')+': '+Math.round(c.raw).toLocaleString()}}},scales:{x:{grid:{color:'rgba(255,255,255,0.05)'},ticks:{color:'#9c9494',font:{size:9},maxTicksLimit:6}},y:{grid:{color:'rgba(255,255,255,0.05)'},ticks:{color:'#9c9494',font:{size:9},callback:v=>v>=1000?(v/1000).toFixed(1)+'k':v},beginAtZero:true}},animation:{duration:300,easing:'easeInOutQuart'}},plugins:[shimmerLinePlugin]});startShimmerLoop();}
 function setGMode(mode,el){graphMode=mode;document.querySelectorAll('.gBtn').forEach(b=>b.classList.remove('active'));el.classList.add('active');updateGraph();}
 function buildSeries(totalQty,numLegs,legDur,variance,minQ){const legs=generateLegsFor(totalQty,numLegs,variance,minQ);let cumulative=[0];legs.forEach(l=>cumulative.push(cumulative[cumulative.length-1]+l));if(graphMode==='smooth'){const s=[];for(let i=0;i<cumulative.length-1;i++){for(let j=0;j<4;j++){s.push(cumulative[i]+(cumulative[i+1]-cumulative[i])*(j/4));}}s.push(cumulative[cumulative.length-1]);return{data:s,legs};}else if(graphMode==='organic'){const s=[];for(let i=0;i<cumulative.length-1;i++){for(let j=0;j<6;j++){const t=j/6;const n=(Math.random()-.5)*totalQty*.015;s.push(Math.max(0,cumulative[i]+(cumulative[i+1]-cumulative[i])*t+n));}}s.push(cumulative[cumulative.length-1]);return{data:s,legs};}return{data:cumulative,legs};}
-function updateGraph(){if(!growthChart)return;const numLegs=parseInt(document.getElementById('numLegs').value)||5;const legDur=parseInt(document.getElementById('legDuration').value)||30;const legUnit=document.getElementById('legDurationUnit').value;const variance=parseInt(document.getElementById('variance').value)||22;const dl={minutes:'m',hours:'h',days:'d'}[legUnit]||'h';const validSlots=svcSlots.filter(s=>s.service&&(parseInt(document.getElementById('qty-'+s.uid)?.value)||0)>0);if(!validSlots.length){growthChart.data.datasets=[];growthChart.data.labels=[];growthChart.update('none');updateLegsSidePanel([]);return;}let labelsSet=null;const datasets=validSlots.map((slot,idx)=>{const qty=parseInt(document.getElementById('qty-'+slot.uid).value)||0;const slotLegs=slot.legOverride||numLegs;const minQ=getSlotMin(slot.uid);const{data,legs}=buildSeries(qty,slotLegs,legDur,variance,minQ);if(!labelsSet){const stepsPerLeg=graphMode==='smooth'?4:(graphMode==='organic'?6:1);const lbl=[];if(graphMode==='stepped'){lbl.push('Start');legs.forEach((_,i)=>lbl.push(((i+1)*legDur)+dl));}else{for(let i=0;i<legs.length;i++){for(let j=0;j<stepsPerLeg;j++)lbl.push(j===0?(i===0?'Start':(i*legDur)+dl):'');}lbl.push((legs.length*legDur)+dl);}labelsSet=lbl;}return{label:slotTypeLabels[slot.type].replace(/^[^\s]+\s/,'')+(slot.service?' #'+slot.service.service:''),data,borderColor:slotColors[idx%slotColors.length],backgroundColor:'transparent',borderWidth:2.5,fill:false,tension:graphMode==='smooth'||graphMode==='organic'?.4:0,stepped:graphMode==='stepped'?'before':false,pointRadius:0,pointHoverRadius:4,_legs:legs};});growthChart.data.labels=labelsSet;growthChart.data.datasets=datasets;growthChart.update('none');updateLegsSidePanel(validSlots.map((s,i)=>({slot:s,legs:datasets[i]._legs})));}
+function updateGraph(){if(!growthChart)return;const numLegs=parseInt(document.getElementById('numLegs').value)||5;const legDur=parseInt(document.getElementById('legDuration').value)||30;const legUnit=document.getElementById('legDurationUnit').value;const variance=parseInt(document.getElementById('variance').value)||22;const dl={minutes:'m',hours:'h',days:'d'}[legUnit]||'h';const validSlots=svcSlots.filter(s=>s.service&&(parseInt(document.getElementById('qty-'+s.uid)?.value)||0)>0);if(!validSlots.length){growthChart.data.datasets=[];growthChart.data.labels=[];growthChart.update('none');updateLegsSidePanel([]);return;}let labelsSet=null;const datasets=validSlots.map((slot,idx)=>{const qty=parseInt(document.getElementById('qty-'+slot.uid).value)||0;const slotLegs=slot.legOverride||numLegs;const minQ=getSlotMin(slot.uid);const{data,legs}=buildSeries(qty,slotLegs,legDur,variance,minQ);if(!labelsSet){const stepsPerLeg=graphMode==='smooth'?4:(graphMode==='organic'?6:1);const lbl=[];if(graphMode==='stepped'){lbl.push('Start');legs.forEach((_,i)=>lbl.push(((i+1)*legDur)+dl));}else{for(let i=0;i<legs.length;i++){for(let j=0;j<stepsPerLeg;j++)lbl.push(j===0?(i===0?'Start':(i*legDur)+dl):'');}lbl.push((legs.length*legDur)+dl);}labelsSet=lbl;}return{label:slotTypeLabels[slot.type].replace(/^[^\s]+\s/,'')+(slot.service?' #'+slot.service.service:''),data,borderColor:typeLineColors[slot.type]||slotColors[idx%slotColors.length],backgroundColor:'transparent',borderWidth:1.5,fill:false,tension:graphMode==='smooth'||graphMode==='organic'?.4:0,stepped:graphMode==='stepped'?'before':false,pointRadius:0,pointHoverRadius:4,_legs:legs};});growthChart.data.labels=labelsSet;growthChart.data.datasets=datasets;growthChart.update('none');updateLegsSidePanel(validSlots.map((s,i)=>({slot:s,legs:datasets[i]._legs})));}
 
 let lastLegsData=[];
 function toggleLegsSide(){legsSideOpen=!legsSideOpen;document.getElementById('legsSideDetail').classList.toggle('open',legsSideOpen);document.getElementById('legsSideExpandBtn').classList.toggle('open',legsSideOpen);if(legsSideOpen)renderLegsSideDetail();}
@@ -710,15 +814,38 @@ function generateRandomOffsets(numLegs,totalMinutes){
   if(numLegs<=1)return[0];
   const{min:gMin,max:gMax}=getActiveGapRange();
   const gapsCount=numLegs-1;
-  let gaps=[];
-  for(let i=0;i<gapsCount;i++){gaps.push(gMin+Math.floor(Math.random()*(gMax-gMin+1)));}
-  let diff=Math.round(totalMinutes)-gaps.reduce((a,b)=>a+b,0);
+  totalMinutes=Math.round(totalMinutes);
+  // Step 1: raw random gaps, each independently random within [gMin,gMax]
+  let raw=[];
+  for(let i=0;i<gapsCount;i++){raw.push(gMin+Math.random()*(gMax-gMin));}
+  const rawSum=raw.reduce((a,b)=>a+b,0);
+  const rawMin=gMin*gapsCount;
+  const rawMax=gMax*gapsCount;
+  let gapsF;
+  if(rawSum<=rawMin){
+    gapsF=raw.map(()=>gMin);
+  }else{
+    // Linearly scale the random spread so the weighted sum hits the target total,
+    // while keeping every value inside [gMin,gMax]. This preserves randomness
+    // instead of repeatedly slamming a few gaps to the boundary.
+    const targetClamped=Math.min(Math.max(totalMinutes,rawMin),rawMax);
+    const scale=(targetClamped-rawMin)/(rawSum-rawMin);
+    gapsF=raw.map(v=>gMin+scale*(v-gMin));
+  }
+  let gaps=gapsF.map(v=>Math.max(gMin,Math.min(gMax,Math.round(v))));
+  // Step 2: fix the small rounding remainder by nudging random non-saturated gaps
+  let diff=totalMinutes-gaps.reduce((a,b)=>a+b,0);
   let guard=0;
-  while(diff!==0&&guard<8000){
+  while(diff!==0&&guard<2000){
     const idx=Math.floor(Math.random()*gapsCount);
     if(diff>0&&gaps[idx]<gMax){gaps[idx]++;diff--;}
     else if(diff<0&&gaps[idx]>gMin){gaps[idx]--;diff++;}
     guard++;
+  }
+  // Step 3: shuffle order so larger/smaller gaps aren't positionally biased
+  for(let i=gaps.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [gaps[i],gaps[j]]=[gaps[j],gaps[i]];
   }
   const offsets=[0];let cum=0;
   for(let i=0;i<gaps.length;i++){cum+=gaps[i];offsets.push(cum);}
