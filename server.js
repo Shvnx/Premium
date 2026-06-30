@@ -33,7 +33,8 @@ async function initDB() {
         duration_minutes INT DEFAULT 43200,
         activated_at DATETIME DEFAULT NULL,
         expires_at DATETIME DEFAULT NULL,
-        bound_ip VARCHAR(100) DEFAULT NULL
+        bound_ip VARCHAR(100) DEFAULT NULL,
+        bound_device_id VARCHAR(255) DEFAULT NULL
       )
     `);
     await conn.execute(`
@@ -63,6 +64,13 @@ async function initDB() {
     } catch(e) {
       // Column already exists — ignore karo
     }
+    // ✅ FIX: bound_device_id column ensure karo (purane DB ke liye — IP lock se device lock me migrate)
+    try {
+      await conn.execute(`ALTER TABLE licenses ADD COLUMN bound_device_id VARCHAR(255) DEFAULT NULL`);
+      console.log('✅ bound_device_id column added');
+    } catch(e) {
+      // Column already exists — ignore karo
+    }
     console.log('✅ DB connected & table ready');
   } catch(e) {
     console.error('❌ DB init error:', e.message);
@@ -74,11 +82,13 @@ async function initDB() {
 app.get('/', (req, res) => res.send('SPIDEY Backend Running ✅'));
 
 app.post('/check_license.php', async (req, res) => {
-  const { action, key } = req.body || {};
+  const { action, key, deviceId } = req.body || {};
   const keyCode = (key || '').trim();
-  const clientIP = getClientIP(req);
+  const devId = (deviceId || '').trim();
+  const clientIP = getClientIP(req); // ab sirf logging/reference ke liye, lock isse nahi hota
   if (action !== 'verify') return res.json({ valid: false, reason: 'Unknown action' });
   if (!keyCode) return res.json({ valid: false, reason: 'No key provided' });
+  if (!devId) return res.json({ valid: false, reason: 'No device ID provided — update app to latest version' });
   let conn;
   try {
     conn = await mysql.createConnection(dbConfig);
@@ -87,15 +97,22 @@ app.post('/check_license.php', async (req, res) => {
     const row = rows[0];
     if (!row.is_active) return res.json({ valid: false, reason: 'Key revoked' });
     if (!row.activated_at) {
+      // First-time activation — is device se hi lock ho jayega (IP/network kuch bhi badle, fark nahi padega)
       const expiresAt = new Date(Date.now() + row.duration_minutes * 60 * 1000)
         .toISOString().slice(0, 19).replace('T', ' ');
       await conn.execute(
-        'UPDATE licenses SET activated_at = NOW(), expires_at = ?, bound_ip = ? WHERE id = ?',
-        [expiresAt, clientIP, row.id]
+        'UPDATE licenses SET activated_at = NOW(), expires_at = ?, bound_ip = ?, bound_device_id = ? WHERE id = ?',
+        [expiresAt, clientIP, devId, row.id]
       );
       return res.json({ valid: true, expires_at: expiresAt, message: 'Activated successfully' });
     }
-    if (row.bound_ip !== clientIP) return res.json({ valid: false, reason: 'IP locked to another device' });
+    // Purani license jo IP-lock se ban chuki thi aur abhi tak koi device_id save nahi hua,
+    // usko is pehle wale device se hi auto-bind kar do (taaki existing users break na ho).
+    if (!row.bound_device_id) {
+      await conn.execute('UPDATE licenses SET bound_device_id = ? WHERE id = ?', [devId, row.id]);
+    } else if (row.bound_device_id !== devId) {
+      return res.json({ valid: false, reason: 'License already activated on another device' });
+    }
     if (new Date(row.expires_at) < new Date()) return res.json({ valid: false, reason: 'Key expired' });
     return res.json({ valid: true, expires_at: row.expires_at, message: 'Valid' });
   } catch (e) {
