@@ -84,20 +84,6 @@ async function initDB() {
 
 app.get('/', (req, res) => res.send('SPIDEY Backend Running ✅'));
 
-// TEMPORARY: one-time fix to disable old schedules
-app.get('/fix-disable-old-schedules', async (req, res) => {
-  let conn;
-  try {
-    conn = await mysql.createConnection(dbConfig);
-    await conn.execute('UPDATE schedules SET active = 0');
-    res.send('Done: all schedules set to inactive');
-  } catch (e) {
-    res.status(500).send('Error: ' + e.message);
-  } finally {
-    if (conn) await conn.end();
-  }
-});
-
 app.post('/check_license.php', async (req, res) => {
   const { action, key, deviceId } = req.body || {};
   const keyCode = (key || '').trim();
