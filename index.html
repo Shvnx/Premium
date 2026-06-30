@@ -18,6 +18,8 @@ body::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;bac
 @keyframes waFloat{0%,100%{transform:translateY(0px);box-shadow:0 4px 18px rgba(37,211,102,0.5),0 2px 8px rgba(0,0,0,0.3)}50%{transform:translateY(-7px);box-shadow:0 14px 34px rgba(37,211,102,0.75),0 4px 14px rgba(0,0,0,0.25)}}
 @keyframes iconShimmer{0%,100%{filter:drop-shadow(0 0 0px rgba(255,255,255,0))}50%{filter:drop-shadow(0 0 7px rgba(255,255,255,0.95))}}
 .shimmer-text{background:linear-gradient(90deg,rgba(255,255,255,0.45) 0%,rgba(255,255,255,0.45) 35%,rgba(255,255,255,1) 50%,rgba(255,255,255,0.45) 65%,rgba(255,255,255,0.45) 100%);background-size:200% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:shimmer 3s linear infinite}
+.shimmer-link{background:linear-gradient(90deg,rgba(77,163,255,0.45) 0%,rgba(77,163,255,0.45) 40%,#ffffff 50%,rgba(77,163,255,0.45) 60%,rgba(77,163,255,0.45) 100%)!important;background-size:300% auto!important;-webkit-background-clip:text!important;-webkit-text-fill-color:transparent!important;background-clip:text!important;animation:shimmer 1.8s linear infinite!important;text-shadow:0 0 10px rgba(77,163,255,0.6)}
+@keyframes iconShimmerBlue{0%,100%{filter:drop-shadow(0 0 0px rgba(37,99,235,0))}50%{filter:drop-shadow(0 0 9px rgba(96,165,250,1))}}
 .shimmer-text a{-webkit-text-fill-color:transparent!important}
 .spidey-avatar{position:relative;display:inline-block;vertical-align:middle;flex-shrink:0;border-radius:50%;overflow:hidden;box-shadow:0 0 10px rgba(220,38,38,.55),0 0 4px rgba(255,255,255,.25);border:1.5px solid rgba(255,255,255,.22)}
 .spidey-avatar img{width:100%;height:100%;object-fit:cover;display:block}
@@ -224,10 +226,25 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
 #licenseBgVideo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;opacity:0.45;pointer-events:none}
 #licenseOverlayDim{position:absolute;inset:0;z-index:1;background:linear-gradient(135deg,rgba(10,0,0,0.6) 0%,rgba(26,4,4,0.5) 20%,rgba(61,10,10,0.5) 40%,rgba(92,15,15,0.45) 55%,rgba(43,7,7,0.55) 75%,rgba(10,0,0,0.65) 100%)}
 #licenseCard{position:relative;z-index:2;max-width:340px;width:100%;background:rgba(0,0,0,0.45);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.12);border-radius:18px;padding:26px;box-shadow:0 8px 40px rgba(0,0,0,.7),0 0 0 1px rgba(220,38,38,.1)}
+#orderNoticeOverlay{position:fixed;inset:0;z-index:10001;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(0,4,15,.65);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+#orderNoticeCard{position:relative;max-width:360px;width:100%;background:linear-gradient(160deg,rgba(4,12,45,.88),rgba(0,3,15,.92));border:1px solid rgba(59,130,246,.4);border-radius:18px;padding:24px 22px;box-shadow:0 10px 50px rgba(0,0,0,.8),0 0 30px rgba(37,99,235,.3);text-align:center;animation:noticePop .25s ease}
+@keyframes noticePop{0%{transform:scale(.9);opacity:0}100%{transform:scale(1);opacity:1}}
+#orderNoticeCard .notice-text{font-size:13.5px;font-weight:800;line-height:1.6;letter-spacing:.3px;background:linear-gradient(90deg,rgba(255,255,255,0.45) 0%,rgba(255,255,255,0.45) 35%,rgba(255,255,255,1) 50%,rgba(255,255,255,0.45) 65%,rgba(255,255,255,0.45) 100%);background-size:200% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:shimmer 2.5s linear infinite}
+#orderNoticeCard .notice-ok{margin-top:18px;padding:7px 22px;font-size:12px;font-weight:700;border:none;border-radius:100px;background:linear-gradient(135deg,#3b82f6,#1d4ed8);color:#fff;cursor:pointer;box-shadow:0 4px 14px rgba(37,99,235,.45)}
+#orderNoticeCard .notice-ok:active{transform:scale(.96)}
 </style>
 </head>
 <body>
 <div id="toastWrap"></div>
+
+<!-- ORDER NOTICE POPUP -->
+<div id="orderNoticeOverlay">
+  <div id="orderNoticeCard">
+    <div class="notice-text">ORDER VIEWS AND LIKES SEPARATELY FOR BETTER RESULTS AND REDUCED DETECTION</div>
+    <button class="notice-ok" onclick="hideOrderNoticePopup()">OK</button>
+  </div>
+</div>
+
 
 <!-- WhatsApp Float Button -->
 <a id="waBtnFloat" href="https://wa.me/917384793255" target="_blank" rel="noopener" style="position:fixed;bottom:22px;right:20px;z-index:99999;display:flex;align-items:center;justify-content:center;width:52px;height:52px;border-radius:50%;background:#25D366;text-decoration:none;animation:waFloat 2.8s ease-in-out infinite" title="Chat on WhatsApp">
@@ -258,8 +275,8 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
     <div style="margin-top:22px;padding-top:14px;border-top:1px solid rgba(255,255,255,0.07);text-align:center">
       <p class="shimmer-text" style="font-size:11.5px;font-weight:400;letter-spacing:0.4px;line-height:1.8;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;margin:0">
         @Developer- Shovan &nbsp;
-        <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin:0 2px 1px 2px"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
-        <a href="https://ig.me/m/__shvnx__" target="_blank" rel="noopener" style="color:rgba(255,255,255,0.62);text-decoration:none;transition:color .2s" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.62)'">@__shvnx__</a>
+        <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin:0 2px 1px 2px;animation:iconShimmerBlue 1.8s ease-in-out infinite"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+        <a href="https://ig.me/m/__shvnx__" target="_blank" rel="noopener" class="shimmer-link" style="text-decoration:none">@__shvnx__</a>
       </p>
     </div>
   </div>
@@ -294,8 +311,8 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
     <div style="margin-top:28px;padding-top:18px;border-top:1px solid rgba(255,255,255,0.06);text-align:center">
       <p class="shimmer-text" style="font-size:11.5px;font-weight:400;letter-spacing:0.4px;line-height:1.8;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif">
         @Developer- Shovan &nbsp;
-        <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.45)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin:0 2px 1px 2px"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
-        <a href="https://ig.me/m/__shvnx__" target="_blank" rel="noopener" style="color:rgba(255,255,255,0.62);text-decoration:none;transition:color .2s" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.62)'">@__shvnx__</a>
+        <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.45)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin:0 2px 1px 2px;animation:iconShimmerBlue 1.8s ease-in-out infinite"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+        <a href="https://ig.me/m/__shvnx__" target="_blank" rel="noopener" class="shimmer-link" style="text-decoration:none">@__shvnx__</a>
       </p>
     </div>
   </div>
@@ -573,7 +590,9 @@ function startLiveClock(){
 }
 
 async function fetchRate(){try{const r=await fetch('https://open.er-api.com/v6/latest/USD');const d=await r.json();if(d&&d.rates){fxRates=d.rates;usdToInr=d.rates.INR||84;updateAllCostBoxes();}}catch(e){}}
-function switchTab(tab,el){document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));document.getElementById('tab-'+tab).classList.add('active');if(el)el.classList.add('active');if(tab==='order'&&growthChart)setTimeout(()=>{growthChart.resize();updateGraph();},100);const waBtn=document.getElementById('waBtnFloat');if(waBtn)waBtn.style.display=(tab==='setup')?'flex':'none';}
+function switchTab(tab,el){document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));document.getElementById('tab-'+tab).classList.add('active');if(el)el.classList.add('active');if(tab==='order'&&growthChart)setTimeout(()=>{growthChart.resize();updateGraph();},100);if(tab==='order')showOrderNoticePopup();const waBtn=document.getElementById('waBtnFloat');if(waBtn)waBtn.style.display=(tab==='setup')?'flex':'none';}
+function showOrderNoticePopup(){const ov=document.getElementById('orderNoticeOverlay');if(ov)ov.style.display='flex';}
+function hideOrderNoticePopup(){const ov=document.getElementById('orderNoticeOverlay');if(ov)ov.style.display='none';}
 async function callApi(params){const body=new URLSearchParams({_target:apiUrl,key:apiKey,...params});try{const res=await fetch(BACKEND+'/proxy',{method:'POST',body,signal:AbortSignal.timeout(15000)});return JSON.parse(await res.text());}catch(e){try{const r2=await fetch(apiUrl,{method:'POST',body:new URLSearchParams({key:apiKey,...params}),signal:AbortSignal.timeout(8000)});return await r2.json();}catch(e2){return{error:'Network error: '+e2.message};}}}
 function setConnected(msg){document.getElementById('statusDot').classList.add('on');document.getElementById('statusText').textContent=msg;document.querySelector('.status-pill').classList.add('connected');}
 async function testConnection(){apiUrl=document.getElementById('apiUrl').value.trim();apiKey=document.getElementById('apiKey').value.trim();if(!apiUrl||!apiKey){alert('Enter both URL and API key!');return;}const res=await callApi({action:'balance'});if(res.balance!==undefined){setConnected('Balance: $'+parseFloat(res.balance).toFixed(4));alert('Connected! Balance: $'+res.balance);}else alert('Error: '+JSON.stringify(res));}
