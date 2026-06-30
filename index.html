@@ -347,11 +347,11 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
       <div class="row2">
         <div>
           <label>Number of Legs</label>
-          <input type="number" id="numLegs" autocomplete="off" value="" min="1" max="50" oninput="validateAndFixDuration('views');updateGraph();previewLegs();renderMultiSlotLegPicker();updateViewsLegsSlot()" />
+          <input type="number" id="numLegs" autocomplete="off" value="" min="1" max="50" oninput="updateGraph();previewLegs();renderMultiSlotLegPicker();updateViewsLegsSlot()" onblur="validateAndFixDuration('views');updateGraph();previewLegs()" />
         </div>
         <div>
           <label>Like — Number of Legs</label>
-          <input type="number" id="numLegsLike" autocomplete="off" value="" min="1" max="50" oninput="validateAndFixDuration('like');updateViewsLegsSlot();updateGraph();previewLegs()" />
+          <input type="number" id="numLegsLike" autocomplete="off" value="" min="1" max="50" oninput="updateViewsLegsSlot();updateGraph();previewLegs()" onblur="validateAndFixDuration('like');updateGraph();previewLegs()" />
         </div>
       </div>
       <div class="extra-legs-box" id="multiSlotLegPicker" style="display:none">
@@ -365,7 +365,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
         <div>
           <label>👁 Views — Total Time</label>
           <div class="row2" style="gap:6px">
-            <input type="number" id="legDuration" autocomplete="off" value="0" min="1" oninput="validateAndFixDuration('views');updateGraph();previewLegs()" />
+            <input type="number" id="legDuration" autocomplete="off" value="0" min="1" oninput="updateGraph();previewLegs()" onblur="validateAndFixDuration('views');updateGraph();previewLegs()" />
             <select id="legDurationUnit" onchange="validateAndFixDuration('views');updateGraph();previewLegs()">
               <option value="minutes" selected>Min</option>
               <option value="hours">Hrs</option>
@@ -376,7 +376,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
         <div>
           <label>❤️ Like — Total Time</label>
           <div class="row2" style="gap:6px">
-            <input type="number" id="legDurationLike" autocomplete="off" value="0" min="1" oninput="validateAndFixDuration('like');updateGraph();previewLegs()" />
+            <input type="number" id="legDurationLike" autocomplete="off" value="0" min="1" oninput="updateGraph();previewLegs()" onblur="validateAndFixDuration('like');updateGraph();previewLegs()" />
             <select id="legDurationUnitLike" onchange="validateAndFixDuration('like');updateGraph();previewLegs()">
               <option value="minutes" selected>Min</option>
               <option value="hours">Hrs</option>
