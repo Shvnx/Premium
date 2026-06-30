@@ -834,28 +834,20 @@ function generateRandomOffsets(numLegs,totalMinutes){
   const{min:gMin,max:gMax}=getActiveGapRange();
   const gapsCount=numLegs-1;
   totalMinutes=Math.round(totalMinutes);
-  // Step 1: raw random gaps, each independently random within [gMin,gMax]
-  let raw=[];
-  for(let i=0;i<gapsCount;i++){raw.push(gMin+Math.random()*(gMax-gMin));}
-  const rawSum=raw.reduce((a,b)=>a+b,0);
   const rawMin=gMin*gapsCount;
   const rawMax=gMax*gapsCount;
-  let gapsF;
-  if(rawSum<=rawMin){
-    gapsF=raw.map(()=>gMin);
-  }else{
-    // Linearly scale the random spread so the weighted sum hits the target total,
-    // while keeping every value inside [gMin,gMax]. This preserves randomness
-    // instead of repeatedly slamming a few gaps to the boundary.
-    const targetClamped=Math.min(Math.max(totalMinutes,rawMin),rawMax);
-    const scale=(targetClamped-rawMin)/(rawSum-rawMin);
-    gapsF=raw.map(v=>gMin+scale*(v-gMin));
-  }
-  let gaps=gapsF.map(v=>Math.max(gMin,Math.min(gMax,Math.round(v))));
-  // Step 2: fix the small rounding remainder by nudging random non-saturated gaps
+  totalMinutes=Math.max(rawMin,Math.min(rawMax,totalMinutes));
+  // Step 1: raw random gaps, each independently random within [gMin,gMax].
+  // No scaling here — scaling was systematically inflating values toward gMax,
+  // killing true randomness. We keep raw randomness and fix the sum in step 2.
+  let gaps=[];
+  for(let i=0;i<gapsCount;i++){gaps.push(gMin+Math.floor(Math.random()*(gMax-gMin+1)));}
+  // Step 2: nudge random (non-saturated) gaps up/down until sum matches total exactly.
+  // Each nudge picks a random index, so the correction doesn't bias toward max or min.
   let diff=totalMinutes-gaps.reduce((a,b)=>a+b,0);
   let guard=0;
-  while(diff!==0&&guard<2000){
+  const maxGuard=Math.max(5000,Math.abs(diff)*4+gapsCount*4);
+  while(diff!==0&&guard<maxGuard){
     const idx=Math.floor(Math.random()*gapsCount);
     if(diff>0&&gaps[idx]<gMax){gaps[idx]++;diff--;}
     else if(diff<0&&gaps[idx]>gMin){gaps[idx]--;diff++;}
