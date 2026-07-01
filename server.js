@@ -83,7 +83,7 @@ app.get('/', (req, res) => res.send('SPIDEY Backend Running ✅'));
 
 app.post('/check_license.php', async (req, res) => {
   const { action, key, deviceId } = req.body || {};
-  const keyCode = (key || '').trim();
+  const keyCode = (key || '').trim().toUpperCase();
   const devId = (deviceId || '').trim();
   const clientIP = getClientIP(req); // ab sirf logging/reference ke liye, lock isse nahi hota
   if (action !== 'verify') return res.json({ valid: false, reason: 'Unknown action' });
